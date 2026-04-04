@@ -30,6 +30,17 @@ body {
   overflow-x: hidden;
 }
 
+.bg-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(255, 158, 100, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(125, 207, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 80% at 60% 80%, rgba(187, 154, 247, 0.04) 0%, transparent 50%),
+    var(--color-bg-deep);
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: var(--font-space-grotesk), system-ui, sans-serif;

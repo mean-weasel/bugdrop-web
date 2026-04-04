@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/nav";
+import { Footer } from "@/components/footer";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -29,8 +30,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
       <body>
+        <div className="bg-atmosphere" />
         <Nav />
-        {children}
+        <div className="max-w-[1100px] mx-auto px-8 py-16 max-sm:px-4 max-sm:py-8">
+          {children}
+          <Footer />
+        </div>
       </body>
     </html>
   );

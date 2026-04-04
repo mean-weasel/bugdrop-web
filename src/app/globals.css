@@ -19,6 +19,8 @@
   --color-accent-green: #9ece6a;
   --color-accent-purple: #bb9af7;
   --color-border: #3b4261;
+  --animate-fade-up: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-bounce-x: bounce-x 1s ease-in-out infinite;
 }
 
 body {
@@ -39,6 +41,16 @@ body {
     radial-gradient(ellipse 60% 40% at 80% 20%, rgba(125, 207, 255, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse 50% 80% at 60% 80%, rgba(187, 154, 247, 0.04) 0%, transparent 50%),
     var(--color-bg-deep);
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce-x {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
 }
 
 @theme inline {

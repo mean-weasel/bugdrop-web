@@ -1,0 +1,54 @@
+# BugDrop vs Userback
+
+Choosing a visual feedback tool depends on your team size, workflow, and budget. BugDrop and Userback both let users report bugs with screenshots, but they serve different audiences and operate on fundamentally different models. This comparison breaks down where each tool shines so you can make the right choice for your project.
+
+## What is Userback?
+
+Userback is a paid SaaS platform for collecting visual feedback from users and stakeholders. It offers a browser widget that captures screenshots and screen recordings, a built-in collaboration dashboard for managing feedback, and integrations with project management tools like Jira, Trello, and Asana. Userback is designed for product teams and agencies that need a full feedback management workflow — assignment, status tracking, team comments, and client portals.
+
+Userback's feature set includes session replay, video feedback, in-app surveys, and a feedback portal where users can view the status of their submissions. Plans start at $49 per month and scale based on the number of team members and feedback volume.
+
+## What is BugDrop?
+
+BugDrop is an open-source, MIT-licensed feedback widget that creates GitHub Issues from user bug reports. You add a single script tag to any web page, and users can click a feedback button, write a description, and submit an annotated screenshot. The report is automatically formatted as a GitHub issue with the description, screenshot, system information, and page URL.
+
+BugDrop is designed for developers and teams that already use GitHub as their primary issue tracker. There is no separate dashboard, no additional accounts, and no monthly fee. Everything flows into GitHub Issues where you already work.
+
+## Feature Comparison
+
+| Feature | BugDrop | Userback |
+|---|---|---|
+| **Price** | Free / MIT | $49+/mo |
+| **Setup** | 1 script tag | SDK + account setup |
+| **Screenshots** | Yes | Yes |
+| **Issue tracking** | GitHub Issues | Built-in + integrations |
+| **Self-hostable** | Yes | No |
+| **Open source** | Yes | No |
+| **Annotations** | Yes | Yes |
+| **Session replay** | No | Yes |
+| **Team features** | No | Yes (comments, assignment) |
+
+## When to Choose BugDrop
+
+BugDrop is the right fit when your workflow is already centered on GitHub and you want a lightweight, zero-cost solution:
+
+- **Open source projects** — BugDrop is MIT licensed and free, making it a natural fit for OSS projects that cannot justify a monthly SaaS fee for feedback collection. Embed it on your documentation or demo site and let community members report bugs without creating accounts.
+- **GitHub-centric workflows** — if your team lives in GitHub Issues, PRs, and Projects, BugDrop feeds directly into that workflow. There is no context switching to a separate feedback dashboard.
+- **Budget-conscious teams** — early-stage startups, indie developers, and small teams that need visual bug reporting without the overhead of a paid platform.
+- **Privacy-first requirements** — BugDrop is open source and self-hostable. You can audit the code, run it on your own infrastructure, and ensure that feedback data never passes through a third-party service.
+- **Simple use cases** — if you need users to report what they see with a screenshot and a description, BugDrop does exactly that without feature bloat.
+
+## When to Choose Userback
+
+Userback makes sense when you need a full feedback management platform with collaboration features:
+
+- **Enterprise product teams** — teams with dedicated product managers, designers, and QA engineers who need assignment workflows, internal comments, and status tracking within the feedback tool itself.
+- **Non-GitHub workflows** — if your team uses Jira, Trello, Linear, or another project management tool as the primary issue tracker, Userback's integrations provide a better fit than BugDrop's GitHub-only approach.
+- **Session replay needs** — when understanding how a user arrived at a bug is as important as seeing the bug itself, Userback's session replay provides context that a static screenshot cannot.
+- **Client-facing feedback portals** — agencies managing multiple client projects may benefit from Userback's client portal feature, which lets clients view the status of their feedback submissions.
+
+## The Bottom Line
+
+BugDrop and Userback target different segments of the feedback tool market. BugDrop is focused and lightweight — it does one thing well (screenshot bug reports to GitHub Issues) and costs nothing. Userback is a full-featured platform with collaboration, session replay, and multi-tool integrations at a monthly price point.
+
+If you want a simple, open-source widget that turns user feedback into GitHub Issues with no overhead, BugDrop is the clear choice. If you need a comprehensive feedback management platform with team collaboration and advanced features like session replay, Userback may be worth the investment.

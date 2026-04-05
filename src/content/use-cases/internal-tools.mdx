@@ -1,14 +1,49 @@
 # Internal Tools
 
-Internal dashboards, admin panels, and developer tools rarely get formal QA. Bugs pile up because reporting friction is too high.
+Internal dashboards, admin panels, and developer tools rarely get formal QA. They are built quickly to serve internal needs, iterated on by small teams, and almost never have dedicated testers. Bugs pile up quietly because reporting friction is too high — nobody wants to stop what they are doing, open Jira, write a ticket, take a screenshot, upload it, and fill out required fields just to report that a chart is rendering the wrong date range.
 
-## How BugDrop Helps
+## The Problem with Internal Bug Reporting
 
-Embed BugDrop on your internal tools and your team can report issues in seconds — click the feedback button, capture what's wrong with an annotated screenshot, and the issue lands in your team's GitHub repo.
+Most teams rely on informal channels to report internal tool issues. Someone posts a screenshot in Slack with "this looks wrong." Someone else replies "yeah I saw that too." A week later, the thread is buried and the bug is forgotten. When teams do use formal issue trackers for internal tools, the tickets tend to be vague — "analytics dashboard is broken" with no screenshot, no browser info, and no indication of which specific widget or data point is wrong.
+
+The people using internal tools are often not engineers. Product managers, operations staff, and customer support teams interact with admin panels and reporting dashboards daily, but they do not have the technical vocabulary to describe frontend bugs precisely. They know something looks wrong, but explaining whether it is a rendering issue, a data issue, or a layout issue in a way that helps an engineer reproduce it is difficult.
+
+The result is a steady accumulation of small bugs that erode trust in internal tools, push teams back toward manual processes or spreadsheets, and create a death-by-a-thousand-cuts experience for everyone in the organization.
+
+## How BugDrop Solves This
+
+BugDrop eliminates reporting friction by embedding a feedback button directly on your internal tools. One script tag on your admin panel, analytics dashboard, or developer tool, and every team member can report issues in seconds. They click the button, see the widget open with a screenshot already captured, type a quick description, annotate the screenshot to highlight the problem, and submit. A well-formatted GitHub issue appears in your team's repo with the description, annotated screenshot, browser info, and screen dimensions.
+
+No training sessions. No workflow documentation. No extra accounts.
+
+### A Typical Scenario
+
+Picture a product manager reviewing the weekly metrics on your team's analytics dashboard. She notices that the revenue chart for Q1 is showing a negative value that does not match the spreadsheet export. She clicks the BugDrop button in the corner, types "Q1 revenue chart shows -$12K but export shows +$48K," circles the offending chart in the annotation tool, and submits. Two minutes later, the engineering team has a GitHub issue with her description, a screenshot of the exact chart state, her browser version, and her screen resolution. The engineer can immediately see which chart component is affected and start investigating — no Slack thread, no follow-up questions, no lost context.
 
 ## Why It Works for Internal Tools
 
-- **No training needed** — the widget is self-explanatory
-- **Screenshots capture context** — no more vague tickets
-- **System info included** — browser version, screen size, and OS are captured automatically
-- **Categories** — reporters can tag issues as Bug, Feature, or Question
+- **No training needed** — the widget is self-explanatory with a clear button, a text field, and a submit action; anyone who can use a web browser can report a bug
+- **Visual context with screenshots** — annotated screenshots eliminate ambiguity; reporters show exactly what they see, not what they think they see
+- **System info auto-captured** — browser version, operating system, screen size, and viewport dimensions are included with every report, which is critical for debugging layout and rendering issues
+- **Categories for triage** — reporters select Bug, Feature, or Question, allowing the engineering team to filter and prioritize without reading every submission
+- **Works behind VPN** — BugDrop is entirely client-side; the widget runs in the user's browser and communicates with GitHub through BugDrop's backend, so it works on internal networks without any special network configuration
+- **Dismissible button** — power users who do not need the feedback widget can dismiss the button, keeping it out of the way for team members who prefer to file issues directly
+
+## How to Set It Up
+
+Add the widget to your internal tool with a script tag. Here is an example with dark theme configuration, which is common for developer tools and dashboards:
+
+```html
+<script
+  defer
+  src="https://bugdrop.dev/widget.js"
+  data-repo="your-org/internal-tools"
+  data-theme="dark"
+></script>
+```
+
+The dark theme matches the visual style of most internal dashboards and admin panels, so the widget feels like a natural part of the interface rather than an add-on.
+
+## A Low-Cost Quality Investment
+
+Internal tools do not need a full QA team to improve. They just need a way for the people who use them every day to report what is wrong without friction. BugDrop turns every team member into a tester — and because the reports include screenshots and system info, the engineering team can act on them without the usual back-and-forth.

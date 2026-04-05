@@ -22,7 +22,7 @@ export function Nav() {
           GitHub
         </a>
         <a
-          href="https://neonwatty.github.io/feedback-widget-test/"
+          href="https://mean-weasel.github.io/bugdrop-widget-test/"
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm text-text-subtle hover:text-text-primary transition-colors"

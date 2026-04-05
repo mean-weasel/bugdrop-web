@@ -20,6 +20,24 @@ export const metadata: Metadata = {
   title: "BugDrop - In-app feedback to GitHub Issues",
   description:
     "Collect bug reports with screenshots in 30 seconds. Open source feedback widget that creates GitHub issues automatically.",
+  metadataBase: new URL("https://bugdrop.dev"),
+  openGraph: {
+    title: "BugDrop - In-app feedback to GitHub Issues",
+    description:
+      "Collect bug reports with screenshots in 30 seconds. Open source feedback widget that creates GitHub issues automatically.",
+    url: "https://bugdrop.dev",
+    siteName: "BugDrop",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BugDrop - In-app feedback to GitHub Issues",
+    description:
+      "Collect bug reports with screenshots in 30 seconds. Open source feedback widget that creates GitHub issues automatically.",
+  },
+  alternates: {
+    canonical: "https://bugdrop.dev",
+  },
 };
 
 export default function RootLayout({

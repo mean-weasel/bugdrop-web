@@ -20,8 +20,5 @@ jobs:
       - name: Lint
         run: npx eslint .
 
-      - name: Type check
-        run: npx tsc --noEmit
-
-      - name: Build
+      - name: Build (includes type check)
         run: npm run build

@@ -13,6 +13,9 @@ export function Nav() {
         <Link href="/use-cases" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Use Cases
         </Link>
+        <Link href="/compare" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
+          Compare
+        </Link>
         <a
           href="https://github.com/mean-weasel/bugdrop"
           target="_blank"

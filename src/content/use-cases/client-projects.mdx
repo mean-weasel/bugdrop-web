@@ -1,14 +1,55 @@
 # Client Projects
 
-Gathering client feedback during development often means long email threads, vague descriptions, and lost context.
+Gathering client feedback during development often means long email threads, vague descriptions, lost context, and phone calls where someone says "the thing on the left is wrong" while you try to guess which page and which element they mean. For agencies and freelancers managing multiple client projects, this feedback chaos multiplies across every active engagement.
 
-## How BugDrop Helps
+## The Problem with Client Feedback
 
-Add BugDrop to your staging or preview environment. When a client reviews the site, they can click the feedback button, capture and annotate a screenshot, and the feedback lands as a GitHub issue in your project repo.
+Client feedback rounds on staging sites are notoriously painful. The client opens the staging URL, notices something wrong, and reaches for the most familiar communication tool — usually email. They write something like "the header looks off on the about page" or "the form is not working." Sometimes they attach a screenshot, sometimes they do not. Sometimes the screenshot is a photo of their screen taken with a phone. The context is almost never enough to act on without follow-up.
+
+Agencies and freelancers then spend significant time decoding feedback, asking clarifying questions, and manually creating tasks from email threads. A single round of client review can generate a dozen emails, each with partial information scattered across different threads. By the time the feedback is organized into actionable tasks, hours have been spent on project management overhead that could have been spent on actual development.
+
+The problem is compounded when multiple stakeholders review the same staging site. One person emails feedback, another sends a Slack message, and a third mentions something during a call. Consolidating all of this into a single source of truth is a manual, error-prone process.
+
+## How BugDrop Solves This
+
+BugDrop eliminates the feedback chaos by giving clients a single, obvious way to report issues directly on the staging or preview site. You add one script tag to the staging environment, and when a client reviews the site, they see a small feedback button. They click it, type what is wrong, and the widget captures a screenshot that they can annotate — drawing circles around the problem area, adding arrows to highlight specific elements, or marking up text that needs to change. The feedback is submitted as a GitHub issue with the description, annotated screenshot, the page URL, and the client's browser and device information.
+
+No GitHub account required. No special tools to install. No training.
+
+### A Typical Scenario
+
+A client is reviewing their new marketing site on a staging URL you shared. Browsing on their iPad, they notice that the hero section's call-to-action button overlaps the navigation bar in landscape orientation. They tap the BugDrop button, type "CTA button overlaps menu when I rotate my iPad," and the widget captures a screenshot of the exact layout state. The client draws a circle around the overlapping elements and submits. Within seconds, you have a GitHub issue with a clear description, a visual reference showing exactly what the client sees, and device information confirming it is an iPad in landscape mode. You can fix the responsive layout issue without a single follow-up email.
 
 ## Why It Works for Client Projects
 
-- **Visual feedback** — clients show you what's wrong instead of describing it
-- **No GitHub account needed** — clients don't need to know what GitHub is
-- **Organized** — every piece of feedback is a trackable issue
-- **Easy to remove** — when the project ships, just remove the script tag
+- **Visual feedback with annotations** — clients show you exactly what is wrong instead of trying to describe it in words; the annotation tools let them circle, arrow, and highlight problem areas
+- **No GitHub account needed** — clients do not need to know what GitHub is, create an account, or learn a new tool; the widget is simple enough for anyone to use
+- **Organized as trackable issues** — every piece of feedback becomes a GitHub issue that you can assign, label, prioritize, and close; no more digging through email threads to find what needs to be done
+- **Easy to remove when project ships** — when development is complete, remove the script tag and the widget disappears; there is no teardown, no account to cancel, and no residual code
+- **Custom branding with styling options** — the widget can be styled to match the client's brand, so it feels like part of the site rather than a third-party overlay
+- **Collecting submitter name and email** — the widget can capture the reporter's name and email address, making it easy to identify which stakeholder submitted which feedback
+
+## How to Set It Up
+
+Add the widget to your staging environment with a script tag. Here is an example with custom styling to match a client's brand colors:
+
+```html
+<script
+  defer
+  src="https://bugdrop.dev/widget.js"
+  data-repo="your-agency/client-project"
+></script>
+
+<style>
+  .bugdrop-widget {
+    --bugdrop-accent: #4f46e5;
+    --bugdrop-radius: 12px;
+  }
+</style>
+```
+
+You can adjust the accent color, border radius, and other CSS custom properties to match the client's brand. This makes the widget feel like a natural part of the staging site rather than an afterthought.
+
+## Streamlining the Review Process
+
+With BugDrop on every staging site, client review rounds become structured and efficient. All feedback lives in GitHub Issues, each with a screenshot and device context. You can prioritize and assign tasks directly from your existing workflow, close issues as you resolve them, and give clients visibility into progress. The days of searching through email threads and Slack messages for that one piece of feedback about the mobile navigation are over.

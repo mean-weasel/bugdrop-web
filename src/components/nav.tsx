@@ -25,7 +25,7 @@ export function Nav() {
           GitHub
         </a>
         <a
-          href="https://mean-weasel.github.io/bugdrop-widget-test/"
+          href="https://bugdrop-widget-test.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm text-text-subtle hover:text-text-primary transition-colors"

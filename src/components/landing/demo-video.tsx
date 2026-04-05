@@ -16,7 +16,7 @@ export function DemoVideo() {
           />
         </div>
         <div className="flex flex-col gap-4 items-center">
-          <a href="https://neonwatty.github.io/feedback-widget-test/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium bg-gradient-to-br from-accent-warm to-accent-rose text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(255,158,100,0.3)] transition-all duration-300">
+          <a href="https://mean-weasel.github.io/bugdrop-widget-test/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium bg-gradient-to-br from-accent-warm to-accent-rose text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(255,158,100,0.3)] transition-all duration-300">
             Try Live Demo →
           </a>
           <p className="text-text-muted text-sm">See BugDrop running on a real app</p>

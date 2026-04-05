@@ -35,9 +35,6 @@ export const metadata: Metadata = {
     description:
       "Collect bug reports with screenshots in 30 seconds. Open source feedback widget that creates GitHub issues automatically.",
   },
-  alternates: {
-    canonical: "https://bugdrop.dev",
-  },
 };
 
 export default function RootLayout({

@@ -6,10 +6,44 @@ import { StylingShowcase } from "@/components/landing/styling-showcase";
 import { QuickStart } from "@/components/landing/quick-start";
 import { ConfigTable } from "@/components/landing/config-table";
 import { TryCallout } from "@/components/landing/try-callout";
+import { JsonLd } from "@/components/json-ld";
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "BugDrop",
+  description:
+    "Open-source in-app feedback widget that turns user bug reports into GitHub issues with screenshots, annotations, and system info.",
+  url: "https://bugdrop.dev",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  author: {
+    "@type": "Organization",
+    name: "mean-weasel",
+    url: "https://github.com/mean-weasel",
+  },
+  license: "https://opensource.org/licenses/MIT",
+  codeRepository: "https://github.com/mean-weasel/bugdrop",
+  featureList: [
+    "Screenshot capture",
+    "Annotation tools",
+    "Automatic system info",
+    "GitHub issue creation",
+    "Fully stylable widget",
+    "Shadow DOM isolation",
+    "Privacy-first design",
+  ],
+};
 
 export default function Home() {
   return (
     <main>
+      <JsonLd data={structuredData} />
       <Hero />
       <HowItWorks />
       <DemoVideo />

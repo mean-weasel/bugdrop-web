@@ -35,6 +35,9 @@ export const metadata: Metadata = {
     description:
       "Collect bug reports with screenshots in 30 seconds. Open source feedback widget that creates GitHub issues automatically.",
   },
+  verification: {
+    google: "sTi4vjMGXpdkvZcZQnRhs9u-uVyxsqTHOIR_txqHR-w",
+  },
 };
 
 export default function RootLayout({

@@ -17,23 +17,23 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BugDrop - In-app feedback to GitHub Issues",
+  title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
   description:
-    "Collect bug reports with screenshots in 30 seconds. Open source feedback widget that creates GitHub issues automatically.",
+    "Free, open source website feedback widget. Users report bugs with screenshots and annotations — issues are created in GitHub automatically. One script tag, zero config.",
   metadataBase: new URL("https://bugdrop.dev"),
   openGraph: {
-    title: "BugDrop - In-app feedback to GitHub Issues",
+    title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
     description:
-      "Collect bug reports with screenshots in 30 seconds. Open source feedback widget that creates GitHub issues automatically.",
+      "Free, open source website feedback widget. Users report bugs with screenshots and annotations — issues are created in GitHub automatically.",
     url: "https://bugdrop.dev",
     siteName: "BugDrop",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "BugDrop - In-app feedback to GitHub Issues",
+    title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
     description:
-      "Collect bug reports with screenshots in 30 seconds. Open source feedback widget that creates GitHub issues automatically.",
+      "Free, open source website feedback widget. Users report bugs with screenshots and annotations — issues are created in GitHub automatically.",
   },
   verification: {
     google: "sTi4vjMGXpdkvZcZQnRhs9u-uVyxsqTHOIR_txqHR-w",

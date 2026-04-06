@@ -13,7 +13,7 @@ const structuredData = {
   "@type": "SoftwareApplication",
   name: "BugDrop",
   description:
-    "Open-source in-app feedback widget that turns user bug reports into GitHub issues with screenshots, annotations, and system info.",
+    "Free, open-source website feedback widget that turns user bug reports into GitHub issues with screenshots, annotations, and system info.",
   url: "https://bugdrop.dev",
   applicationCategory: "DeveloperApplication",
   operatingSystem: "Web",

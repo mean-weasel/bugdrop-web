@@ -2,15 +2,16 @@ export function Hero() {
   return (
     <header className="text-center py-16 pb-24 animate-fade-up">
       <h1 className="text-[clamp(2.5rem,6vw,4rem)] font-light tracking-tight leading-[1.15] mb-6 bg-gradient-to-br from-text-primary to-text-muted bg-clip-text text-transparent">
-        Collect bug reports with
+        Free website feedback widget with
         <br />
         <strong className="font-bold bg-gradient-to-br from-accent-warm to-accent-rose bg-clip-text">
           screenshots in 30 seconds
         </strong>
       </h1>
       <p className="text-xl text-text-subtle max-w-[600px] mx-auto mb-10">
-        Drop-in feedback widget that turns user reports into GitHub issues.
-        Screenshots, annotations, system info — all automatic.
+        Open source bug reporting widget for any website. Drop it in, and user
+        feedback becomes GitHub issues — with screenshots, annotations, and
+        system info.
       </p>
       <div className="flex gap-4 justify-center flex-wrap max-sm:flex-col">
         <a

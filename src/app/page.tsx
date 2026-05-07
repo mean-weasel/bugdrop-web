@@ -7,6 +7,7 @@ import { QuickStart } from "@/components/landing/quick-start";
 import { ConfigTable } from "@/components/landing/config-table";
 import { TryCallout } from "@/components/landing/try-callout";
 import { JsonLd } from "@/components/json-ld";
+import { MARKETPLACE_URL } from "@/lib/links";
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -29,6 +30,7 @@ const structuredData = {
   },
   license: "https://opensource.org/licenses/MIT",
   codeRepository: "https://github.com/mean-weasel/bugdrop",
+  sameAs: [MARKETPLACE_URL],
   featureList: [
     "Screenshot capture",
     "Annotation tools",

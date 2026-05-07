@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MARKETPLACE_URL } from "@/lib/links";
 
 export function QuickStart() {
   const [copied, setCopied] = useState(false);
@@ -20,8 +21,8 @@ export function QuickStart() {
         <div className="flex gap-4 items-start">
           <div className="w-7 h-7 rounded-full bg-bg-elevated border border-border text-accent-warm font-semibold text-sm flex items-center justify-center shrink-0">1</div>
           <div>
-            <p className="text-text-subtle mb-3"><strong className="text-text-primary">Install the GitHub App</strong> on your repository:</p>
-            <p><a href="https://github.com/apps/neonwatty-bugdrop/installations/new" target="_blank" rel="noopener noreferrer" className="text-accent-cyan no-underline hover:underline">https://github.com/apps/neonwatty-bugdrop/installations/new</a></p>
+            <p className="text-text-subtle mb-3"><strong className="text-text-primary">Install from GitHub Marketplace</strong> on your repository:</p>
+            <p><a href={MARKETPLACE_URL} target="_blank" rel="noopener noreferrer" className="text-accent-cyan no-underline hover:underline">{MARKETPLACE_URL}</a></p>
           </div>
         </div>
         <div className="flex gap-4 items-start">

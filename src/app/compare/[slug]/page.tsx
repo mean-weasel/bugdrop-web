@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { compareNav } from "@/lib/compare-nav";
+import { MARKETPLACE_URL } from "@/lib/links";
 import Link from "next/link";
 
 export function generateStaticParams() {
@@ -33,12 +34,12 @@ export default async function ComparePage({
             Add screenshot-powered bug reporting to any site in under a minute.
           </p>
           <a
-            href="https://github.com/apps/neonwatty-bugdrop/installations/new"
+            href={MARKETPLACE_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-[10px] font-medium bg-gradient-to-br from-accent-warm to-accent-rose text-bg-deep hover:-translate-y-0.5 transition-all duration-300"
           >
-            Install GitHub App
+            Install from GitHub Marketplace
           </a>
         </div>
       </div>

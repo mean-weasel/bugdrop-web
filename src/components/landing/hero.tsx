@@ -1,3 +1,5 @@
+import { MARKETPLACE_URL } from "@/lib/links";
+
 export function Hero() {
   return (
     <header className="text-center py-16 pb-24 animate-fade-up">
@@ -13,14 +15,17 @@ export function Hero() {
         feedback becomes GitHub issues — with screenshots, annotations, and
         system info.
       </p>
+      <p className="text-sm text-accent-cyan mb-6">
+        Now available on GitHub Marketplace
+      </p>
       <div className="flex gap-4 justify-center flex-wrap max-sm:flex-col">
         <a
-          href="https://github.com/apps/neonwatty-bugdrop/installations/new"
+          href={MARKETPLACE_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium text-[0.95rem] bg-gradient-to-br from-accent-warm to-accent-rose text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(255,158,100,0.3)] transition-all duration-300 max-sm:w-full max-sm:justify-center"
         >
-          Install GitHub App
+          Install from GitHub Marketplace
         </a>
         <a
           href="https://github.com/mean-weasel/bugdrop"

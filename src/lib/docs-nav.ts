@@ -11,6 +11,7 @@ export const docsNav: DocLink[] = [
   { slug: "javascript-api", title: "JavaScript API" },
   { slug: "version-pinning", title: "Version Pinning" },
   { slug: "ci-testing", title: "CI Testing" },
+  { slug: "demo", title: "Live Demo" },
   { slug: "security", title: "Security" },
   { slug: "self-hosting", title: "Self-Hosting" },
   { slug: "faq", title: "FAQ" },

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DEMO_URL } from "@/lib/links";
 
 export function Nav() {
   return (
@@ -25,7 +26,7 @@ export function Nav() {
           GitHub
         </a>
         <a
-          href="https://bugdrop-widget-test.vercel.app"
+          href={DEMO_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm text-text-subtle hover:text-text-primary transition-colors"

@@ -1,10 +1,16 @@
+import Link from "next/link";
+import { ExternalLink, PlayCircle } from "lucide-react";
+import { DEMO_PATH } from "@/lib/links";
 import { SectionHeading } from "./section-heading";
 
 export function DemoVideo() {
   return (
     <section className="mb-20">
       <SectionHeading>See It In Action</SectionHeading>
-      <div className="bg-bg-surface border border-border rounded-3xl p-12 text-center max-w-[500px] mx-auto max-md:p-8">
+      <div className="bg-bg-surface border border-border rounded-3xl p-12 text-center max-w-[640px] mx-auto max-md:p-8">
+        <p className="mx-auto mb-8 max-w-[460px] text-text-subtle">
+          Watch the flow, then open the hosted demo to submit feedback through the real widget.
+        </p>
         <div className="relative rounded-xl overflow-hidden bg-black mb-8">
           <iframe
             src="https://www.youtube.com/embed/VkLvP1xmRzo"
@@ -16,10 +22,19 @@ export function DemoVideo() {
           />
         </div>
         <div className="flex flex-col gap-4 items-center">
-          <a href="https://bugdrop-widget-test.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium bg-gradient-to-br from-accent-warm to-accent-rose text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(255,158,100,0.3)] transition-all duration-300">
-            Try Live Demo →
-          </a>
-          <p className="text-text-muted text-sm">See BugDrop running on a real app</p>
+          <div className="flex gap-3 max-sm:w-full max-sm:flex-col">
+            <a href={DEMO_PATH} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-[10px] font-medium bg-gradient-to-br from-accent-warm to-accent-rose text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(255,158,100,0.3)] transition-all duration-300 max-sm:w-full">
+              <PlayCircle className="size-4" aria-hidden="true" />
+              Try live demo
+            </a>
+            <Link href="/docs/demo" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-[10px] font-medium bg-bg-deep text-text-primary border border-border hover:bg-bg-elevated hover:-translate-y-0.5 transition-all duration-300 max-sm:w-full">
+              Demo details
+              <ExternalLink className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
+          <p className="text-text-muted text-sm">
+            The demo opens a separate test site with BugDrop installed.
+          </p>
         </div>
       </div>
     </section>

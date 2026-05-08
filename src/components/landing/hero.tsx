@@ -1,4 +1,5 @@
-import { MARKETPLACE_URL } from "@/lib/links";
+import { ArrowUpRight, Code2, PlayCircle } from "lucide-react";
+import { DEMO_PATH, MARKETPLACE_URL } from "@/lib/links";
 
 export function Hero() {
   return (
@@ -20,11 +21,21 @@ export function Hero() {
       </p>
       <div className="flex gap-4 justify-center flex-wrap max-sm:flex-col">
         <a
+          href={DEMO_PATH}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium text-[0.95rem] bg-accent-cyan text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(125,207,255,0.24)] transition-all duration-300 max-sm:w-full max-sm:justify-center"
+        >
+          <PlayCircle className="size-4" aria-hidden="true" />
+          Try the live demo
+        </a>
+        <a
           href={MARKETPLACE_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium text-[0.95rem] bg-gradient-to-br from-accent-warm to-accent-rose text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(255,158,100,0.3)] transition-all duration-300 max-sm:w-full max-sm:justify-center"
         >
+          <ArrowUpRight className="size-4" aria-hidden="true" />
           Install from GitHub Marketplace
         </a>
         <a
@@ -33,6 +44,7 @@ export function Hero() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium text-[0.95rem] bg-bg-surface text-text-primary border border-border hover:bg-bg-elevated hover:-translate-y-0.5 transition-all duration-300 max-sm:w-full max-sm:justify-center"
         >
+          <Code2 className="size-4" aria-hidden="true" />
           View on GitHub
         </a>
       </div>

@@ -1,5 +1,6 @@
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
+import { LiveDemoCta } from "@/components/landing/live-demo-cta";
 import { DemoVideo } from "@/components/landing/demo-video";
 import { Features } from "@/components/landing/features";
 import { StylingShowcase } from "@/components/landing/styling-showcase";
@@ -48,6 +49,7 @@ export default function Home() {
       <JsonLd data={structuredData} />
       <Hero />
       <HowItWorks />
+      <LiveDemoCta />
       <DemoVideo />
       <Features />
       <StylingShowcase />

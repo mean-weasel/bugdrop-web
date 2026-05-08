@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { PlayCircle } from "lucide-react";
+import { DEMO_PATH } from "@/lib/links";
 
 export const metadata = {
   title: "Docs — BugDrop",
@@ -13,6 +15,23 @@ export default function DocsIndex() {
         BugDrop is an open-source feedback widget that turns user bug reports into GitHub issues.
         Screenshots, annotations, and system info — all captured automatically.
       </p>
+      <div className="mb-8 flex flex-wrap gap-3">
+        <a
+          href={DEMO_PATH}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-[10px] bg-accent-cyan px-4 py-2 text-sm font-medium text-bg-deep transition-all hover:-translate-y-0.5"
+        >
+          <PlayCircle className="size-4" aria-hidden="true" />
+          Try the live demo
+        </a>
+        <Link
+          href="/docs/installation"
+          className="inline-flex items-center rounded-[10px] border border-border bg-bg-surface px-4 py-2 text-sm font-medium text-text-primary transition-all hover:-translate-y-0.5 hover:bg-bg-elevated"
+        >
+          Install BugDrop
+        </Link>
+      </div>
       <h2 className="text-xl font-semibold text-text-primary mt-8 mb-3">Quick Overview</h2>
       <ol className="list-decimal list-inside text-text-subtle space-y-2 mb-6">
         <li>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DEMO_URL } from "@/lib/links";
+import { DEMO_PATH } from "@/lib/links";
 
 export function Nav() {
   return (
@@ -7,7 +7,7 @@ export function Nav() {
       <Link href="/" className="text-xl font-semibold text-text-primary no-underline flex items-center gap-2">
         BugDrop
       </Link>
-      <div className="flex gap-8 items-center">
+      <div className="flex gap-8 items-center max-sm:flex-wrap max-sm:justify-center max-sm:gap-4">
         <Link href="/docs" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Docs
         </Link>
@@ -26,10 +26,10 @@ export function Nav() {
           GitHub
         </a>
         <a
-          href={DEMO_URL}
+          href={DEMO_PATH}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm text-text-subtle hover:text-text-primary transition-colors"
+          className="inline-flex items-center rounded-[10px] border border-accent-cyan/40 bg-accent-cyan/10 px-3 py-1.5 text-sm font-medium text-accent-cyan transition-all hover:-translate-y-0.5 hover:border-accent-cyan hover:bg-accent-cyan/15"
         >
           Demo
         </a>

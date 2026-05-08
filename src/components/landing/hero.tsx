@@ -27,7 +27,7 @@ export function Hero() {
           className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium text-[0.95rem] bg-accent-cyan text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(125,207,255,0.24)] transition-all duration-300 max-sm:w-full max-sm:justify-center"
         >
           <PlayCircle className="size-4" aria-hidden="true" />
-          Try the live demo
+          Open Sample App Demo
         </a>
         <a
           href={MARKETPLACE_URL}

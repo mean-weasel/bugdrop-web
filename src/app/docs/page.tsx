@@ -23,7 +23,7 @@ export default function DocsIndex() {
           className="inline-flex items-center gap-2 rounded-[10px] bg-accent-cyan px-4 py-2 text-sm font-medium text-bg-deep transition-all hover:-translate-y-0.5"
         >
           <PlayCircle className="size-4" aria-hidden="true" />
-          Try the live demo
+          Open Sample App Demo
         </a>
         <Link
           href="/docs/installation"

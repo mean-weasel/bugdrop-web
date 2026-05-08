@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { LiveDemoCta } from "@/components/landing/live-demo-cta";
@@ -8,7 +9,7 @@ import { QuickStart } from "@/components/landing/quick-start";
 import { ConfigTable } from "@/components/landing/config-table";
 import { TryCallout } from "@/components/landing/try-callout";
 import { JsonLd } from "@/components/json-ld";
-import { MARKETPLACE_URL } from "@/lib/links";
+import { MARKETPLACE_URL, SAMPLE_DEMO_REPO, WIDGET_URL } from "@/lib/links";
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -47,6 +48,19 @@ export default function Home() {
   return (
     <main>
       <JsonLd data={structuredData} />
+      <Script
+        src={WIDGET_URL}
+        strategy="afterInteractive"
+        data-repo={SAMPLE_DEMO_REPO}
+        data-theme="dark"
+        data-position="bottom-right"
+        data-color="#7dcfff"
+        data-label="Feedback"
+        data-welcome="This is the BugDrop landing page demo. Send a test report to see what your users would experience."
+        data-button-dismissible="true"
+        data-dismiss-duration="60"
+        data-show-restore="true"
+      />
       <Hero />
       <HowItWorks />
       <LiveDemoCta />

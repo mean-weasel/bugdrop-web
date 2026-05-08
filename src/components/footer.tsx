@@ -1,7 +1,7 @@
 const repoLinks = [
   { label: "API", href: "https://github.com/mean-weasel/bugdrop" },
   { label: "Landing Page", href: "https://github.com/mean-weasel/bugdrop-web" },
-  { label: "Widget Demo", href: "https://github.com/mean-weasel/bugdrop-widget-test" },
+  { label: "Sample App Demo", href: "https://github.com/mean-weasel/bugdrop-widget-test" },
 ];
 
 export function Footer() {

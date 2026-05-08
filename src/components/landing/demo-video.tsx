@@ -9,7 +9,7 @@ export function DemoVideo() {
       <SectionHeading>See It In Action</SectionHeading>
       <div className="bg-bg-surface border border-border rounded-3xl p-12 text-center max-w-[640px] mx-auto max-md:p-8">
         <p className="mx-auto mb-8 max-w-[460px] text-text-subtle">
-          Watch the flow, then open the hosted demo to submit feedback through the real widget.
+          Watch the flow, then open the Sample App Demo to submit feedback in a realistic product page.
         </p>
         <div className="relative rounded-xl overflow-hidden bg-black mb-8">
           <iframe
@@ -25,15 +25,15 @@ export function DemoVideo() {
           <div className="flex gap-3 max-sm:w-full max-sm:flex-col">
             <a href={DEMO_PATH} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-[10px] font-medium bg-gradient-to-br from-accent-warm to-accent-rose text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(255,158,100,0.3)] transition-all duration-300 max-sm:w-full">
               <PlayCircle className="size-4" aria-hidden="true" />
-              Try live demo
+              Open Sample App Demo
             </a>
             <Link href="/docs/demo" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-[10px] font-medium bg-bg-deep text-text-primary border border-border hover:bg-bg-elevated hover:-translate-y-0.5 transition-all duration-300 max-sm:w-full">
-              Demo details
+              Sample demo details
               <ExternalLink className="size-4" aria-hidden="true" />
             </Link>
           </div>
           <p className="text-text-muted text-sm">
-            The demo opens a separate test site with BugDrop installed.
+            The sample app opens a separate test site with BugDrop installed.
           </p>
         </div>
       </div>

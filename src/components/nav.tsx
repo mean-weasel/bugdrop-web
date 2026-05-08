@@ -31,7 +31,7 @@ export function Nav() {
           rel="noopener noreferrer"
           className="inline-flex items-center rounded-[10px] border border-accent-cyan/40 bg-accent-cyan/10 px-3 py-1.5 text-sm font-medium text-accent-cyan transition-all hover:-translate-y-0.5 hover:border-accent-cyan hover:bg-accent-cyan/15"
         >
-          Demo
+          Sample App Demo
         </a>
       </div>
     </nav>

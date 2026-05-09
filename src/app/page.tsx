@@ -62,7 +62,7 @@ export default function Home() {
         data-radius="10"
         data-shadow="soft"
         data-font="inherit"
-        data-button="false"
+        data-label="Feedback"
         data-welcome="This is the BugDrop landing page demo. Send a test report to see what your users would experience."
       />
       <Hero />

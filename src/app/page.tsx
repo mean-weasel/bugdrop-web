@@ -62,11 +62,8 @@ export default function Home() {
         data-radius="10"
         data-shadow="soft"
         data-font="inherit"
-        data-label="Feedback"
+        data-button="false"
         data-welcome="This is the BugDrop landing page demo. Send a test report to see what your users would experience."
-        data-button-dismissible="true"
-        data-dismiss-duration="60"
-        data-show-restore="true"
       />
       <Hero />
       <HowItWorks />

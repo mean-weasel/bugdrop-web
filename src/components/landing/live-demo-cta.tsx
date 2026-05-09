@@ -11,7 +11,6 @@ export function LiveDemoCta() {
           </h2>
           <p className="mt-2 max-w-[620px] text-text-subtle">
             Open the feedback button and send a demo report to see the experience your users would get.
-            You can also use the floating button in the corner.
           </p>
         </div>
         <div className="flex shrink-0 gap-3 max-sm:w-full max-sm:flex-col">

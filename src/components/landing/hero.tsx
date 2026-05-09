@@ -1,5 +1,5 @@
-import { ArrowUpRight, Code2, PlayCircle } from "lucide-react";
-import { DEMO_PATH, MARKETPLACE_URL } from "@/lib/links";
+import { ArrowUpRight, Code2, MessageSquare } from "lucide-react";
+import { MARKETPLACE_URL } from "@/lib/links";
 
 export function Hero() {
   return (
@@ -21,13 +21,11 @@ export function Hero() {
       </p>
       <div className="flex gap-4 justify-center flex-wrap max-sm:flex-col">
         <a
-          href={DEMO_PATH}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#try-bugdrop"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium text-[0.95rem] bg-accent-cyan text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(125,207,255,0.24)] transition-all duration-300 max-sm:w-full max-sm:justify-center"
         >
-          <PlayCircle className="size-4" aria-hidden="true" />
-          Open Sample App Demo
+          <MessageSquare className="size-4" aria-hidden="true" />
+          Try it on this page
         </a>
         <a
           href={MARKETPLACE_URL}

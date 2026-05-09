@@ -5,11 +5,11 @@ export function TryCallout() {
   return (
     <div className="bg-gradient-to-br from-accent-warm/10 to-accent-rose/10 border border-accent-warm/20 rounded-2xl p-8 text-center mb-20">
       <h3 className="text-xl font-semibold text-text-primary mb-2">
-        Try BugDrop in a sample app
+        Want to see BugDrop in another app?
       </h3>
       <p className="mx-auto mb-6 max-w-[520px] text-text-subtle">
-        Open the Sample App Demo to test the form, screenshot capture, annotation flow,
-        and GitHub issue creation in a realistic page.
+        Open the Sample App Demo to try the same widget in a different product flow
+        with different styling.
       </p>
       <a
         href={DEMO_PATH}

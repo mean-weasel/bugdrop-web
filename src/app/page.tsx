@@ -55,20 +55,24 @@ export default function Home() {
         data-theme="dark"
         data-position="bottom-right"
         data-color="#7dcfff"
+        data-bg="#24283b"
+        data-text="#c0caf5"
+        data-border-color="#7dcfff"
+        data-border-width="1"
+        data-radius="10"
+        data-shadow="soft"
+        data-font="inherit"
         data-label="Feedback"
         data-welcome="This is the BugDrop landing page demo. Send a test report to see what your users would experience."
-        data-button-dismissible="true"
-        data-dismiss-duration="60"
-        data-show-restore="true"
       />
       <Hero />
       <HowItWorks />
       <LiveDemoCta />
-      <DemoVideo />
       <Features />
       <StylingShowcase />
       <QuickStart />
       <ConfigTable />
+      <DemoVideo />
       <TryCallout />
     </main>
   );

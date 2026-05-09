@@ -1,7 +1,5 @@
 "use client";
 
-import { MessageSquare } from "lucide-react";
-
 declare global {
   interface Window {
     BugDrop?: {
@@ -30,10 +28,10 @@ export function OpenWidgetButton() {
     <button
       type="button"
       onClick={openWidget}
-      className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-accent-cyan/40 bg-bg-surface px-5 py-3 font-medium text-accent-cyan transition-all hover:-translate-y-0.5 hover:bg-bg-elevated max-sm:w-full"
+      className="inline-flex items-center justify-center gap-2 rounded-full bg-accent-cyan px-5 py-3 font-semibold text-bg-deep shadow-[0_12px_32px_rgba(125,207,255,0.28)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(125,207,255,0.36)] max-sm:w-full max-sm:rounded-[10px]"
     >
-      <MessageSquare className="size-4" aria-hidden="true" />
-      Open page widget
+      <span aria-hidden="true">🐛</span>
+      Feedback
     </button>
   );
 }

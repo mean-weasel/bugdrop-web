@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { DEMO_PATH } from "@/lib/links";
 
 export function Nav() {
   return (
@@ -25,14 +24,12 @@ export function Nav() {
         >
           GitHub
         </a>
-        <a
-          href={DEMO_PATH}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href="/#try-bugdrop"
           className="inline-flex items-center rounded-[10px] border border-accent-cyan/40 bg-accent-cyan/10 px-3 py-1.5 text-sm font-medium text-accent-cyan transition-all hover:-translate-y-0.5 hover:border-accent-cyan hover:bg-accent-cyan/15"
         >
-          Sample App Demo
-        </a>
+          Try Widget
+        </Link>
       </div>
     </nav>
   );

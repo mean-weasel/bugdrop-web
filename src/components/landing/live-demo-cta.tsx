@@ -1,6 +1,3 @@
-import Link from "next/link";
-import { ArrowUpRight, PlayCircle } from "lucide-react";
-import { DEMO_PATH } from "@/lib/links";
 import { OpenWidgetButton } from "./open-widget-button";
 
 export function LiveDemoCta() {
@@ -13,28 +10,12 @@ export function LiveDemoCta() {
             This landing page is running BugDrop.
           </h2>
           <p className="mt-2 max-w-[620px] text-text-subtle">
-            Open the feedback button in the corner and send a demo report to see the experience your users would get.
-            Want a fuller product flow? Open the Sample App Demo.
+            Open the feedback button and send a demo report to see the experience your users would get.
+            You can also use the floating button in the corner.
           </p>
         </div>
         <div className="flex shrink-0 gap-3 max-sm:w-full max-sm:flex-col">
           <OpenWidgetButton />
-          <a
-            href={DEMO_PATH}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-accent-cyan px-5 py-3 font-medium text-bg-deep transition-all hover:-translate-y-0.5 max-sm:w-full"
-          >
-            <PlayCircle className="size-4" aria-hidden="true" />
-            Sample App Demo
-          </a>
-          <Link
-            href="/docs/demo"
-            className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-border bg-bg-surface px-5 py-3 font-medium text-text-primary transition-all hover:-translate-y-0.5 hover:bg-bg-elevated max-sm:w-full"
-          >
-            Details
-            <ArrowUpRight className="size-4" aria-hidden="true" />
-          </Link>
         </div>
       </div>
     </section>

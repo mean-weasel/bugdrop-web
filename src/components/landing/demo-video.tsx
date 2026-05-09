@@ -9,7 +9,7 @@ export function DemoVideo() {
       <SectionHeading>See It In Action</SectionHeading>
       <div className="bg-bg-surface border border-border rounded-3xl p-12 text-center max-w-[640px] mx-auto max-md:p-8">
         <p className="mx-auto mb-8 max-w-[460px] text-text-subtle">
-          Watch the flow, then open the Sample App Demo to submit feedback in a realistic product page.
+          Watch the report flow, then try a second example in a realistic product page.
         </p>
         <div className="relative rounded-xl overflow-hidden bg-black mb-8">
           <iframe

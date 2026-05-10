@@ -13,6 +13,13 @@ const repoLinks = [
   { label: "Product Hunt", href: PRODUCT_HUNT_URL },
 ];
 
+const trustLinks = [
+  { label: "Open source", href: GITHUB_REPO_URL },
+  { label: "MIT licensed", href: `${GITHUB_REPO_URL}/blob/main/LICENSE` },
+  { label: "Built by mean-weasel", href: GITHUB_ORG_URL },
+  { label: "Powered by Cloudflare Workers", href: "https://workers.cloudflare.com/" },
+];
+
 export function Footer() {
   return (
     <footer className="text-center pt-12 border-t border-border">
@@ -51,13 +58,16 @@ export function Footer() {
         ))}
       </div>
       <div className="flex justify-center gap-4 mt-4 flex-wrap">
-        {["TypeScript", "Cloudflare Workers", "Shadow DOM"].map((badge) => (
-          <span
-            key={badge}
+        {trustLinks.map((link) => (
+          <a
+            key={link.label}
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-[0.7rem] font-medium tracking-wider uppercase text-text-muted bg-bg-surface px-3 py-1.5 rounded border border-border"
           >
-            {badge}
-          </span>
+            {link.label}
+          </a>
         ))}
       </div>
     </footer>

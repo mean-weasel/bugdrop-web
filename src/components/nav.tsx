@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GITHUB_REPO_URL } from "@/lib/links";
 
 export function Nav() {
   return (
@@ -17,7 +18,7 @@ export function Nav() {
           Compare
         </Link>
         <a
-          href="https://github.com/mean-weasel/bugdrop"
+          href={GITHUB_REPO_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm text-text-subtle hover:text-text-primary transition-colors"

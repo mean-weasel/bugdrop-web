@@ -19,12 +19,20 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
   description:
-    "Free, open source website feedback widget. Users report bugs with screenshots and annotations — issues are created in GitHub automatically. One script tag, zero config.",
+    "Free, open source website feedback widget by mean-weasel. Users report bugs with screenshots and annotations — issues are created in GitHub automatically. One script tag, zero config.",
+  keywords: [
+    "BugDrop",
+    "mean-weasel",
+    "GitHub Issues feedback widget",
+    "website feedback widget",
+    "bug reporting widget",
+    "Product Hunt",
+  ],
   metadataBase: new URL("https://bugdrop.dev"),
   openGraph: {
     title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
     description:
-      "Free, open source website feedback widget. Users report bugs with screenshots and annotations — issues are created in GitHub automatically.",
+      "Free, open source website feedback widget by mean-weasel. Users report bugs with screenshots and annotations — issues are created in GitHub automatically.",
     url: "https://bugdrop.dev",
     siteName: "BugDrop",
     type: "website",

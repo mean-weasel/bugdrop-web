@@ -3,6 +3,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "api.producthunt.com",
+        pathname: "/widgets/embed-image/v1/**",
+      },
+    ],
+  },
   experimental: {
     mdxRs: {
       mdxType: "gfm",

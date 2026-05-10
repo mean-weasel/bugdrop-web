@@ -1,7 +1,16 @@
+import {
+  GITHUB_ORG_URL,
+  GITHUB_PROFILE_URL,
+  GITHUB_REPO_URL,
+  GITHUB_WEB_REPO_URL,
+  PRODUCT_HUNT_URL,
+} from "@/lib/links";
+
 const repoLinks = [
-  { label: "API", href: "https://github.com/mean-weasel/bugdrop" },
-  { label: "Landing Page", href: "https://github.com/mean-weasel/bugdrop-web" },
+  { label: "API", href: GITHUB_REPO_URL },
+  { label: "Landing Page", href: GITHUB_WEB_REPO_URL },
   { label: "Sample App Demo", href: "https://github.com/mean-weasel/bugdrop-widget-test" },
+  { label: "Product Hunt", href: PRODUCT_HUNT_URL },
 ];
 
 export function Footer() {
@@ -10,7 +19,7 @@ export function Footer() {
       <p className="text-text-muted text-sm mb-4">
         Built by{" "}
         <a
-          href="https://github.com/neonwatty"
+          href={GITHUB_PROFILE_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="text-accent-cyan no-underline hover:underline"
@@ -19,7 +28,7 @@ export function Footer() {
         </a>{" "}
         /{" "}
         <a
-          href="https://github.com/mean-weasel"
+          href={GITHUB_ORG_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="text-accent-cyan no-underline hover:underline"

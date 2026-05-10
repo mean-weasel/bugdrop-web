@@ -9,7 +9,16 @@ import { QuickStart } from "@/components/landing/quick-start";
 import { ConfigTable } from "@/components/landing/config-table";
 import { TryCallout } from "@/components/landing/try-callout";
 import { JsonLd } from "@/components/json-ld";
-import { MARKETPLACE_URL, SAMPLE_DEMO_REPO, WIDGET_URL } from "@/lib/links";
+import {
+  GITHUB_ORG_URL,
+  GITHUB_PROFILE_URL,
+  GITHUB_REPO_URL,
+  GITHUB_WEB_REPO_URL,
+  MARKETPLACE_URL,
+  PRODUCT_HUNT_URL,
+  SAMPLE_DEMO_REPO,
+  WIDGET_URL,
+} from "@/lib/links";
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -28,11 +37,29 @@ const structuredData = {
   author: {
     "@type": "Organization",
     name: "mean-weasel",
-    url: "https://github.com/mean-weasel",
+    url: GITHUB_ORG_URL,
+  },
+  creator: {
+    "@type": "Person",
+    name: "neonwatty",
+    url: GITHUB_PROFILE_URL,
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "mean-weasel",
+    url: GITHUB_ORG_URL,
   },
   license: "https://opensource.org/licenses/MIT",
-  codeRepository: "https://github.com/mean-weasel/bugdrop",
-  sameAs: [MARKETPLACE_URL],
+  codeRepository: GITHUB_REPO_URL,
+  sameAs: [
+    MARKETPLACE_URL,
+    PRODUCT_HUNT_URL,
+    GITHUB_REPO_URL,
+    GITHUB_WEB_REPO_URL,
+    GITHUB_ORG_URL,
+    GITHUB_PROFILE_URL,
+  ],
+  award: "Product Hunt #6 Product of the Day, May 9, 2026",
   featureList: [
     "Screenshot capture",
     "Annotation tools",

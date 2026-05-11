@@ -3,6 +3,7 @@ import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { homeDescription } from "@/lib/seo";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -18,8 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
-  description:
-    "Free, open source website feedback widget by mean-weasel. Users report bugs with screenshots and annotations — issues are created in GitHub automatically. One script tag, zero config.",
+  description: homeDescription,
   keywords: [
     "BugDrop",
     "mean-weasel",
@@ -31,8 +31,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://bugdrop.dev"),
   openGraph: {
     title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
-    description:
-      "Free, open source website feedback widget by mean-weasel. Users report bugs with screenshots and annotations — issues are created in GitHub automatically.",
+    description: homeDescription,
     url: "https://bugdrop.dev",
     siteName: "BugDrop",
     type: "website",
@@ -40,8 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
-    description:
-      "Free, open source website feedback widget. Users report bugs with screenshots and annotations — issues are created in GitHub automatically.",
+    description: homeDescription,
   },
   verification: {
     google: "sTi4vjMGXpdkvZcZQnRhs9u-uVyxsqTHOIR_txqHR-w",

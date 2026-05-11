@@ -10,19 +10,33 @@ import {
 
 export function Hero() {
   return (
-    <header className="text-center py-16 pb-24 animate-fade-up max-sm:-mt-6 max-sm:pt-0 max-sm:pb-16">
-      <h1 className="text-[clamp(2.5rem,6vw,4rem)] font-light tracking-tight leading-[1.15] mb-6 bg-gradient-to-br from-text-primary to-text-muted bg-clip-text text-transparent max-sm:text-[2.35rem]">
+    <header className="text-center py-16 pb-24 max-sm:-mt-6 max-sm:pt-0 max-sm:pb-16">
+      <h1 className="text-[clamp(2.5rem,6vw,4rem)] font-light tracking-tight leading-[1.15] mb-6 text-text-primary max-sm:text-[2.35rem]">
         Free website feedback widget with
         <br />
-        <strong className="font-bold bg-gradient-to-br from-accent-warm to-accent-rose bg-clip-text">
+        <strong className="font-bold text-accent-warm">
           screenshots in 30 seconds
         </strong>
       </h1>
       <p className="text-xl text-text-subtle max-w-[600px] mx-auto mb-10 max-sm:mb-7 max-sm:text-lg">
-        Open source bug reporting widget for any website. Drop it in, and user
-        feedback becomes GitHub issues — with screenshots, annotations, and
-        system info.
+        BugDrop is an open-source website feedback widget that creates GitHub
+        Issues with screenshots, annotations, system info, and redaction
+        controls. Add one script tag to any site.
       </p>
+      <div className="mx-auto mb-7 flex max-w-[720px] flex-wrap justify-center gap-2 text-xs font-medium text-text-muted">
+        <span className="rounded border border-border bg-bg-surface px-3 py-1.5">
+          MIT licensed
+        </span>
+        <span className="rounded border border-border bg-bg-surface px-3 py-1.5">
+          GitHub Marketplace
+        </span>
+        <span className="rounded border border-border bg-bg-surface px-3 py-1.5">
+          Self-hostable
+        </span>
+        <span className="rounded border border-border bg-bg-surface px-3 py-1.5">
+          Screenshot privacy controls
+        </span>
+      </div>
       <div className="mb-7 flex flex-col items-center gap-3 max-sm:mb-5">
         <p className="text-sm text-accent-cyan">
           Now available on GitHub Marketplace. Open source by{" "}

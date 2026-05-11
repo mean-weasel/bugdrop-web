@@ -1,4 +1,5 @@
 import {
+  DEMO_PATH,
   GITHUB_ORG_URL,
   GITHUB_PROFILE_URL,
   GITHUB_REPO_URL,
@@ -7,13 +8,18 @@ import {
 } from "@/lib/links";
 
 const repoLinks = [
+  { label: "Docs", href: "/docs" },
+  { label: "Demo", href: DEMO_PATH },
+  { label: "Use Cases", href: "/use-cases" },
+  { label: "Compare", href: "/compare" },
   { label: "API", href: GITHUB_REPO_URL },
   { label: "Landing Page", href: GITHUB_WEB_REPO_URL },
-  { label: "Sample App Demo", href: "https://github.com/mean-weasel/bugdrop-widget-test" },
   { label: "Product Hunt", href: PRODUCT_HUNT_URL },
 ];
 
 const trustLinks = [
+  { label: "Security", href: "/docs/security" },
+  { label: "Self-hosting", href: "/docs/self-hosting" },
   { label: "Open source", href: GITHUB_REPO_URL },
   { label: "MIT licensed", href: `${GITHUB_REPO_URL}/blob/main/LICENSE` },
   { label: "Built by mean-weasel", href: GITHUB_ORG_URL },
@@ -49,8 +55,8 @@ export function Footer() {
           <a
             key={link.label}
             href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
+            target={link.href.startsWith("http") ? "_blank" : undefined}
+            rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
             className="text-[0.7rem] font-medium tracking-wider uppercase text-text-muted hover:text-accent-cyan bg-bg-surface px-3 py-1.5 rounded border border-border no-underline transition-colors"
           >
             {link.label}
@@ -62,8 +68,8 @@ export function Footer() {
           <a
             key={link.label}
             href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
+            target={link.href.startsWith("http") ? "_blank" : undefined}
+            rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
             className="text-[0.7rem] font-medium tracking-wider uppercase text-text-muted bg-bg-surface px-3 py-1.5 rounded border border-border"
           >
             {link.label}

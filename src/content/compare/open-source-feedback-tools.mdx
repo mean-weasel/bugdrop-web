@@ -1,0 +1,36 @@
+# Open-Source Feedback Tools
+
+Open-source website feedback tools are useful when teams want control over cost, data flow, and integration behavior. BugDrop fits this category as a free, MIT-licensed feedback widget that sends screenshot bug reports directly to GitHub Issues.
+
+## What to Look For
+
+When evaluating open-source feedback tools, focus on the workflow you want after a user submits feedback:
+
+- **Issue destination** -- where does the report land?
+- **Visual context** -- are screenshots and annotations included?
+- **Privacy controls** -- can sensitive page content be redacted or masked?
+- **Setup complexity** -- does it require a backend, database, or account system?
+- **Self-hosting** -- can your team run the infrastructure?
+- **Maintenance fit** -- does it align with your existing development workflow?
+
+## Where BugDrop Fits
+
+BugDrop is strongest when GitHub Issues is already your team's issue tracker. It does not try to be a customer feedback portal, survey product, or roadmap tool. It focuses on one workflow: users report what they see, and developers receive a useful GitHub Issue.
+
+## Strengths
+
+- Free and MIT licensed
+- One-script installation
+- Screenshots, annotations, and system information
+- Manual screenshot redaction and `data-bugdrop-mask`
+- GitHub App integration
+- Self-hostable Cloudflare Worker architecture
+- No reporter accounts required
+
+## Tradeoffs
+
+BugDrop is intentionally focused. It does not include voting boards, customer feedback analytics, session replay, product roadmaps, or a standalone dashboard. If you need those features, a hosted feedback suite may be a better fit.
+
+## Recommended Next Step
+
+Try the [BugDrop demo](/demo), then follow the [installation guide](/docs/installation). If your site contains private customer or billing information, review [security and screenshot masking](/docs/security) before installing.

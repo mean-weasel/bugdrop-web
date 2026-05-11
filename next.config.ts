@@ -20,11 +20,6 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: "/demo",
-        destination: "https://bugdrop-widget-test.vercel.app",
-        permanent: false,
-      },
-      {
         source: "/:path*",
         has: [{ type: "host", value: "www.bugdrop.dev" }],
         destination: "https://bugdrop.dev/:path*",

@@ -1,0 +1,25 @@
+# Visual Bug Reporting
+
+BugDrop helps users report visual bugs by capturing what they see, not just what they can describe. Reports include screenshots, annotations, system information, and page URLs so developers can understand layout, styling, rendering, and content problems quickly.
+
+## The Problem with Text-Only Reports
+
+Visual bugs are hard to describe precisely. A user might say "the button is broken" when the actual issue is a responsive layout overlap, clipped text, missing image, dark-mode contrast problem, or browser-specific rendering bug. Without a screenshot, developers often spend more time asking clarifying questions than fixing the issue.
+
+BugDrop turns that report into a visual artifact. The screenshot shows the broken state, and annotations let the reporter circle, point to, or highlight the important region.
+
+## Best Fits
+
+- Marketing sites where layout regressions affect conversion
+- Documentation sites where examples, tabs, or navigation render incorrectly
+- SaaS apps with dense dashboards and responsive UI states
+- Internal tools with charts, tables, filters, and customer data
+- Staging sites where clients and QA reviewers need structured feedback
+
+## Privacy Controls
+
+Visual context can expose sensitive content. BugDrop supports manual redaction before submit and developer-configured masking with `data-bugdrop-mask`. Password and credit-card fields are protected by default. Review [screenshot masking](/docs/security#screenshot-masking) before enabling visual reports on pages with private data.
+
+## How to Add It
+
+Install the GitHub App, add the script tag from the [installation guide](/docs/installation), and configure screenshot behavior in [configuration](/docs/configuration). Use [CI testing](/docs/ci-testing) to verify the widget appears and works on important pages before release.

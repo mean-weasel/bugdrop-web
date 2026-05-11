@@ -1,21 +1,39 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { compareNav } from "@/lib/compare-nav";
+import { JsonLd } from "@/components/json-ld";
+import { articleSchema, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Compare — BugDrop",
-  description: "See how BugDrop compares to other feedback tools.",
-  alternates: {
-    canonical: "/compare",
-  },
-};
+const description =
+  "Compare BugDrop with Userback, Canny, Sentry User Feedback, Marker.io, BugHerd, Usersnap, and other website feedback tools.";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Compare BugDrop",
+  description,
+  path: "/compare",
+  type: "article",
+});
 
 export default function CompareIndex() {
   return (
     <div>
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Compare", path: "/compare" },
+        ])}
+      />
+      <JsonLd
+        data={articleSchema({
+          title: "Compare BugDrop",
+          description,
+          path: "/compare",
+        })}
+      />
       <h1 className="text-3xl font-bold text-text-primary mb-2">Compare</h1>
       <p className="text-text-subtle mb-10">
-        See how BugDrop compares to other feedback tools.
+        Compare BugDrop with visual feedback, roadmap, and customer feedback
+        tools to choose the right workflow for GitHub-native bug reports.
       </p>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
         {compareNav.map((c) => (

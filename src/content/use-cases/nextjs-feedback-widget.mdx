@@ -1,0 +1,30 @@
+# Next.js Feedback Widget
+
+BugDrop works as a Next.js feedback widget because it loads from a plain script tag and renders inside a Shadow DOM. It does not require a React provider, npm package, API route, or build-time integration.
+
+## Why It Fits Next.js Sites
+
+Next.js apps often have multiple surfaces where feedback matters: marketing pages, docs, dashboards, preview deployments, and internal admin tools. BugDrop can be added to any of them with the same script tag, and reports land in GitHub Issues with screenshots and system information.
+
+Because the widget is framework-agnostic, it works with the App Router, Pages Router, static pages, server-rendered pages, and client-heavy application screens.
+
+## Basic Setup
+
+Add the script tag near the end of your HTML body or in the appropriate root layout for the pages where you want feedback:
+
+```html
+<script
+  src="https://bugdrop.neonwatty.workers.dev/widget.js"
+  data-repo="owner/repo"
+></script>
+```
+
+For production, review [version pinning](/docs/version-pinning) so widget updates are predictable. For design alignment, use the [styling options](/docs/styling). For sensitive dashboards, add `data-bugdrop-mask` to private UI and read the [security guide](/docs/security).
+
+## Preview Deployment Feedback
+
+BugDrop is especially useful on Vercel or other preview deployments. Clients, QA reviewers, and product managers can report exactly what they see on a preview URL, and the report creates a GitHub Issue your engineering team can triage beside the pull request.
+
+## Testing
+
+Use the [Playwright CI guide](/docs/ci-testing) to confirm the widget initializes, the Shadow DOM renders, and your expected configuration is present before deploying changes.

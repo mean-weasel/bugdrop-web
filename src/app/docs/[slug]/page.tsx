@@ -2,6 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { docsNav } from "@/lib/docs-nav";
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
+import {
+  articleSchema,
+  breadcrumbSchema,
+  faqSchema,
+  pageMetadata,
+  videoSchema,
+} from "@/lib/seo";
 
 export function generateStaticParams() {
   return docsNav
@@ -18,12 +26,12 @@ export async function generateMetadata({
   const doc = docsNav.find((d) => d.slug === slug);
   if (!doc) notFound();
 
-  return {
+  return pageMetadata({
     title: `${doc.title} — BugDrop Docs`,
-    alternates: {
-      canonical: `/docs/${slug}`,
-    },
-  };
+    description: doc.description,
+    path: `/docs/${slug}`,
+    type: "article",
+  });
 }
 
 export default async function DocPage({
@@ -34,6 +42,7 @@ export default async function DocPage({
   const { slug } = await params;
   const currentIndex = docsNav.findIndex((d) => d.slug === slug);
   if (currentIndex === -1) notFound();
+  const doc = docsNav[currentIndex];
 
   try {
     const Content = (await import(`@/content/docs/${slug}.mdx`)).default;
@@ -42,6 +51,23 @@ export default async function DocPage({
       currentIndex < docsNav.length - 1 ? docsNav[currentIndex + 1] : null;
     return (
       <div>
+        <JsonLd
+          data={breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Docs", path: "/docs" },
+            { name: doc.title, path: `/docs/${slug}` },
+          ])}
+        />
+        <JsonLd
+          data={articleSchema({
+            title: `${doc.title} — BugDrop Docs`,
+            description: doc.description,
+            path: `/docs/${slug}`,
+            type: "TechArticle",
+          })}
+        />
+        {slug === "faq" ? <JsonLd data={faqSchema()} /> : null}
+        {slug === "demo" ? <JsonLd data={videoSchema()} /> : null}
         <Content />
         <nav className="flex justify-between mt-12 pt-6 border-t border-border">
           {prev ? (

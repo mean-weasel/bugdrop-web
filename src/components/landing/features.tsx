@@ -1,12 +1,42 @@
 import { SectionHeading } from "./section-heading";
 
 const features = [
-  { icon: "📸", title: "Screenshot Capture", description: "Full page or element-specific screenshots with automatic capture." },
-  { icon: "🎨", title: "Annotation Tools", description: "Draw, arrows, and rectangles to highlight exactly what's wrong." },
-  { icon: "🏷️", title: "Feedback Categories", description: "Bug, Feature, or Question — automatically tagged with GitHub labels." },
-  { icon: "💻", title: "System Info", description: "Browser, OS, viewport, and more captured automatically for debugging." },
-  { icon: "🎯", title: "Fully Stylable", description: "Fonts, colors, borders, shadows, radius — match any design system with data attributes." },
-  { icon: "🔒", title: "Privacy First", description: "No tracking, no cookies. URLs are redacted. Your data stays yours." },
+  {
+    icon: "📸",
+    title: "Screenshot Capture",
+    description: "Full page or element-specific screenshots with automatic capture.",
+  },
+  {
+    icon: "🎨",
+    title: "Annotation Tools",
+    description: "Draw, arrows, and rectangles to highlight exactly what's wrong.",
+  },
+  {
+    icon: "⬛",
+    title: "Screenshot Redaction",
+    description:
+      "Users can cover sensitive regions, and developers can mask private UI with data-bugdrop-mask.",
+  },
+  {
+    icon: "🏷️",
+    title: "Feedback Categories",
+    description: "Bug, Feature, or Question — automatically tagged with GitHub labels.",
+  },
+  {
+    icon: "💻",
+    title: "System Info",
+    description: "Browser, OS, viewport, and more captured automatically for debugging.",
+  },
+  {
+    icon: "🎯",
+    title: "Fully Stylable",
+    description: "Fonts, colors, borders, shadows, radius — match any design system with data attributes.",
+  },
+  {
+    icon: "🔒",
+    title: "Privacy First",
+    description: "No tracking, no cookies. URLs, passwords, and credit-card fields are protected by default.",
+  },
 ];
 
 export function Features() {

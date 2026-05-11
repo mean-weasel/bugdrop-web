@@ -1,0 +1,90 @@
+name: Weekly SEO checkup
+
+on:
+  schedule:
+    # Mondays at 15:00 UTC.
+    - cron: "0 15 * * 1"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  create-checkup-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create weekly SEO checkup issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = "Weekly SEO/GEO checkup";
+            const labelName = "seo";
+            const { owner, repo } = context.repo;
+            const query = `repo:${owner}/${repo} is:issue is:open in:title "${title}"`;
+
+            const existing = await github.rest.search.issuesAndPullRequests({ q: query });
+            if (existing.data.total_count > 0) {
+              core.info(`Open checkup issue already exists: ${existing.data.items[0].html_url}`);
+              return;
+            }
+
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: labelName });
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: labelName,
+                color: "0e8a16",
+                description: "Search engine optimization and generative engine optimization",
+              });
+            }
+
+            const body = `## Weekly SEO/GEO checkup
+
+            Run this checklist for https://bugdrop.dev.
+
+            ### Technical checks
+            - [ ] Confirm https://bugdrop.dev/robots.txt is live and does not include Cloudflare managed crawler blocks.
+            - [ ] Confirm https://bugdrop.dev/sitemap.xml returns 200 and lists the expected URLs.
+            - [ ] Confirm recent production pages have unique title, description, canonical, and JSON-LD.
+            - [ ] Run or spot-check IndexNow submission if important pages changed.
+
+            ### Google Search Console
+            - [ ] Check sitemap status.
+            - [ ] Check Pages report for indexing growth or new errors.
+            - [ ] Review any "Crawled - currently not indexed", "Discovered - currently not indexed", or canonical warnings.
+            - [ ] Inspect/request indexing for important new or changed URLs.
+
+            ### Content and GEO
+            - [ ] Review Performance queries for movement on target terms:
+              - website feedback widget
+              - GitHub Issues feedback widget
+              - open source feedback widget
+              - visual bug reporting widget
+              - Userback alternative
+            - [ ] Identify one content or internal-linking improvement for next week.
+
+            ### Priority URLs
+            - https://bugdrop.dev/
+            - https://bugdrop.dev/docs/installation
+            - https://bugdrop.dev/docs/security
+            - https://bugdrop.dev/demo
+            - https://bugdrop.dev/use-cases/github-issues-feedback
+            - https://bugdrop.dev/use-cases/visual-bug-reporting
+            - https://bugdrop.dev/use-cases/nextjs-feedback-widget
+            - https://bugdrop.dev/compare/userback
+            - https://bugdrop.dev/compare/marker-io
+            - https://bugdrop.dev/compare/open-source-feedback-tools
+            `;
+
+            const issue = await github.rest.issues.create({
+              owner,
+              repo,
+              title,
+              body: body.replace(/^ {12}/gm, ""),
+              labels: [labelName],
+            });
+
+            core.info(`Created ${issue.data.html_url}`);

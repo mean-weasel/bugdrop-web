@@ -1,0 +1,26 @@
+# GitHub Issues Feedback
+
+BugDrop is a website feedback widget for teams that want user reports to become GitHub Issues without a separate dashboard. A reporter clicks the feedback button, describes the problem, attaches or annotates a screenshot, and BugDrop creates a formatted issue in the repository you choose.
+
+## Why Use GitHub Issues for Feedback?
+
+Many teams already triage bugs, assign work, discuss fixes, and close tasks in GitHub. Moving user feedback into a separate SaaS dashboard creates another inbox to monitor and another workflow to maintain. BugDrop keeps feedback where engineering work already happens.
+
+Each report includes the user's description, feedback category, page URL, browser details, viewport size, operating system, and optional screenshot. That context makes the issue actionable without a long follow-up thread.
+
+## What BugDrop Adds
+
+- **One script tag** -- add the widget to a production site, docs site, internal tool, or staging environment
+- **No reporter account** -- users do not need GitHub accounts to submit feedback
+- **Issue labels** -- bug, feature, and question reports can map to GitHub labels
+- **Visual context** -- screenshots and annotations show the exact UI state
+- **Privacy controls** -- reporters can redact screenshot regions and developers can mark private UI with `data-bugdrop-mask`
+- **GitHub-native triage** -- assign, label, comment, prioritize, and close issues in your existing workflow
+
+## Example Workflow
+
+A user sees a pricing table that wraps incorrectly on mobile. They tap the BugDrop button, write "The Pro plan card overlaps the CTA on my phone," circle the overlapping area, and submit. GitHub receives an issue with the screenshot, URL, viewport, browser, and OS. The developer can reproduce the layout immediately.
+
+## Set It Up
+
+Start with the [installation guide](/docs/installation), then review [configuration](/docs/configuration) for labels, screenshot behavior, submitter fields, and button placement. If screenshots may include sensitive data, read the [security guide](/docs/security) before adding BugDrop to production pages.

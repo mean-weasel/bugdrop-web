@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { useCasesNav } from "@/lib/use-cases-nav";
 import { MARKETPLACE_URL } from "@/lib/links";
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
+import { articleSchema, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   return useCasesNav.map((uc) => ({ slug: uc.slug }));
@@ -17,13 +19,12 @@ export async function generateMetadata({
   const useCase = useCasesNav.find((uc) => uc.slug === slug);
   if (!useCase) notFound();
 
-  return {
+  return pageMetadata({
     title: `${useCase.title} — BugDrop Use Cases`,
     description: useCase.description,
-    alternates: {
-      canonical: `/use-cases/${slug}`,
-    },
-  };
+    path: `/use-cases/${slug}`,
+    type: "article",
+  });
 }
 
 export default async function UseCasePage({
@@ -38,6 +39,20 @@ export default async function UseCasePage({
     const Content = (await import(`@/content/use-cases/${slug}.mdx`)).default;
     return (
       <div>
+        <JsonLd
+          data={breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Use Cases", path: "/use-cases" },
+            { name: useCase.title, path: `/use-cases/${slug}` },
+          ])}
+        />
+        <JsonLd
+          data={articleSchema({
+            title: `${useCase.title} — BugDrop Use Cases`,
+            description: useCase.description,
+            path: `/use-cases/${slug}`,
+          })}
+        />
         <Link
           href="/use-cases"
           className="text-accent-cyan hover:underline text-sm mb-6 block"

@@ -2,18 +2,36 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { PlayCircle } from "lucide-react";
 import { DEMO_PATH } from "@/lib/links";
+import { JsonLd } from "@/components/json-ld";
+import { articleSchema, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Docs — BugDrop",
-  description: "BugDrop documentation.",
-  alternates: {
-    canonical: "/docs",
-  },
-};
+const description =
+  "Documentation for installing, configuring, styling, testing, securing, and self-hosting the BugDrop website feedback widget.";
+
+export const metadata: Metadata = pageMetadata({
+  title: "BugDrop Docs",
+  description,
+  path: "/docs",
+  type: "article",
+});
 
 export default function DocsIndex() {
   return (
     <div>
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Docs", path: "/docs" },
+        ])}
+      />
+      <JsonLd
+        data={articleSchema({
+          title: "BugDrop Docs",
+          description,
+          path: "/docs",
+          type: "TechArticle",
+        })}
+      />
       <h1 className="text-3xl font-bold text-text-primary mb-4">Getting Started</h1>
       <p className="text-text-subtle mb-6 leading-relaxed">
         BugDrop is an open-source feedback widget that turns user bug reports into GitHub issues.

@@ -27,4 +27,25 @@ export const useCasesNav: UseCaseLink[] = [
       "Let clients report issues with screenshots during development — no GitHub account needed.",
     icon: "🤝",
   },
+  {
+    slug: "github-issues-feedback",
+    title: "GitHub Issues Feedback",
+    description:
+      "Collect website feedback as structured GitHub Issues with screenshots, labels, browser info, and page URLs.",
+    icon: "📋",
+  },
+  {
+    slug: "visual-bug-reporting",
+    title: "Visual Bug Reporting",
+    description:
+      "Capture visual bugs with annotated screenshots so developers can see the exact broken UI state.",
+    icon: "🖼️",
+  },
+  {
+    slug: "nextjs-feedback-widget",
+    title: "Next.js Feedback Widget",
+    description:
+      "Add BugDrop to a Next.js site with one script tag and send user feedback directly to GitHub Issues.",
+    icon: "▲",
+  },
 ];

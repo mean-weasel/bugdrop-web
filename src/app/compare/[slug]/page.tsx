@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { compareNav } from "@/lib/compare-nav";
 import { MARKETPLACE_URL } from "@/lib/links";
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
+import { articleSchema, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   return compareNav.map((c) => ({ slug: c.slug }));
@@ -17,13 +19,12 @@ export async function generateMetadata({
   const comparison = compareNav.find((c) => c.slug === slug);
   if (!comparison) notFound();
 
-  return {
+  return pageMetadata({
     title: `${comparison.title} — BugDrop`,
     description: comparison.description,
-    alternates: {
-      canonical: `/compare/${slug}`,
-    },
-  };
+    path: `/compare/${slug}`,
+    type: "article",
+  });
 }
 
 export default async function ComparePage({
@@ -38,6 +39,20 @@ export default async function ComparePage({
     const Content = (await import(`@/content/compare/${slug}.mdx`)).default;
     return (
       <div>
+        <JsonLd
+          data={breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Compare", path: "/compare" },
+            { name: comparison.title, path: `/compare/${slug}` },
+          ])}
+        />
+        <JsonLd
+          data={articleSchema({
+            title: `${comparison.title} — BugDrop`,
+            description: comparison.description,
+            path: `/compare/${slug}`,
+          })}
+        />
         <Link
           href="/compare"
           className="text-accent-cyan hover:underline text-sm mb-6 block"

@@ -11,12 +11,11 @@ import { ConfigTable } from "@/components/landing/config-table";
 import { TryCallout } from "@/components/landing/try-callout";
 import { JsonLd } from "@/components/json-ld";
 import {
-  GITHUB_ORG_URL,
-  GITHUB_PROFILE_URL,
-  GITHUB_REPO_URL,
-  GITHUB_WEB_REPO_URL,
-  MARKETPLACE_URL,
-  PRODUCT_HUNT_URL,
+  organizationSchema,
+  softwareApplicationSchema,
+  websiteSchema,
+} from "@/lib/seo";
+import {
   SAMPLE_DEMO_REPO,
   WIDGET_URL,
 } from "@/lib/links";
@@ -27,64 +26,12 @@ export const metadata: Metadata = {
   },
 };
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "BugDrop",
-  description:
-    "Free, open-source website feedback widget that turns user bug reports into GitHub issues with screenshots, annotations, and system info.",
-  url: "https://bugdrop.dev",
-  applicationCategory: "DeveloperApplication",
-  operatingSystem: "Web",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
-  author: {
-    "@type": "Organization",
-    name: "mean-weasel",
-    url: GITHUB_ORG_URL,
-  },
-  creator: {
-    "@type": "Person",
-    name: "neonwatty",
-    url: GITHUB_PROFILE_URL,
-  },
-  publisher: {
-    "@type": "Organization",
-    name: "mean-weasel",
-    url: GITHUB_ORG_URL,
-  },
-  license: "https://opensource.org/licenses/MIT",
-  codeRepository: GITHUB_REPO_URL,
-  sameAs: [
-    MARKETPLACE_URL,
-    PRODUCT_HUNT_URL,
-    GITHUB_REPO_URL,
-    GITHUB_WEB_REPO_URL,
-    GITHUB_ORG_URL,
-    GITHUB_PROFILE_URL,
-  ],
-  award: "Product Hunt #6 Product of the Day, May 9, 2026",
-  featureList: [
-    "Screenshot capture",
-    "Annotation tools",
-    "Screenshot redaction",
-    "Developer-configured privacy masking",
-    "Automatic password and credit-card field masking",
-    "Automatic system info",
-    "GitHub issue creation",
-    "Fully stylable widget",
-    "Shadow DOM isolation",
-    "Privacy-first design",
-  ],
-};
-
 export default function Home() {
   return (
     <main>
-      <JsonLd data={structuredData} />
+      <JsonLd data={softwareApplicationSchema()} />
+      <JsonLd data={organizationSchema()} />
+      <JsonLd data={websiteSchema()} />
       <Script
         src={WIDGET_URL}
         strategy="afterInteractive"

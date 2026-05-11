@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { compareNav } from "@/lib/compare-nav";
 import { MARKETPLACE_URL } from "@/lib/links";
@@ -5,6 +6,24 @@ import Link from "next/link";
 
 export function generateStaticParams() {
   return compareNav.map((c) => ({ slug: c.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const comparison = compareNav.find((c) => c.slug === slug);
+  if (!comparison) notFound();
+
+  return {
+    title: `${comparison.title} — BugDrop`,
+    description: comparison.description,
+    alternates: {
+      canonical: `/compare/${slug}`,
+    },
+  };
 }
 
 export default async function ComparePage({

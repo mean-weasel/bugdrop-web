@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { docsNav } from "@/lib/docs-nav";
 import Link from "next/link";
@@ -6,6 +7,23 @@ export function generateStaticParams() {
   return docsNav
     .filter((doc) => doc.slug !== "")
     .map((doc) => ({ slug: doc.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const doc = docsNav.find((d) => d.slug === slug);
+  if (!doc) notFound();
+
+  return {
+    title: `${doc.title} — BugDrop Docs`,
+    alternates: {
+      canonical: `/docs/${slug}`,
+    },
+  };
 }
 
 export default async function DocPage({

@@ -1,4 +1,5 @@
 import Script from "next/script";
+import type { Metadata } from "next";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { LiveDemoCta } from "@/components/landing/live-demo-cta";
@@ -19,6 +20,12 @@ import {
   SAMPLE_DEMO_REPO,
   WIDGET_URL,
 } from "@/lib/links";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
 
 const structuredData = {
   "@context": "https://schema.org",

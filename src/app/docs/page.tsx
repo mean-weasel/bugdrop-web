@@ -1,10 +1,14 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { PlayCircle } from "lucide-react";
 import { DEMO_PATH } from "@/lib/links";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Docs — BugDrop",
   description: "BugDrop documentation.",
+  alternates: {
+    canonical: "/docs",
+  },
 };
 
 export default function DocsIndex() {

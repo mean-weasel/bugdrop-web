@@ -1,9 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { useCasesNav } from "@/lib/use-cases-nav";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Use Cases — BugDrop",
   description: "See how teams use BugDrop.",
+  alternates: {
+    canonical: "/use-cases",
+  },
 };
 
 export default function UseCasesIndex() {

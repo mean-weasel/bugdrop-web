@@ -1,22 +1,36 @@
 import type { MetadataRoute } from "next";
+import { compareNav } from "@/lib/compare-nav";
+import { docsNav } from "@/lib/docs-nav";
+import { useCasesNav } from "@/lib/use-cases-nav";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://bugdrop.dev";
+  const lastModified = new Date();
 
   return [
-    { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/docs`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/docs/installation`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/docs/configuration`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/docs/styling`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/docs/faq`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/use-cases`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${base}/use-cases/open-source`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/use-cases/internal-tools`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/use-cases/client-projects`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/compare`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${base}/compare/userback`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/compare/canny`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${base}/compare/sentry-user-feedback`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
+    { url: base, lastModified, changeFrequency: "weekly", priority: 1 },
+    { url: `${base}/docs`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    ...docsNav
+      .filter((doc) => doc.slug !== "")
+      .map((doc) => ({
+        url: `${base}/docs/${doc.slug}`,
+        lastModified,
+        changeFrequency: "monthly" as const,
+        priority: doc.slug === "faq" ? 0.6 : 0.7,
+      })),
+    { url: `${base}/use-cases`, lastModified, changeFrequency: "monthly", priority: 0.8 },
+    ...useCasesNav.map((useCase) => ({
+      url: `${base}/use-cases/${useCase.slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+    { url: `${base}/compare`, lastModified, changeFrequency: "monthly", priority: 0.8 },
+    ...compareNav.map((comparison) => ({
+      url: `${base}/compare/${comparison.slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
   ];
 }

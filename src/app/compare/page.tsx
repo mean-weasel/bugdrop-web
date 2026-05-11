@@ -1,9 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { compareNav } from "@/lib/compare-nav";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Compare — BugDrop",
   description: "See how BugDrop compares to other feedback tools.",
+  alternates: {
+    canonical: "/compare",
+  },
 };
 
 export default function CompareIndex() {

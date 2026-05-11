@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { useCasesNav } from "@/lib/use-cases-nav";
 import { MARKETPLACE_URL } from "@/lib/links";
@@ -5,6 +6,24 @@ import Link from "next/link";
 
 export function generateStaticParams() {
   return useCasesNav.map((uc) => ({ slug: uc.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const useCase = useCasesNav.find((uc) => uc.slug === slug);
+  if (!useCase) notFound();
+
+  return {
+    title: `${useCase.title} — BugDrop Use Cases`,
+    description: useCase.description,
+    alternates: {
+      canonical: `/use-cases/${slug}`,
+    },
+  };
 }
 
 export default async function UseCasePage({

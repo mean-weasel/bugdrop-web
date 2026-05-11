@@ -2,8 +2,6 @@
 
 Getting BugDrop running on your site takes about 30 seconds. There are only two steps: install the GitHub App and add a script tag. No npm packages, no build configuration, no backend setup required.
 
-Want to try it first? Open the [Sample App Demo](https://bugdrop-widget-test.vercel.app/) to use the widget before installing it.
-
 ## Step 1: Install the GitHub App
 
 BugDrop needs access to your GitHub repository to create issues and store screenshots. Install the official GitHub App to grant these permissions.
@@ -72,6 +70,21 @@ You can add data attributes to customize the widget's appearance and behavior:
 ```
 
 See the [Configuration](/docs/configuration) and [Styling](/docs/styling) docs for all available attributes.
+
+## Protecting sensitive data
+
+If your page renders customer data, billing details, or any other content you do not
+want to appear in submitted screenshots, mark those elements with `data-bugdrop-mask`:
+
+```html
+<div class="customer-row" data-bugdrop-mask>
+  Jane Doe — jane@acme.com
+</div>
+```
+
+BugDrop covers each marked element with an opaque rectangle on the captured screenshot.
+Password inputs and credit-card autocomplete fields are masked automatically. See
+[Screenshot masking](/docs/security#screenshot-masking) on the Security page for details.
 
 ## Step 3: You Are Done
 

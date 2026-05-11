@@ -70,6 +70,9 @@ const structuredData = {
   featureList: [
     "Screenshot capture",
     "Annotation tools",
+    "Screenshot redaction",
+    "Developer-configured privacy masking",
+    "Automatic password and credit-card field masking",
     "Automatic system info",
     "GitHub issue creation",
     "Fully stylable widget",

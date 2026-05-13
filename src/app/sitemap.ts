@@ -29,9 +29,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${base}/use-cases/${useCase.slug}`,
       lastModified,
       changeFrequency: "monthly" as const,
-      priority: ["github-issues-feedback", "visual-bug-reporting", "nextjs-feedback-widget"].includes(
-        useCase.slug,
-      )
+      priority: [
+        "github-issues-feedback",
+        "website-feedback-widget",
+        "free-website-feedback-widget",
+        "screenshot-feedback-widget",
+        "visual-bug-reporting",
+        "nextjs-feedback-widget",
+      ].includes(useCase.slug)
         ? 0.8
         : 0.6,
     })),

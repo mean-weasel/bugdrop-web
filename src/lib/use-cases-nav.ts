@@ -35,6 +35,27 @@ export const useCasesNav: UseCaseLink[] = [
     icon: "📋",
   },
   {
+    slug: "website-feedback-widget",
+    title: "Website Feedback Widget",
+    description:
+      "Add a lightweight website feedback widget that sends screenshots, page context, and user notes to GitHub Issues.",
+    icon: "💬",
+  },
+  {
+    slug: "free-website-feedback-widget",
+    title: "Free Website Feedback Widget",
+    description:
+      "Use a free feedback widget for public sites, docs, SaaS apps, and internal tools without adding another inbox.",
+    icon: "Free",
+  },
+  {
+    slug: "screenshot-feedback-widget",
+    title: "Screenshot Feedback Widget",
+    description:
+      "Capture screenshots, annotations, browser metadata, and page URLs when users report UI bugs.",
+    icon: "📸",
+  },
+  {
     slug: "visual-bug-reporting",
     title: "Visual Bug Reporting",
     description:
@@ -47,5 +68,19 @@ export const useCasesNav: UseCaseLink[] = [
     description:
       "Add BugDrop to a Next.js site with one script tag and send user feedback directly to GitHub Issues.",
     icon: "▲",
+  },
+  {
+    slug: "open-source-feedback-widget",
+    title: "Open-Source Feedback Widget",
+    description:
+      "Choose an open-source feedback widget that can be inspected, self-hosted, and adapted to your GitHub workflow.",
+    icon: "OSS",
+  },
+  {
+    slug: "client-website-feedback-tool",
+    title: "Client Website Feedback Tool",
+    description:
+      "Give clients a simple way to report website issues with screenshots during review, QA, and launch prep.",
+    icon: "QA",
   },
 ];

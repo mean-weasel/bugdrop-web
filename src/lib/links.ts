@@ -18,6 +18,7 @@ export const DEMO_PATH = "/demo";
 
 export const DEMO_URL = "https://bugdrop-widget-test.vercel.app";
 
-export const WIDGET_URL = "https://bugdrop.neonwatty.workers.dev/widget.js";
+export const WIDGET_URL =
+  process.env.NEXT_PUBLIC_BUGDROP_WIDGET_URL ?? "https://bugdrop.neonwatty.workers.dev/widget.js";
 
 export const SAMPLE_DEMO_REPO = "mean-weasel/bugdrop-widget-test";

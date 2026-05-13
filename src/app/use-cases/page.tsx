@@ -41,6 +41,8 @@ export default function UseCasesIndex() {
           <Link
             key={uc.slug}
             href={`/use-cases/${uc.slug}`}
+            data-analytics-event="use_case_index_click"
+            data-analytics-label={uc.title}
             className="bg-bg-surface border border-border rounded-2xl p-7 transition-all duration-300 hover:-translate-y-1 hover:border-accent-warm hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] no-underline"
           >
             <span className="text-3xl mb-4 block">{uc.icon}</span>

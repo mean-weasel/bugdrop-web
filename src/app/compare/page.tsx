@@ -40,6 +40,8 @@ export default function CompareIndex() {
           <Link
             key={c.slug}
             href={`/compare/${c.slug}`}
+            data-analytics-event="compare_index_click"
+            data-analytics-label={c.title}
             className="bg-bg-surface border border-border rounded-2xl p-7 transition-all duration-300 hover:-translate-y-1 hover:border-accent-warm hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] no-underline"
           >
             <h2 className="text-lg font-semibold text-text-primary mb-2">{c.title}</h2>

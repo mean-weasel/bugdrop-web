@@ -5,13 +5,16 @@ import { HowItWorks } from "@/components/landing/how-it-works";
 import { LiveDemoCta } from "@/components/landing/live-demo-cta";
 import { DemoVideo } from "@/components/landing/demo-video";
 import { Features } from "@/components/landing/features";
+import { KeywordPositioning } from "@/components/landing/keyword-positioning";
 import { StylingShowcase } from "@/components/landing/styling-showcase";
 import { QuickStart } from "@/components/landing/quick-start";
 import { ConfigTable } from "@/components/landing/config-table";
 import { TryCallout } from "@/components/landing/try-callout";
 import { JsonLd } from "@/components/json-ld";
 import {
+  homeDescription,
   organizationSchema,
+  pageMetadata,
   softwareApplicationSchema,
   websiteSchema,
 } from "@/lib/seo";
@@ -21,6 +24,25 @@ import {
 } from "@/lib/links";
 
 export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "Free Website Feedback Widget for GitHub Issues | BugDrop",
+    description: homeDescription,
+    path: "/",
+  }),
+  keywords: [
+    "website feedback widget",
+    "GitHub Issues feedback widget",
+    "visual bug reporting tool",
+    "bug reporting widget",
+    "open source feedback widget",
+    "screenshot feedback widget",
+    "Userback alternative",
+    "Marker.io alternative",
+    "BugHerd alternative",
+    "Usersnap alternative",
+    "Sentry User Feedback alternative",
+    "Canny alternative for bug reports",
+  ],
   alternates: {
     canonical: "/",
   },
@@ -53,6 +75,7 @@ export default function Home() {
       <HowItWorks />
       <LiveDemoCta />
       <Features />
+      <KeywordPositioning />
       <StylingShowcase />
       <QuickStart />
       <ConfigTable />

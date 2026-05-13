@@ -11,10 +11,10 @@ import {
 
 export const SITE_URL = "https://bugdrop.dev";
 export const SITE_NAME = "BugDrop";
-export const SITE_UPDATED = "2026-05-11";
+export const SITE_UPDATED = "2026-05-13";
 
 export const homeDescription =
-  "Free, open source website feedback widget by mean-weasel. Users report bugs with screenshots and annotations — issues are created in GitHub automatically. One script tag, zero config.";
+  "Free, open-source website feedback widget for GitHub Issues. Capture bug reports with screenshots, annotations, browser metadata, and privacy controls from one script tag.";
 
 export function absoluteUrl(path = "/") {
   if (path.startsWith("https://")) return path;
@@ -95,11 +95,6 @@ export function softwareApplicationSchema() {
     url: SITE_URL,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
     author: {
       "@type": "Organization",
       name: "mean-weasel",
@@ -126,6 +121,13 @@ export function softwareApplicationSchema() {
       GITHUB_PROFILE_URL,
     ],
     award: "Product Hunt #6 Product of the Day, May 9, 2026",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      url: MARKETPLACE_URL,
+    },
     featureList: [
       "Screenshot capture",
       "Annotation tools",
@@ -133,6 +135,8 @@ export function softwareApplicationSchema() {
       "Developer-configured privacy masking",
       "Automatic password and credit-card field masking",
       "Automatic system info",
+      "Browser metadata",
+      "GitHub Marketplace installation",
       "GitHub issue creation",
       "Fully stylable widget",
       "Shadow DOM isolation",

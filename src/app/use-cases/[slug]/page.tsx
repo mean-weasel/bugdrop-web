@@ -71,6 +71,8 @@ export default async function UseCasePage({
             href={MARKETPLACE_URL}
             target="_blank"
             rel="noopener noreferrer"
+            data-analytics-event="use_case_marketplace_click"
+            data-analytics-label={useCase.title}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-[10px] font-medium bg-gradient-to-br from-accent-warm to-accent-rose text-bg-deep hover:-translate-y-0.5 transition-all duration-300"
           >
             Install from GitHub Marketplace

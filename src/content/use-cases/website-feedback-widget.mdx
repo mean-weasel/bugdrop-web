@@ -1,0 +1,25 @@
+# Website Feedback Widget
+
+BugDrop is a website feedback widget for teams that want actionable reports without asking users to leave the page. Visitors click the widget, describe what they saw, attach or annotate a screenshot, and BugDrop sends the report to GitHub Issues with the page URL and browser context.
+
+## What Makes a Feedback Widget Useful?
+
+A feedback widget should reduce friction for the reporter and reduce ambiguity for the developer. Text-only reports often miss the page state, viewport, browser, and reproduction context. BugDrop captures those details at submit time so the issue starts with enough information to triage.
+
+## Best-Fit Workflows
+
+- Marketing pages where layout or copy issues affect conversion
+- Documentation sites where examples, tabs, and navigation need quick feedback
+- SaaS apps where users can report broken UI states from inside the product
+- Internal tools where teammates need a low-friction way to report bugs
+- Client review sites where non-technical stakeholders should not need GitHub accounts
+
+## Why Send Feedback to GitHub Issues?
+
+Most development teams already use GitHub for triage, assignment, labels, discussion, and release tracking. A separate feedback inbox creates another place to check. BugDrop keeps website feedback in the same workflow as engineering work.
+
+Each report can include a description, screenshot, annotations, feedback type, page URL, browser, operating system, viewport size, and labels. That makes the GitHub Issue useful immediately.
+
+## Add It to a Site
+
+Install the GitHub App, add the script tag from the [installation guide](/docs/installation), and configure the widget with [configuration options](/docs/configuration). For sensitive pages, review [security and screenshot masking](/docs/security) before launch.

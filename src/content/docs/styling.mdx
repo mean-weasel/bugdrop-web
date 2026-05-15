@@ -14,7 +14,7 @@ All styling is done through data attributes on the script tag. No CSS files to i
 | `data-text` | Theme-dependent | Text color inside the widget |
 | `data-border-width` | `"1px"` | Border width of the form container |
 | `data-border-color` | Theme-dependent | Border color of the form container |
-| `data-shadow` | `"0 8px 30px rgba(0,0,0,0.12)"` | Box shadow of the form container |
+| `data-shadow` | `"soft"` | Shadow preset for the form container: `"soft"`, `"hard"`, or `"none"` |
 
 ### Defaults by Theme
 
@@ -68,7 +68,7 @@ For a sophisticated, editorial-style site with serif typography:
   data-text="#2d2d2d"
   data-border-width="1px"
   data-border-color="#c9b99a"
-  data-shadow="0 2px 8px rgba(0,0,0,0.08)"
+  data-shadow="soft"
   data-color="#8b6914"
 ></script>
 ```
@@ -93,7 +93,7 @@ For a bold, high-contrast site with a brutalist aesthetic:
   data-text="#000000"
   data-border-width="3px"
   data-border-color="#000000"
-  data-shadow="6px 6px 0 #000000"
+  data-shadow="hard"
   data-color="#ff0000"
 ></script>
 ```
@@ -119,7 +119,7 @@ For a clean dark-themed site:
   data-text="#fafafa"
   data-border-width="1px"
   data-border-color="#262626"
-  data-shadow="0 16px 48px rgba(0,0,0,0.4)"
+  data-shadow="soft"
   data-color="#3b82f6"
 ></script>
 ```
@@ -138,7 +138,7 @@ For a friendly, approachable site with soft colors:
   data-text="#4a2c5e"
   data-border-width="2px"
   data-border-color="#e8d5f5"
-  data-shadow="0 4px 20px rgba(124,58,237,0.1)"
+  data-shadow="soft"
   data-color="#a855f7"
 ></script>
 ```
@@ -193,7 +193,7 @@ Combine a custom icon with a text label for maximum clarity:
 2. **Use your brand's primary color** -- Set `data-color` to your brand's primary or accent color for the button and form highlights
 3. **Consider `data-font="inherit"`** -- Unless you want the widget to look deliberately different from your site, `inherit` is the easiest way to match typography
 4. **Test both themes** -- If your site supports light and dark mode, test BugDrop with both `data-theme="light"` and `data-theme="dark"`
-5. **Shadow depth signals importance** -- A larger shadow makes the widget feel more prominent; a subtle shadow lets it blend in
+5. **Shadow depth signals importance** -- Use `data-shadow="hard"` when the widget should stand out, `soft` for the default layered look, or `none` for a flat interface
 
 ## Next Steps
 

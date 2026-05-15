@@ -9,14 +9,14 @@ These attributes control the fundamental behavior of the widget.
 | Attribute | Default | Description |
 |-----------|---------|-------------|
 | `data-repo` | **(required)** | GitHub repository in `owner/repo` format |
-| `data-theme` | `"light"` | Widget theme: `"light"` or `"dark"` |
+| `data-theme` | `"auto"` | Widget theme: `"auto"`, `"light"`, or `"dark"` |
 | `data-position` | `"bottom-right"` | Button position: `"bottom-right"` or `"bottom-left"` |
 | `data-color` | `"#7c3aed"` | Primary accent color (any CSS color value) |
 | `data-icon` | *(default bug icon)* | Custom icon: URL to an image, `"none"` to hide, or omit for default |
 | `data-label` | `""` | Text label displayed next to the button icon |
 | `data-category-labels` | built-in labels | Self-hosted JSON mapping from built-in categories to GitHub labels |
 | `data-button` | `"true"` | Show the floating button: `"true"` or `"false"` |
-| `data-welcome` | `"Report a bug or request a feature"` | Welcome message displayed at the top of the form |
+| `data-welcome` | `"once"` | Welcome screen behavior: `"once"`, `"always"`, or `"never"` |
 
 ### Basic Example
 
@@ -27,7 +27,7 @@ These attributes control the fundamental behavior of the widget.
   data-theme="dark"
   data-position="bottom-left"
   data-color="#ef4444"
-  data-welcome="Found a bug? Let us know!"
+  data-welcome="always"
 ></script>
 ```
 
@@ -35,11 +35,16 @@ These attributes control the fundamental behavior of the widget.
 
 The `data-theme` attribute controls the overall color scheme of the widget:
 
-- **`light`** (default) -- White background with dark text. Suitable for most sites.
+- **`auto`** (default) -- Follows the visitor's system color scheme.
+- **`light`** -- White background with dark text. Suitable for most sites.
 - **`dark`** -- Dark background with light text. Ideal for sites with dark color schemes.
 
 ```html
-<!-- Light theme (default) -->
+<!-- Auto theme (default) -->
+<script src="https://bugdrop.neonwatty.workers.dev/widget.js"
+  data-repo="owner/repo" data-theme="auto"></script>
+
+<!-- Light theme -->
 <script src="https://bugdrop.neonwatty.workers.dev/widget.js"
   data-repo="owner/repo" data-theme="light"></script>
 
@@ -88,18 +93,18 @@ Allow users to dismiss the floating button so it does not obstruct their view. T
 | Attribute | Default | Description |
 |-----------|---------|-------------|
 | `data-button-dismissible` | `"false"` | Allow users to dismiss (hide) the floating button |
-| `data-dismiss-duration` | `"session"` | How long the button stays dismissed: `"session"` (until tab close) or a number in minutes (e.g., `"60"`) |
+| `data-dismiss-duration` | *(forever)* | Positive whole number of days before the dismissed button can reappear |
 | `data-show-restore` | `"true"` | Show a small restore link after dismissing |
 
 ### Dismissible Button Example
 
 ```html
-<!-- Dismissible button that stays hidden for 60 minutes -->
+<!-- Dismissible button that stays hidden for 30 days -->
 <script
   src="https://bugdrop.neonwatty.workers.dev/widget.js"
   data-repo="owner/repo"
   data-button-dismissible="true"
-  data-dismiss-duration="60"
+  data-dismiss-duration="30"
   data-show-restore="true"
 ></script>
 ```
@@ -108,8 +113,8 @@ When a user dismisses the button:
 
 1. The floating button hides
 2. If `data-show-restore` is `"true"`, a small "Restore feedback button" link appears in the corner
-3. The button stays hidden for the duration specified by `data-dismiss-duration`
-4. After the duration expires (or the session ends), the button reappears automatically
+3. The button stays hidden for the number of days specified by `data-dismiss-duration`, or forever if no duration is set
+4. After the duration expires, the button reappears automatically
 
 ## Feedback Categories
 
@@ -307,18 +312,18 @@ Here is a script tag using many configuration options together:
   data-theme="dark"
   data-position="bottom-left"
   data-color="#6366f1"
-  data-welcome="We'd love to hear from you!"
+  data-welcome="always"
   data-show-name="true"
   data-show-email="true"
   data-require-email="true"
   data-button-dismissible="true"
-  data-dismiss-duration="120"
+  data-dismiss-duration="30"
   data-show-restore="true"
   data-label="Feedback"
 ></script>
 ```
 
-This configuration creates a dark-themed widget in the bottom-left corner with an indigo accent color, collects the submitter's name and email (email required), and shows a "Feedback" label on the button. The button is dismissible for 2 hours with a restore link.
+This configuration creates a dark-themed widget in the bottom-left corner with an indigo accent color, collects the submitter's name and email (email required), and shows a "Feedback" label on the button. The button is dismissible for 30 days with a restore link.
 
 ## Next Steps
 

@@ -9,14 +9,15 @@ These attributes control the fundamental behavior of the widget.
 | Attribute | Default | Description |
 |-----------|---------|-------------|
 | `data-repo` | **(required)** | GitHub repository in `owner/repo` format |
-| `data-theme` | `"light"` | Widget theme: `"light"` or `"dark"` |
+| `data-theme` | `"auto"` | Widget theme: `"light"`, `"dark"`, or `"auto"` |
 | `data-position` | `"bottom-right"` | Button position: `"bottom-right"` or `"bottom-left"` |
-| `data-color` | `"#7c3aed"` | Primary accent color (any CSS color value) |
+| `data-color` | `"#14b8a6"` | Primary accent color (any CSS color value) |
 | `data-icon` | *(default bug icon)* | Custom icon: URL to an image, `"none"` to hide, or omit for default |
-| `data-label` | `""` | Text label displayed next to the button icon |
+| `data-label` | `"Feedback"` | Text label displayed next to the button icon |
 | `data-category-labels` | built-in labels | Self-hosted JSON mapping from built-in categories to GitHub labels |
 | `data-button` | `"true"` | Show the floating button: `"true"` or `"false"` |
 | `data-welcome` | `"Report a bug or request a feature"` | Welcome message displayed at the top of the form |
+| `data-show-issue-link` | `"public"` | Show the GitHub issue link after submission: `"public"`, `"always"`, or `"never"` |
 
 ### Basic Example
 
@@ -35,11 +36,16 @@ These attributes control the fundamental behavior of the widget.
 
 The `data-theme` attribute controls the overall color scheme of the widget:
 
-- **`light`** (default) -- White background with dark text. Suitable for most sites.
+- **`auto`** (default) -- Follows the user's system color scheme.
+- **`light`** -- White background with dark text. Suitable for most sites.
 - **`dark`** -- Dark background with light text. Ideal for sites with dark color schemes.
 
 ```html
-<!-- Light theme (default) -->
+<!-- Auto theme (default) -->
+<script src="https://bugdrop.neonwatty.workers.dev/widget.js"
+  data-repo="owner/repo" data-theme="auto"></script>
+
+<!-- Light theme -->
 <script src="https://bugdrop.neonwatty.workers.dev/widget.js"
   data-repo="owner/repo" data-theme="light"></script>
 
@@ -52,8 +58,31 @@ The `data-theme` attribute controls the overall color scheme of the widget:
 
 The `data-position` attribute controls where the floating button appears:
 
-- **`bottom-right`** (default) -- Fixed to the bottom-right corner
-- **`bottom-left`** -- Fixed to the bottom-left corner
+- **`bottom-right`** (default) -- Anchored to the right edge
+- **`bottom-left`** -- Anchored to the left edge
+
+The button is shown as an edge label with a small drag handle. Users can drag it vertically
+when it covers page content, and BugDrop remembers that position in the browser for the same
+repository and side.
+
+## Issue Link Visibility
+
+Control whether the success confirmation links to the GitHub Issue that was created.
+
+| Value | Behavior |
+|-------|----------|
+| `"public"` | Default. Show the issue number and GitHub link for public repositories only. Private repository submissions use a generic success message. |
+| `"always"` | Show the issue number and GitHub link whenever the server returns an issue URL, including private repositories. Use this only for trusted internal users who already have GitHub access to the target repository. |
+| `"never"` | Show the issue number for public repositories, but do not show a GitHub link. Private repository submissions use a generic success message. |
+
+```html
+<!-- Show private repository issue links to trusted internal users -->
+<script
+  src="https://bugdrop.neonwatty.workers.dev/widget.js"
+  data-repo="owner/private-repo"
+  data-show-issue-link="always"
+></script>
+```
 
 ## Submitter Information
 
@@ -88,18 +117,18 @@ Allow users to dismiss the floating button so it does not obstruct their view. T
 | Attribute | Default | Description |
 |-----------|---------|-------------|
 | `data-button-dismissible` | `"false"` | Allow users to dismiss (hide) the floating button |
-| `data-dismiss-duration` | `"session"` | How long the button stays dismissed: `"session"` (until tab close) or a number in minutes (e.g., `"60"`) |
+| `data-dismiss-duration` | Forever | How long the button stays dismissed: omit for forever, or provide a number of days (e.g., `"7"`) |
 | `data-show-restore` | `"true"` | Show a small restore link after dismissing |
 
 ### Dismissible Button Example
 
 ```html
-<!-- Dismissible button that stays hidden for 60 minutes -->
+<!-- Dismissible button that stays hidden for 7 days -->
 <script
   src="https://bugdrop.neonwatty.workers.dev/widget.js"
   data-repo="owner/repo"
   data-button-dismissible="true"
-  data-dismiss-duration="60"
+  data-dismiss-duration="7"
   data-show-restore="true"
 ></script>
 ```
@@ -109,7 +138,7 @@ When a user dismisses the button:
 1. The floating button hides
 2. If `data-show-restore` is `"true"`, a small "Restore feedback button" link appears in the corner
 3. The button stays hidden for the duration specified by `data-dismiss-duration`
-4. After the duration expires (or the session ends), the button reappears automatically
+4. After the duration expires, the button reappears automatically
 
 ## Feedback Categories
 
@@ -211,6 +240,7 @@ Control how screenshots are collected during the feedback flow.
 |-----------|---------|-------------|
 | `data-screenshot` | `"optional"` | Screenshot mode: `"optional"`, `"auto"`, or `"required"` |
 | `data-screenshot-scale` | `"2"` | Minimum pixel ratio for screenshot captures |
+| `data-element-context-max-area` | `"0"` | Maximum surrounding container size for Select Element captures, expressed as a multiple of the visible viewport area |
 
 ### Screenshot Modes
 
@@ -218,7 +248,58 @@ Control how screenshots are collected during the feedback flow.
 - **`auto`** -- Automatically captures a full-page screenshot after the form is submitted, without showing the manual screenshot picker or redaction step.
 - **`required`** -- Requires a screenshot before submission. Users can choose full page, element, or area, then annotate or redact before submitting.
 
-Manual redaction is controlled by the person submitting feedback. Use developer-configured masking for fields that should never appear in screenshots, especially with automatic screenshots.
+Manual redaction is controlled by the person submitting feedback. Use developer-configured masking for fields that should be visually covered in supported screenshot modes, especially with automatic screenshots. Auto mode warns users that a full-page screenshot will be attached, but it does not show the manual picker or annotation review step.
+
+### Select Element screenshots
+
+When a user chooses **Select Element**, BugDrop captures the selected element and draws a rounded border around it. The border is drawn with a small 2px inner gap so it does not sit directly on top of the selected element. This keeps the default behavior tight and predictable.
+
+The highlight uses the same styling controls as the widget:
+
+- `data-color` controls the highlight color.
+- `data-radius` controls the rounded corners.
+- `data-border-width` controls the highlight border thickness.
+
+GitHub issues include a screenshot caption that identifies the selected element border and includes the exact resolved highlight color.
+
+Selected-element reports also include CSS selector metadata for the chosen element, including a full CSS path. Avoid putting secrets, customer identifiers, or other private data in DOM IDs or class names if issue visibility is broader than your internal team.
+
+The amount of surrounding context is controlled by one attribute:
+
+```html
+<script
+  src="https://bugdrop.neonwatty.workers.dev/widget.js"
+  data-repo="owner/repo"
+  data-element-context-max-area="1.5"
+></script>
+```
+
+- Omit `data-element-context-max-area`, or set it to `"0"`, to capture only the selected element.
+- Increase `data-element-context-max-area` to allow larger surrounding containers. This can provide more context for triage and AI-assisted review, but may create larger images and slower captures.
+
+Select Element captures are capped at 1x pixel ratio even when `data-screenshot-scale` is higher. This keeps context screenshots small enough for practical issue uploads.
+
+The screenshot review step also links to this configuration section when a Select Element screenshot is being reviewed, so teams can discover the context setting during testing.
+
+### Developer-configured screenshot masking
+
+BugDrop can visually mask fields that your app marks as private before a screenshot is uploaded:
+
+```html
+<input data-bugdrop-redact value="sk_live_..." />
+<section data-bugdrop-mask>Private account details</section>
+```
+
+Supported attributes:
+
+- `data-bugdrop-redact`
+- `data-bd-redact`
+- `data-bugdrop-redacted`
+- `data-bugdrop-mask`
+
+This is best-effort visual masking, not a data-loss-prevention or security boundary. BugDrop can only mask content it can measure in the page DOM. Unmarked sensitive information can still appear, and browser rendering limits can apply to canvas, image, video, iframe, SVG, shadow DOM, pseudo-element, and highly custom control content.
+
+Selected-area screenshots are rendered to the selected dimensions and masks are translated into that crop, but the capture still runs client-side against the page DOM. Avoid screenshots entirely for pages where client-side screenshot rendering is unacceptable.
 
 ```html
 <!-- Automatically attach a full-page screenshot -->
@@ -312,13 +393,13 @@ Here is a script tag using many configuration options together:
   data-show-email="true"
   data-require-email="true"
   data-button-dismissible="true"
-  data-dismiss-duration="120"
+  data-dismiss-duration="7"
   data-show-restore="true"
   data-label="Feedback"
 ></script>
 ```
 
-This configuration creates a dark-themed widget in the bottom-left corner with an indigo accent color, collects the submitter's name and email (email required), and shows a "Feedback" label on the button. The button is dismissible for 2 hours with a restore link.
+This configuration creates a dark-themed widget in the bottom-left corner with an indigo accent color, collects the submitter's name and email (email required), and shows a "Feedback" label on the button. The button is dismissible for 7 days with a restore link.
 
 ## Next Steps
 

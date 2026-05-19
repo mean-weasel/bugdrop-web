@@ -5,10 +5,7 @@ import { HowItWorks } from "@/components/landing/how-it-works";
 import { LiveDemoCta } from "@/components/landing/live-demo-cta";
 import { DemoVideo } from "@/components/landing/demo-video";
 import { Features } from "@/components/landing/features";
-import { KeywordPositioning } from "@/components/landing/keyword-positioning";
-import { StylingShowcase } from "@/components/landing/styling-showcase";
 import { QuickStart } from "@/components/landing/quick-start";
-import { ConfigTable } from "@/components/landing/config-table";
 import { TryCallout } from "@/components/landing/try-callout";
 import { JsonLd } from "@/components/json-ld";
 import {
@@ -76,10 +73,7 @@ export default function Home() {
       <LiveDemoCta />
       <HowItWorks />
       <Features />
-      <KeywordPositioning />
-      <StylingShowcase />
       <QuickStart />
-      <ConfigTable />
       <TryCallout />
     </main>
   );

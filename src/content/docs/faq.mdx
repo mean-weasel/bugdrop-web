@@ -208,15 +208,16 @@ If the widget appears but submissions fail:
 
 1. **Check the GitHub App** -- Make sure it is installed on the correct repository with Issues and Contents permissions
 2. **Check rate limits** -- You may have hit the per-IP or per-repository rate limit
-3. **Check the console** -- Look for error messages in the browser developer console
-4. **Check the network tab** -- Inspect the API request to see the response status and body
+3. **Check CSP** -- If your site uses a strict Content Security Policy, make sure `https://bugdrop.neonwatty.workers.dev` is allowed in `connect-src` so the browser can submit feedback to the Worker API
+4. **Check the console** -- Look for error messages in the browser developer console
+5. **Check the network tab** -- Inspect the API request to see the response status and body
 
 ### Screenshots are not being uploaded
 
 If issues are created but without screenshots:
 
 1. **Check branch protection** -- The GitHub App needs permission to push to the `bugdrop-screenshots` branch. See the [Installation](/docs/installation) page for details on branch protection configuration.
-2. **Check CSP** -- Make sure your Content Security Policy allows the BugDrop widget script.
+2. **Check CSP** -- Make sure your Content Security Policy allows the BugDrop widget script in `script-src` and feedback submission in `connect-src`.
 3. **Cross-origin content** -- Browser screenshot rendering cannot capture cross-origin iframes or images loaded without CORS headers. These elements may appear blank in the screenshot.
 
 ### Can I use BugDrop on a static site?

@@ -72,14 +72,14 @@ export default function Home() {
         data-welcome="This is the BugDrop landing page demo. Send a test report to see what your users would experience."
       />
       <Hero />
-      <HowItWorks />
+      <DemoVideo />
       <LiveDemoCta />
+      <HowItWorks />
       <Features />
       <KeywordPositioning />
       <StylingShowcase />
       <QuickStart />
       <ConfigTable />
-      <DemoVideo />
       <TryCallout />
     </main>
   );

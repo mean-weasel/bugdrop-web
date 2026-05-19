@@ -111,10 +111,12 @@ The BugDrop script tag should **not** include the `async` or `defer` attributes.
 If your site uses a Content Security Policy, allow the BugDrop worker domain in your CSP directives:
 
 ```
-Content-Security-Policy: script-src 'self' https://bugdrop.neonwatty.workers.dev;
+Content-Security-Policy:
+  script-src 'self' https://bugdrop.neonwatty.workers.dev;
+  connect-src 'self' https://bugdrop.neonwatty.workers.dev;
 ```
 
-If you have a strict CSP, make sure the BugDrop worker domain is included in your `script-src` directive.
+`script-src` lets the widget load. `connect-src` lets the browser submit feedback to the BugDrop Worker API.
 
 ### Branch Protection and the Screenshots Branch
 

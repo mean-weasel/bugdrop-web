@@ -64,7 +64,7 @@ const initialConfig: SandboxConfig = {
   showEmail: false,
   requireEmail: false,
   buttonDismissible: false,
-  dismissDuration: "session",
+  dismissDuration: "7",
   showRestore: true,
   showButton: true,
   screenshotScale: "2",
@@ -866,6 +866,15 @@ export function WidgetSandbox() {
                 checked={config.buttonDismissible}
                 onChange={(value) => update("buttonDismissible", value)}
               />
+              {config.buttonDismissible ? (
+                <Field label="Dismiss days">
+                  <TextInput
+                    value={config.dismissDuration}
+                    onChange={(value) => update("dismissDuration", value)}
+                    placeholder="Leave blank for forever"
+                  />
+                </Field>
+              ) : null}
               <Checkbox
                 label="Show restore tab"
                 checked={config.showRestore}

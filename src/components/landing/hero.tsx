@@ -19,9 +19,8 @@ export function Hero() {
         </strong>
       </h1>
       <p className="text-xl text-text-subtle max-w-[600px] mx-auto mb-10 max-sm:mb-7 max-sm:text-lg">
-        BugDrop is an open-source website feedback widget for visual bug
-        reporting. Capture screenshots, annotations, browser metadata, and
-        privacy redactions, then create GitHub Issues from one script tag.
+        Capture screenshots, annotations, and browser context, then turn user
+        feedback into GitHub Issues, all from one script tag.
       </p>
       <div className="mx-auto mb-7 flex max-w-[720px] flex-wrap justify-center gap-2 text-xs font-medium text-text-muted">
         <span className="rounded border border-border bg-bg-surface px-3 py-1.5">

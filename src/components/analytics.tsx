@@ -86,17 +86,23 @@ function referrerDomain(referrer: string) {
 function attributionProperties(pagePath: string, searchParams: URLSearchParams) {
   const currentParams = searchParamsObject(searchParams);
   const stored = parseStoredAttribution();
-  const firstTouch = stored ?? {
-    first_landing_page: pagePath,
-    first_referrer: document.referrer || undefined,
-    first_referring_domain: referrerDomain(document.referrer),
-    first_seen_at: new Date().toISOString(),
+  const firstTouch = {
+    ...(stored ?? {}),
+    first_landing_page: stored?.first_landing_page ?? pagePath,
+    first_referrer: (stored?.first_referrer ?? document.referrer) || undefined,
+    first_referring_domain:
+      stored?.first_referring_domain ?? referrerDomain(document.referrer),
+    first_seen_at: stored?.first_seen_at ?? new Date().toISOString(),
     ...Object.fromEntries(
-      Object.entries(currentParams).map(([key, value]) => [`first_${key}`, value]),
+      Object.entries(currentParams)
+        .filter(([key]) => !stored?.[`first_${key}`])
+        .map(([key, value]) => [`first_${key}`, value]),
     ),
   };
 
   if (!stored) {
+    safeLocalStorageSet(attributionStorageKey, JSON.stringify(firstTouch));
+  } else if (!stored.first_landing_page) {
     safeLocalStorageSet(attributionStorageKey, JSON.stringify(firstTouch));
   }
 

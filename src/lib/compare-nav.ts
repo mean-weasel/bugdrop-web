@@ -8,7 +8,8 @@ export const compareNav: CompareLink[] = [
   {
     slug: "userback",
     title: "BugDrop vs Userback",
-    description: "Open-source GitHub-native alternative to Userback's visual feedback platform.",
+    description:
+      "Userback alternative for teams that want open-source screenshot feedback sent directly to GitHub Issues.",
   },
   {
     slug: "canny",
@@ -24,13 +25,13 @@ export const compareNav: CompareLink[] = [
     slug: "marker-io",
     title: "BugDrop vs Marker.io",
     description:
-      "Open-source GitHub Issues feedback widget vs a paid visual bug reporting platform for teams.",
+      "Free Marker.io alternative for GitHub-native teams that want screenshot bug reports without another dashboard.",
   },
   {
     slug: "bugherd",
     title: "BugDrop vs BugHerd",
     description:
-      "GitHub-native screenshot feedback for developers vs a hosted website annotation and task board.",
+      "Usersnap vs BugHerd research often comes down to hosted feedback suites; BugDrop is the GitHub-native alternative.",
   },
   {
     slug: "usersnap",

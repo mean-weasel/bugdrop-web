@@ -11,7 +11,7 @@ import {
 
 export const SITE_URL = "https://bugdrop.dev";
 export const SITE_NAME = "BugDrop";
-export const SITE_UPDATED = "2026-05-13";
+export const SITE_UPDATED = "2026-05-30";
 
 export const homeDescription =
   "Free, open-source website feedback widget for GitHub Issues. Capture bug reports with screenshots, annotations, browser metadata, and privacy controls from one script tag.";

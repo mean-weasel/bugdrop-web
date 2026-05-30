@@ -38,7 +38,7 @@ export const useCasesNav: UseCaseLink[] = [
     slug: "website-feedback-widget",
     title: "Website Feedback Widget",
     description:
-      "Add a lightweight website feedback widget that sends screenshots, page context, and user notes to GitHub Issues.",
+      "Install a website feedback widget that captures screenshots, page context, and user notes as GitHub Issues.",
     icon: "💬",
   },
   {
@@ -52,7 +52,7 @@ export const useCasesNav: UseCaseLink[] = [
     slug: "screenshot-feedback-widget",
     title: "Screenshot Feedback Widget",
     description:
-      "Capture screenshots, annotations, browser metadata, and page URLs when users report UI bugs.",
+      "Add a screenshot feedback widget for annotated visual bug reports with browser metadata and page URLs.",
     icon: "📸",
   },
   {

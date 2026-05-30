@@ -2,6 +2,12 @@
 
 BugDrop and BugHerd both reduce the friction of reporting website issues, but they take different approaches. BugDrop sends screenshot-powered reports to GitHub Issues. BugHerd provides a hosted website annotation and task board workflow.
 
+Searches like "Usersnap vs BugHerd" usually compare paid hosted feedback suites for product, QA, and client review workflows. BugDrop is the simpler alternative when the destination should be GitHub Issues and the team does not need a separate review board.
+
+**Best for:** BugDrop fits GitHub-native engineering teams, open-source maintainers, docs sites, preview deployments, and internal tools that need annotated screenshot reports without a hosted feedback suite.
+
+[Try the widget](/demo) or [read the setup docs](/docs/getting-started).
+
 ## What is BugHerd?
 
 BugHerd is a visual feedback and bug tracking platform commonly used by agencies and web teams. Users can pin feedback to page elements, create tasks, and manage review work in BugHerd's interface.
@@ -12,6 +18,13 @@ That model is useful when clients and non-technical stakeholders need a dedicate
 
 BugDrop is an open-source feedback widget that creates GitHub Issues from website reports. It is designed for teams that want screenshots, annotations, system info, and page URLs to flow directly into GitHub without a separate task board.
 
+## How BugDrop Works
+
+1. Connect BugDrop to the GitHub repository that should receive website feedback.
+2. Add the script tag to the pages where users, clients, or QA reviewers need to report issues.
+3. Reviewers submit a description, annotated screenshot, redactions, and page context.
+4. Developers triage the resulting GitHub Issue with normal labels, assignments, comments, and project workflows.
+
 ## Feature Comparison
 
 | Feature | BugDrop | BugHerd |
@@ -21,7 +34,10 @@ BugDrop is an open-source feedback widget that creates GitHub Issues from websit
 | Setup | One script tag | Account + project setup |
 | Screenshots | Yes | Yes |
 | Annotations | Yes | Yes |
+| Browser and page metadata | Yes | Yes |
+| GitHub Issues output | Native | Integration-dependent |
 | Client feedback | Yes | Yes |
+| Hosted task board | No | Yes |
 | Self-hostable | Yes | No |
 | Best fit | Developer teams in GitHub | Agencies needing a managed review board |
 
@@ -32,3 +48,7 @@ Choose BugDrop when GitHub is your source of truth and you want reports to becom
 ## When to Choose BugHerd
 
 BugHerd can be a better fit when your process revolves around client review, task boards, and non-GitHub project management. Agencies that want a dedicated feedback workspace may prefer that model.
+
+## Start with BugDrop
+
+Use the [demo](/demo) to test the feedback flow, then follow [installation](/docs/installation) to add the widget to a site. The implementation is open source on [GitHub](https://github.com/mean-weasel/bugdrop).

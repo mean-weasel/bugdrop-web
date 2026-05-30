@@ -1,12 +1,24 @@
-# Screenshot Feedback Widget
+# Screenshot Feedback Widget for Visual Bug Reports
 
 BugDrop is a screenshot feedback widget for teams that need users to show the problem, not just describe it. A report can include the current page screenshot, annotations, redacted regions, the page URL, and browser metadata.
+
+**Best for:** visual QA, docs issues, responsive layout bugs, client review, preview deployments, and product screens where a screenshot is faster than a reproduction essay.
+
+[Try the screenshot widget](/demo) or [read the screenshot configuration docs](/docs/configuration).
 
 ## Why Screenshots Matter
 
 Website bugs are often visual: clipped text, broken spacing, missing images, wrong colors, hidden buttons, mobile overflow, dark-mode issues, or browser-specific rendering problems. A written report like "the page looks broken" rarely gives developers enough context.
 
 A screenshot turns the report into a concrete artifact. An annotation points to the exact area, and metadata explains the environment where it happened.
+
+## Screenshot Feedback Flow
+
+1. Add the BugDrop script tag to the page where visual reports should be available.
+2. Users click the feedback button when they see a broken UI state.
+3. BugDrop captures the page, lets the user annotate the relevant area, and supports manual redaction before submit.
+4. The widget sends the screenshot, description, page URL, viewport, browser, OS, and labels to GitHub Issues.
+5. Developers triage the issue beside the code, pull requests, and release workflow.
 
 ## BugDrop Screenshot Reports Include
 
@@ -19,12 +31,22 @@ A screenshot turns the report into a concrete artifact. An annotation points to 
 - Browser and operating system
 - Feedback category and labels
 
+## Feature Summary
+
+| Capability | BugDrop screenshot widget |
+|---|---|
+| Screenshot capture | Current page state with reporter context |
+| Annotation | User can point to the broken area |
+| Redaction | Reporter can hide sensitive regions before submit |
+| Developer masking | `data-bugdrop-mask` covers marked private UI |
+| Output | GitHub Issue with screenshot, URL, metadata, and labels |
+
 ## Privacy Controls
 
-Screenshots can expose private information. BugDrop supports user redaction and developer-defined masking for sensitive elements. Password and payment fields should be treated carefully, and teams should review [screenshot masking](/docs/security#screenshot-masking) before deploying the widget to authenticated product pages.
+Screenshots can expose private information. BugDrop supports user redaction and developer-defined masking for sensitive elements. Password and payment fields should be treated carefully, and teams should review [screenshot masking](/docs/security) before deploying the widget to authenticated product pages.
 
 ## GitHub-Native Output
 
 Instead of sending screenshots to a separate dashboard, BugDrop creates a GitHub Issue. That keeps visual bug reports close to the code, release process, assignees, labels, and comments developers already use.
 
-Start with [installation](/docs/installation), then configure screenshot behavior in [configuration](/docs/configuration).
+Start with [installation](/docs/installation), then configure screenshot behavior in [configuration](/docs/configuration). Use the [demo](/demo) to try the capture and submission flow first.

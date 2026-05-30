@@ -1,6 +1,12 @@
-# BugDrop vs Marker.io
+# Free Marker.io Alternative: BugDrop vs Marker.io
 
-BugDrop and Marker.io both help teams collect visual website feedback, but they are built for different workflows. BugDrop is an open-source widget that creates GitHub Issues directly. Marker.io is a hosted visual bug reporting platform with team workflows and integrations across project management tools.
+BugDrop is a free Marker.io alternative for teams that want visual website feedback to become GitHub Issues. Both tools collect screenshot bug reports, annotations, and browser context, but the workflow is different: BugDrop is open source and GitHub-native, while Marker.io is a paid hosted visual bug reporting platform with team workflows and integrations across project management tools.
+
+If you are searching for "Marker.io alternative", "Marker.io free alternative", or "Marker.io vs BugDrop", the main question is whether you need a managed feedback workspace or a lightweight widget that sends reports where developers already triage work.
+
+**Best for:** BugDrop fits GitHub-native teams, open-source projects, staging sites, docs, and small product teams that want screenshot feedback without adding another paid dashboard.
+
+[Try the widget](/demo) or [read the installation guide](/docs/installation).
 
 ## What is Marker.io?
 
@@ -12,6 +18,13 @@ Its value is strongest for teams that need a managed feedback platform, stakehol
 
 BugDrop is a free, MIT-licensed website feedback widget for teams that want reports to become GitHub Issues. It captures screenshots, annotations, page context, browser details, and privacy controls without requiring a separate feedback dashboard.
 
+## How BugDrop Works
+
+1. Install the GitHub App for the repository that should receive reports.
+2. Add one script tag to the site, docs, product screen, or preview deployment.
+3. Users click the feedback widget, describe the issue, and annotate or redact a screenshot.
+4. BugDrop creates a GitHub Issue with the screenshot, page URL, browser metadata, labels, and reporter notes.
+
 ## Feature Comparison
 
 | Feature | BugDrop | Marker.io |
@@ -21,14 +34,21 @@ BugDrop is a free, MIT-licensed website feedback widget for teams that want repo
 | Setup | One script tag | Account + project setup |
 | Screenshots | Yes | Yes |
 | Annotations | Yes | Yes |
-| Screenshot redaction | Yes | Product-dependent |
+| Browser and page metadata | Yes | Yes |
+| Screenshot redaction and masking | Yes | Product-dependent |
+| GitHub Issues destination | Native | Integration |
+| Hosted feedback dashboard | No | Yes |
 | Self-hostable | Yes | No |
 | Best fit | GitHub-native developer teams | Teams needing managed feedback workflows |
 
 ## When to Choose BugDrop
 
-Choose BugDrop when your team already works in GitHub Issues, wants an open-source tool, needs a lightweight script tag, or prefers feedback data to stay in your own GitHub repository. BugDrop is also a strong fit for open-source projects, internal tools, and staging sites where a paid feedback platform is unnecessary.
+Choose BugDrop when your team already works in GitHub Issues, wants an open-source tool, needs a lightweight script tag, or prefers feedback data to stay in your own GitHub repository. BugDrop is also a strong fit for open-source projects, internal tools, docs, and staging sites where a paid feedback platform is unnecessary.
 
 ## When to Choose Marker.io
 
 Marker.io can be a better fit when you need a polished hosted platform, richer stakeholder management, and integrations across several non-GitHub tools. Larger QA or product teams may value those workflows more than open-source control.
+
+## Start with BugDrop
+
+Use the [live demo](/demo) to try the reporting flow, then follow [getting started](/docs/getting-started) to install the widget. Developers can also inspect the [GitHub repository](https://github.com/mean-weasel/bugdrop) before adopting it.

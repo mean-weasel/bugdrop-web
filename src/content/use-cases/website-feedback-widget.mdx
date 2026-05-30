@@ -1,6 +1,10 @@
-# Website Feedback Widget
+# Website Feedback Widget for GitHub Issues
 
 BugDrop is a website feedback widget for teams that want actionable reports without asking users to leave the page. Visitors click the widget, describe what they saw, attach or annotate a screenshot, and BugDrop sends the report to GitHub Issues with the page URL and browser context.
+
+**Best for:** product pages, docs, SaaS apps, internal tools, and client review environments where developers already triage work in GitHub.
+
+[Try the widget](/demo) or [follow the installation guide](/docs/installation).
 
 ## What Makes a Feedback Widget Useful?
 
@@ -20,6 +24,26 @@ Most development teams already use GitHub for triage, assignment, labels, discus
 
 Each report can include a description, screenshot, annotations, feedback type, page URL, browser, operating system, viewport size, and labels. That makes the GitHub Issue useful immediately.
 
+## Install and Use the Widget
+
+1. Install the GitHub App and grant access to the repository that should receive feedback.
+2. Add the widget script tag from the [installation guide](/docs/installation) to the site or app shell.
+3. Configure labels, categories, theme, position, and screenshot behavior in [configuration](/docs/configuration).
+4. Open the page, click the feedback button, and submit a test report.
+5. Triage the created GitHub Issue with your existing labels, assignees, comments, and project board.
+
+## What Users Submit
+
+| Report detail | Why it helps |
+|---|---|
+| Description | Captures what the user expected or noticed |
+| Screenshot and annotation | Shows the exact visual state |
+| Page URL | Points developers to the affected route |
+| Browser, OS, and viewport | Explains environment-specific issues |
+| Category and labels | Speeds up triage in GitHub |
+
 ## Add It to a Site
 
 Install the GitHub App, add the script tag from the [installation guide](/docs/installation), and configure the widget with [configuration options](/docs/configuration). For sensitive pages, review [security and screenshot masking](/docs/security) before launch.
+
+You can test the full flow in the [live demo](/demo) before adding it to your own site.

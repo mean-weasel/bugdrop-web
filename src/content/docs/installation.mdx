@@ -85,7 +85,7 @@ BugDrop to visually cover in supported screenshot modes, mark those elements wit
 
 BugDrop covers each marked element with an opaque rectangle on supported captured screenshots.
 Password inputs and credit-card autocomplete fields are masked automatically. See
-[Screenshot masking](/docs/security) on the Security page for details.
+[Screenshot masking](/security#screenshot-masking) on the Security page for details.
 
 ## Step 3: You Are Done
 
@@ -111,12 +111,10 @@ The BugDrop script tag should **not** include the `async` or `defer` attributes.
 If your site uses a Content Security Policy, allow the BugDrop worker domain in your CSP directives:
 
 ```
-Content-Security-Policy:
-  script-src 'self' https://bugdrop.neonwatty.workers.dev;
-  connect-src 'self' https://bugdrop.neonwatty.workers.dev;
+Content-Security-Policy: script-src 'self' https://bugdrop.neonwatty.workers.dev;
 ```
 
-`script-src` lets the widget load. `connect-src` lets the browser submit feedback to the BugDrop Worker API.
+If you have a strict CSP, make sure the BugDrop worker domain is included in your `script-src` directive.
 
 ### Branch Protection and the Screenshots Branch
 

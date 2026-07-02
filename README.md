@@ -5,16 +5,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 First, run the development server:
 
 ```bash
-npm run dev
+npm run dev -- -H bugdrop.localhost
 # or
-yarn dev
+yarn dev -H bugdrop.localhost
 # or
-pnpm dev
+pnpm dev -- -H bugdrop.localhost
 # or
-bun dev
+bun dev -H bugdrop.localhost
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://bugdrop.localhost:3000](http://bugdrop.localhost:3000) with your browser to see the result. Use the project-specific `bugdrop.localhost` host consistently for local browser testing instead of mixing bare `localhost` and `127.0.0.1`; cookies are scoped by host, not port, and shared `localhost` cookies can break unrelated local OAuth/callback flows with oversized request headers. Leave local analytics keys such as `NEXT_PUBLIC_GA_MEASUREMENT_ID` and `NEXT_PUBLIC_POSTHOG_KEY` unset unless you are intentionally testing analytics.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

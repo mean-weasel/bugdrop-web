@@ -6,6 +6,7 @@ import { LiveDemoCta } from "@/components/landing/live-demo-cta";
 import { DemoVideo } from "@/components/landing/demo-video";
 import { Features } from "@/components/landing/features";
 import { QuickStart } from "@/components/landing/quick-start";
+import { ShowcaseCta } from "@/components/landing/showcase-cta";
 import { TryCallout } from "@/components/landing/try-callout";
 import { JsonLd } from "@/components/json-ld";
 import {
@@ -73,6 +74,7 @@ export default function Home() {
       <LiveDemoCta />
       <HowItWorks />
       <Features />
+      <ShowcaseCta />
       <QuickStart />
       <TryCallout />
     </main>

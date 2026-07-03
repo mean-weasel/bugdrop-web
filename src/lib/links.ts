@@ -14,6 +14,13 @@ export const GITHUB_REPO_URL = "https://github.com/mean-weasel/bugdrop";
 
 export const GITHUB_WEB_REPO_URL = "https://github.com/mean-weasel/bugdrop-web";
 
+export const SHOWCASE_PATH = "/showcase";
+
+export const SHOWCASE_URL = "https://bugdrop.dev/showcase";
+
+export const SHOWCASE_SUBMISSION_ISSUE_URL =
+  "https://github.com/mean-weasel/bugdrop/issues/241";
+
 export const DEMO_PATH = "/demo";
 
 export const DEMO_URL = "https://bugdrop-widget-test.vercel.app";

@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: base, lastModified, changeFrequency: "weekly", priority: 1 },
     { url: `${base}/demo`, lastModified, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/showcase`, lastModified, changeFrequency: "monthly", priority: 0.75 },
     { url: `${base}/docs`, lastModified, changeFrequency: "weekly", priority: 0.8 },
     ...docsNav
       .filter((doc) => doc.slug !== "")

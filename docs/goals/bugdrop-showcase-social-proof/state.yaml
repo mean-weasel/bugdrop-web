@@ -1,0 +1,364 @@
+version: 2
+
+goal:
+  title: "BugDrop Showcase Social Proof"
+  slug: "bugdrop-showcase-social-proof"
+  kind: existing_plan
+  tranche: "Implement the first shippable BugDrop showcase and opt-in submission loop."
+  status: done
+  oracle:
+    signal: "Local /showcase and homepage CTA render truthfully, the seeded first-party apps are listed, and the mean-weasel/bugdrop submission issue exists and is pinned or explicitly blocked with proof."
+    cadence: "after Scout, after GitHub issue/pinning, after web implementation, after browser proof, and at final audit"
+    final_proof: "Lint/build/browser evidence, sitemap/source inspection, and GitHub issue/pin evidence prove the social-proof loop is complete without overclaiming external customer adoption."
+  intake:
+    original_request: "Create a GoalBuddy prep board for the BugDrop showcase implementation and include a pinned issue in the bugdrop repo."
+    interpreted_outcome: "Prepare and execute a board that adds /showcase to bugdrop-web, seeds first-party apps, links from the homepage, and creates a pinned submission issue in mean-weasel/bugdrop."
+    input_shape: existing_plan
+    audience: "Prospective installers, existing installers, and the BugDrop maintainer"
+    authority: approved
+    proof_type: demo
+    completion_proof: "A local browser walkthrough plus repository/GitHub inspection proves the page, CTA, seeded entries, pinned submission issue, and verification gates are complete."
+    likely_misfire: "Shipping only the web page or only a GitHub issue, while missing the end-to-end loop or implying external customer proof before opt-in submissions exist."
+    blind_spots_considered:
+      - "bugdrop-web has unrelated unstaged edits that must be preserved."
+      - "bugdrop may have unrelated worktree changes that must be preserved."
+      - "GitHub issue pinning may need permissions or a specific API/CLI path."
+      - "Marketplace/App listing updates may be manual and should be captured as handoff copy if direct editing is unavailable."
+      - "Seed apps are first-party examples and should be labeled honestly."
+    existing_plan_facts:
+      - "Design spec exists at docs/superpowers/specs/2026-07-03-bugdrop-showcase-design.md."
+      - "Seed apps are bleepthat.sh, deckchecker.app, and seatify.app."
+      - "Canonical destination is /showcase in bugdrop-web."
+      - "Homepage CTA should be subtle and not in the hero."
+      - "A pinned issue in mean-weasel/bugdrop is required for opt-in submissions."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  missing_input_or_credentials_do_not_stop_goal: true
+  exact_human_approval_can_terminal_wait: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/bugdrop-showcase-social-proof/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.3.9/skills/goalbuddy/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal /Users/neonwatty/Desktop/bugdrop-web/docs/goals/bugdrop-showcase-social-proof"
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Validate the existing design spec against current bugdrop-web and bugdrop repo state before implementation."
+    inputs:
+      - "/Users/neonwatty/Desktop/bugdrop-web/docs/superpowers/specs/2026-07-03-bugdrop-showcase-design.md"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/app/page.tsx"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/components/landing/**"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/app/sitemap.ts"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/lib/links.ts"
+      - "/Users/neonwatty/Desktop/bugdrop/README.md"
+    constraints:
+      - "Read-only."
+      - "Do not edit implementation files."
+      - "Preserve unrelated local changes in both repos."
+      - "Confirm where the homepage CTA, /showcase route, sitemap entry, and repo submission link should live."
+    expected_output:
+      - "Current route/component map."
+      - "Verification commands for bugdrop-web."
+      - "Exact GitHub issue creation/pinning path or identified blocker."
+      - "Recommended first Worker/PM task sequence."
+    receipt:
+      result: done
+      summary: "Validated the design against current repo state. bugdrop-web uses Next App Router, so /showcase should be src/app/showcase/page.tsx. Homepage CTA belongs after Features or near the existing landing sections; sitemap and links live in src/app/sitemap.ts and src/lib/links.ts. No existing duplicate showcase issue was found in mean-weasel/bugdrop, and the current GitHub viewer has ADMIN permission."
+      evidence:
+        - "node_modules/next/dist/docs/01-app/index.md confirms App Router filesystem routes."
+        - "src/app/page.tsx composes Hero, DemoVideo, LiveDemoCta, HowItWorks, Features, QuickStart, TryCallout."
+        - "src/components/landing/features.tsx already has a modest post-feature CTA pattern."
+        - "src/app/sitemap.ts enumerates static pages and mapped docs/use-cases/compare pages."
+        - "src/lib/links.ts centralizes Marketplace, GitHub, demo, and widget URLs."
+        - "gh issue list --repo mean-weasel/bugdrop --search '\"Show us what you built with BugDrop\" in:title' returned []."
+        - "gh repo view mean-weasel/bugdrop --json nameWithOwner,viewerPermission returned viewerPermission ADMIN."
+      verification_commands:
+        - "npm run lint"
+        - "npm run build"
+        - "Local browser or Playwright inspection of / and /showcase at desktop and mobile widths."
+        - "Source inspection for /showcase sitemap entry and homepage CTA link."
+      recommended_sequence:
+        - "T002 approve issue-first sequence so the final Share your setup URL is known."
+        - "T003 create and pin the GitHub issue."
+        - "T004 implement the web page and homepage CTA using the issue URL."
+        - "T005 add only a lightweight README/docs discovery link if it does not clutter install docs."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Approve the implementation sequence and bounded file scopes for the showcase loop."
+    inputs:
+      - "T001 receipt"
+      - "Design spec"
+    constraints:
+      - "Do not implement."
+      - "Reject plans that make the pinned issue optional."
+      - "Reject copy that implies external customer adoption before opt-in submissions exist."
+    expected_output:
+      - "Decision."
+      - "Whether to create/pin the GitHub issue before or after web implementation."
+      - "Exact Worker objective."
+      - "allowed_files."
+      - "verify commands."
+      - "stop_if conditions."
+    receipt:
+      result: done
+      decision: approved
+      issue_sequence: "Create and pin the GitHub issue before web implementation so /showcase can link to the final Share your setup URL."
+      worker_objective: "Implement /showcase, seeded first-party cards, homepage CTA, and sitemap/link updates after T003 records the issue URL."
+      allowed_files:
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/app/page.tsx"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/app/showcase/**"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/components/landing/**"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/components/showcase/**"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/components/footer.tsx"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/components/nav.tsx"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/lib/links.ts"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/app/sitemap.ts"
+      verify:
+        - "npm run lint"
+        - "npm run build"
+        - "Local browser or Playwright inspection of / and /showcase at desktop and mobile widths."
+        - "Source inspection confirms /showcase is in sitemap and homepage CTA links to it."
+      stop_if:
+        - "Need files outside allowed_files."
+        - "Issue URL is unavailable after T003."
+        - "Unrelated local changes would need to be overwritten."
+        - "Copy implies external customers before external opt-in submissions exist."
+      rationale: "The spec is concrete and bounded. The largest safe useful slice after the issue exists is one coherent web implementation package."
+
+  - id: T003
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: medium
+    objective: "Create and pin the BugDrop showcase submission issue in mean-weasel/bugdrop, then record its URL for the web implementation."
+    inputs:
+      - "T001 receipt"
+      - "T002 decision"
+      - "/Users/neonwatty/Desktop/bugdrop"
+    constraints:
+      - "Use the GitHub repo mean-weasel/bugdrop."
+      - "Title the issue: Show us what you built with BugDrop."
+      - "Ask for app/site name, public URL, screenshot/logo optional, one-sentence use case, attribution preference, and explicit permission to list on bugdrop.dev/showcase."
+      - "Pin the issue if permissions and tooling allow."
+      - "If pinning is unavailable, create the issue, record the blocker, and continue local implementation with the issue URL while marking pin verification as blocked for final audit."
+      - "Do not modify code in this PM task."
+    expected_output:
+      - "Issue URL."
+      - "Pin status evidence or blocker."
+      - "Exact URL to use for /showcase Share your setup links."
+    receipt:
+      result: done
+      issue_url: "https://github.com/mean-weasel/bugdrop/issues/241"
+      pin_status: "pinned"
+      share_setup_url: "https://github.com/mean-weasel/bugdrop/issues/241"
+      summary: "Created the opt-in BugDrop showcase submission issue and pinned it in mean-weasel/bugdrop."
+      evidence:
+        - "gh issue create returned https://github.com/mean-weasel/bugdrop/issues/241."
+        - "gh issue view 241 returned id I_kwDOQr5fRM8AAAABHmXJIQ, state OPEN, and title Show us what you built with BugDrop."
+        - "gh api graphql pinIssue returned issue #241."
+        - "Pinned issues query returned #241 in repository.pinnedIssues.nodes."
+
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Implement the /showcase page, seeded first-party cards, homepage CTA, and sitemap/link updates in bugdrop-web."
+    allowed_files:
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/app/page.tsx"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/app/showcase/**"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/components/landing/**"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/components/showcase/**"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/components/footer.tsx"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/components/nav.tsx"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/lib/links.ts"
+      - "/Users/neonwatty/Desktop/bugdrop-web/src/app/sitemap.ts"
+    verify:
+      - "npm run lint"
+      - "npm run build"
+      - "Local browser or Playwright inspection of / and /showcase at desktop and mobile widths."
+      - "Source inspection confirms /showcase is in sitemap and homepage CTA links to it."
+    stop_if:
+      - "Need to edit files outside allowed_files."
+      - "Share-your-setup issue URL is unavailable and no safe placeholder strategy was approved by T002."
+      - "Unrelated local changes would need to be overwritten."
+      - "Copy would imply external customers before external opt-in submissions exist."
+      - "Verification fails twice for the same unexplained reason."
+    receipt:
+      result: done
+      changed_files:
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/app/showcase/page.tsx"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/components/landing/showcase-cta.tsx"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/app/page.tsx"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/app/sitemap.ts"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/components/footer.tsx"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/components/landing/quick-start.tsx"
+        - "/Users/neonwatty/Desktop/bugdrop-web/src/lib/links.ts"
+      summary: "Implemented /showcase with first-party cards for Bleep That Sh*t!, DeckChecker, and Seatify; added a modest homepage CTA after Features; added footer/sitemap/link constants; and fixed existing Quick Start mobile overflow so homepage proof passes."
+      commands:
+        - command: "npm run lint"
+          status: pass
+        - command: "npm run build"
+          status: pass
+          evidence: "Next build lists /showcase as a static route."
+        - command: "Playwright walkthrough at 1440px and 390px against http://127.0.0.1:3027"
+          status: pass
+          evidence: "showcase h1 Built with BugDrop, 3 first-party cards, 3 issue links, no automatic install-data publishing copy, and no horizontal overflow on / or /showcase."
+        - command: "curl -fsS http://127.0.0.1:3027/sitemap.xml | rg -n 'showcase|bugdrop.dev'"
+          status: pass
+          evidence: "sitemap contains https://bugdrop.dev/showcase."
+        - command: "git diff --check"
+          status: pass
+      artifacts:
+        - "/Users/neonwatty/Desktop/bugdrop-web/test-results/bugdrop-showcase-social-proof/showcase-desktop.png"
+        - "/Users/neonwatty/Desktop/bugdrop-web/test-results/bugdrop-showcase-social-proof/showcase-mobile.png"
+        - "/Users/neonwatty/Desktop/bugdrop-web/test-results/bugdrop-showcase-social-proof/home-desktop.png"
+        - "/Users/neonwatty/Desktop/bugdrop-web/test-results/bugdrop-showcase-social-proof/home-mobile.png"
+
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add repo-side discovery links or handoff copy after the showcase page exists."
+    allowed_files:
+      - "/Users/neonwatty/Desktop/bugdrop/README.md"
+      - "/Users/neonwatty/Desktop/bugdrop/docs/website/**"
+      - "/Users/neonwatty/Desktop/bugdrop/docs/goals/bugdrop-showcase-social-proof/**"
+    verify:
+      - "git diff --check"
+      - "Direct inspection confirms README/docs links point to bugdrop.dev/showcase or the pinned issue only where appropriate."
+    stop_if:
+      - "Need files outside allowed_files."
+      - "The /showcase URL or submission issue URL is still unknown."
+      - "The change would clutter primary installation docs."
+    receipt:
+      result: done
+      changed_files:
+        - "/Users/neonwatty/Desktop/bugdrop/README.md"
+      summary: "Added a single README documentation link to the BugDrop showcase without changing install instructions or cluttering primary docs."
+      commands:
+        - command: "git diff --check"
+          cwd: "/Users/neonwatty/Desktop/bugdrop"
+          status: pass
+        - command: "rg -n 'Showcase|bugdrop.dev/showcase|Built with BugDrop' README.md"
+          cwd: "/Users/neonwatty/Desktop/bugdrop"
+          status: pass
+          evidence: "README.md:63 links to https://bugdrop.dev/showcase."
+
+  - id: T006
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: default
+    objective: "Prepare Marketplace/App listing update copy and record whether direct editing is possible."
+    inputs:
+      - "Final /showcase URL"
+      - "Pinned issue URL"
+    constraints:
+      - "Do not claim the listing was updated unless it was actually changed and verified."
+      - "If direct editing is unavailable, record exact copy for manual update in the receipt."
+    expected_output:
+      - "Listing copy."
+      - "Direct update evidence or manual-update handoff."
+    receipt:
+      result: done
+      direct_update_status: "manual_handoff_required"
+      summary: "Prepared Marketplace/App listing copy. Direct listing editing is not available through the current repo or GitHub CLI path, so no external listing update was claimed."
+      listing_copy:
+        short: "Using BugDrop? Share your setup for the BugDrop showcase: https://bugdrop.dev/showcase"
+        expanded: "Using BugDrop in a public app, internal tool, client project, or self-hosted setup? Share your setup for the opt-in BugDrop showcase: https://bugdrop.dev/showcase"
+      related_urls:
+        showcase: "https://bugdrop.dev/showcase"
+        submission_issue: "https://github.com/mean-weasel/bugdrop/issues/241"
+      evidence:
+        - "Marketplace/App listing content is external configuration, not a tracked file in bugdrop-web or bugdrop."
+        - "Current available GitHub CLI/API workflow handled issue creation/pinning but did not expose Marketplace listing edit fields."
+
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Final audit against the social-proof oracle and burden-of-proof requirement."
+    inputs:
+      - "All done task receipts"
+      - "Last verification"
+      - "Current dirty diffs in bugdrop-web and bugdrop"
+      - "GitHub issue/pin evidence"
+      - "Browser proof"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the pinned issue is missing, unless the issue exists and pinning is explicitly blocked with evidence."
+      - "Reject completion if /showcase or homepage CTA copy implies external customers before opt-in submissions exist."
+      - "Reject completion if unrelated local changes were overwritten or included."
+      - "Reject completion if required Worker/PM tasks remain queued or active."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Evidence mapping back to the oracle"
+      - "Strongest realistic failure mode checked"
+      - "Next task if not complete"
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      summary: "Final audit passed. The full social-proof loop exists: /showcase renders locally with three first-party apps, homepage links to it, the submission issue exists and is pinned, README links to the showcase, and Marketplace/App copy is prepared as a manual handoff."
+      evidence:
+        - "npm run lint passed after implementation."
+        - "npm run build passed and listed /showcase as a static route."
+        - "Playwright desktop/mobile proof found Built with BugDrop, first-party cards for bleepthat.sh, deckchecker.app, and seatify.app, three links to issue #241, no automatic install-data publishing copy, and no horizontal overflow on / or /showcase."
+        - "curl -fsS http://127.0.0.1:3027/sitemap.xml | rg -n 'showcase|bugdrop.dev' found https://bugdrop.dev/showcase."
+        - "GitHub GraphQL query found issue #241 open and present in repository.pinnedIssues."
+        - "rg overclaim search for customer/customers/trusted by/external adopters/teams are using/used by returned no matches in showcase/home CTA source."
+        - "git diff --check passed in both bugdrop-web and bugdrop."
+      strongest_failure_mode_checked: "The realistic failure mode was shipping a nice page while either overclaiming external customer adoption or skipping the pinned submission loop. Source search found no customer/trusted-by overclaiming, and GitHub pinnedIssues proves #241 is pinned."
+      residual_notes:
+        - "GitHub Marketplace/App listing copy is prepared but not directly updated because listing settings are external configuration unavailable through the current repo/CLI path."
+        - "bugdrop-web had pre-existing unstaged edits in AGENTS.md, CLAUDE.md, and src/components/analytics.tsx; they remain unrelated local changes."
+
+checks:
+  dirty_fingerprint: "bugdrop-web initially had unstaged AGENTS.md, CLAUDE.md, and src/components/analytics.tsx changes before this goal board."
+  last_verification:
+    result: pass
+    task: T999
+    commands:
+      - "npm run lint"
+      - "npm run build"
+      - "Playwright desktop/mobile walkthrough of / and /showcase"
+      - "GitHub GraphQL issue/pinnedIssues query"
+      - "git diff --check in bugdrop-web and bugdrop"

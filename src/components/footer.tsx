@@ -5,11 +5,13 @@ import {
   GITHUB_REPO_URL,
   GITHUB_WEB_REPO_URL,
   PRODUCT_HUNT_URL,
+  SHOWCASE_PATH,
 } from "@/lib/links";
 
 const repoLinks = [
   { label: "Docs", href: "/docs" },
   { label: "Demo", href: DEMO_PATH },
+  { label: "Showcase", href: SHOWCASE_PATH },
   { label: "Use Cases", href: "/use-cases" },
   { label: "Compare", href: "/compare" },
   { label: "API", href: GITHUB_REPO_URL },

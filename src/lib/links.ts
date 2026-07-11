@@ -8,6 +8,8 @@ export const PRODUCT_HUNT_BADGE_URL =
 
 export const GITHUB_ORG_URL = "https://github.com/mean-weasel";
 
+export const MEAN_WEASEL_PROJECT_URL = "https://mean-weasel.com/projects/bugdrop";
+
 export const GITHUB_PROFILE_URL = "https://github.com/neonwatty";
 
 export const GITHUB_REPO_URL = "https://github.com/mean-weasel/bugdrop";

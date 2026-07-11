@@ -1,9 +1,9 @@
 import {
   DEMO_PATH,
-  GITHUB_ORG_URL,
   GITHUB_PROFILE_URL,
   GITHUB_REPO_URL,
   GITHUB_WEB_REPO_URL,
+  MEAN_WEASEL_PROJECT_URL,
   PRODUCT_HUNT_URL,
   SHOWCASE_PATH,
 } from "@/lib/links";
@@ -24,7 +24,7 @@ const trustLinks = [
   { label: "Self-hosting", href: "/docs/self-hosting" },
   { label: "Open source", href: GITHUB_REPO_URL },
   { label: "MIT licensed", href: `${GITHUB_REPO_URL}/blob/main/LICENSE` },
-  { label: "Built by mean-weasel", href: GITHUB_ORG_URL },
+  { label: "Built by mean-weasel", href: MEAN_WEASEL_PROJECT_URL },
   { label: "Powered by Cloudflare Workers", href: "https://workers.cloudflare.com/" },
 ];
 
@@ -43,7 +43,7 @@ export function Footer() {
         </a>{" "}
         /{" "}
         <a
-          href={GITHUB_ORG_URL}
+          href={MEAN_WEASEL_PROJECT_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="text-accent-cyan no-underline hover:underline"

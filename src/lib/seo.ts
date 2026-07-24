@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import {
-  DEMO_URL,
   GITHUB_ORG_URL,
   GITHUB_PROFILE_URL,
   GITHUB_REPO_URL,
@@ -252,8 +251,7 @@ export function videoSchema() {
     description:
       "Watch BugDrop collect website feedback with a screenshot and create a GitHub Issue.",
     thumbnailUrl: "https://img.youtube.com/vi/VkLvP1xmRzo/hqdefault.jpg",
-    uploadDate: SITE_UPDATED,
+    uploadDate: "2025-12-27T02:26:48-08:00",
     embedUrl: "https://www.youtube.com/embed/VkLvP1xmRzo",
-    contentUrl: DEMO_URL,
   };
 }

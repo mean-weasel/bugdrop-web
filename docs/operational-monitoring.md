@@ -19,8 +19,8 @@ screenshot, GitHub Issue body, token, run URL, repository credential, or respons
   `X-BugDrop-Heartbeat-Id` is validated, hashed before storage, and makes retries idempotent. The
   receipt and component transition commit atomically.
 - Issue delivery becomes degraded seven hours after the last successful E2E proof: four-hour
-  frequency plus a three-hour grace period. The first deployment gets the same seven-hour activation
-  grace even if no heartbeat ever arrives.
+  frequency plus a three-hour grace period. Successful monitor initialization starts the same
+  seven-hour activation grace even if no heartbeat has arrived yet.
 - Incident open and recovery alerts enter a transactional outbox. The evaluator retries failed
   deliveries with exponential backoff through either a generic webhook, Resend email, or both.
 - Check results and heartbeat receipts are retained for 90 days. Incident and event audit history is
@@ -28,8 +28,9 @@ screenshot, GitHub Issue body, token, run URL, repository credential, or respons
 
 Vercel Cron requires a plan that supports five-minute schedules. Vercel does not retry failed cron
 invocations, so the next invocation and the persisted evaluator freshness timestamp are part of the
-recovery model. Vercel may deliver the same cron more than once; each UTC schedule window can be
-evaluated only once, so a delayed duplicate cannot increment a confirmation policy twice.
+recovery model. Vercel may deliver the same cron more than once. The monitor coalesces calls received
+in the same UTC schedule window and rejects overlap; it cannot identify an arbitrarily delayed
+delivery that arrives in a later window, which is treated as a fresh availability observation.
 
 ## Provisioning
 
@@ -78,14 +79,18 @@ authorized heartbeat.
 
 1. Run the schema migration and deploy with alert delivery temporarily routed to an authorized test
    destination.
-2. Invoke the evaluator with its bearer secret and confirm all four HTTP components initialize.
+2. Invoke the evaluator with its bearer secret, confirm `status: completed`, and confirm all four
+   HTTP components initialize. This successful initialization starts the heartbeat activation grace.
 3. Send one authorized heartbeat and confirm Issue delivery changes from Unknown to Operational.
-4. Override one target in a preview deployment with a known 404. Confirm the first failure is
-   suppressed, the second opens one incident, and two successes resolve the same incident.
+4. Override one target in a preview deployment with a known 404. Vercel Cron does not invoke preview
+   deployments, so manually invoke the authenticated evaluator once in each of four distinct
+   five-minute UTC windows. Confirm the first failure is suppressed, the second opens one incident,
+   and two later successes resolve the same incident. Require `status: completed` for each call.
 5. Retry one heartbeat with the same ID and confirm it creates only one receipt.
 6. Run overlapping evaluator requests and confirm one returns `already_running`.
-7. Make the authorized test alert destination return an error, provoke a preview incident, restore
-   the destination, and confirm the pending outbox delivery is retried successfully.
+7. Make the authorized test alert destination return an error, provoke a preview incident using the
+   same distinct-window procedure, restore the destination, and confirm a later evaluator window
+   retries the pending outbox delivery successfully.
 8. Inspect `/api/status`, the database, logs, and alert content for secrets or response bodies.
 9. Confirm `/status` reports Unknown or stale monitoring instead of claiming health when the database
    or evaluator is unavailable.

@@ -51,7 +51,6 @@ export async function evaluateMonitoring(now = new Date()): Promise<EvaluationSu
   }
 
   const completedAt = new Date();
-  await markEvaluatorCompleted(completedAt);
   await pruneMonitoringHistory(completedAt);
   const alerts = await dispatchPendingAlerts();
   if (alerts.failed > 0 || alerts.skipped > 0) {
@@ -59,6 +58,7 @@ export async function evaluateMonitoring(now = new Date()): Promise<EvaluationSu
       `Alert delivery is impaired: ${alerts.failed} failed, ${alerts.skipped} skipped`,
     );
   }
+  await markEvaluatorCompleted(completedAt);
   return {
     status: "completed",
     checkedAt: now.toISOString(),

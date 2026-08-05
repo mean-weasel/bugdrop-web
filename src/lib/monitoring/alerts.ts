@@ -61,6 +61,7 @@ async function sendWebhook(payload: AlertPayload): Promise<boolean> {
   const secret = process.env.MONITOR_ALERT_WEBHOOK_SECRET?.trim();
   const response = await fetch(url, {
     method: "POST",
+    redirect: "error",
     headers: {
       "content-type": "application/json",
       ...(secret ? { authorization: `Bearer ${secret}` } : {}),

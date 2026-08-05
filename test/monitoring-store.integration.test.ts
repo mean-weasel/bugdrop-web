@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { dispatchPendingAlerts } from "@/lib/monitoring/alerts";
 import { COMPONENTS } from "@/lib/monitoring/config";
 import { monitoringSql } from "@/lib/monitoring/db";
@@ -179,6 +179,22 @@ describe.skipIf(!testDatabaseUrl)("monitoring PostgreSQL integration", () => {
       status: "pending",
       last_error: "webhook is temporarily not configured",
     });
+  });
+
+  it("refuses webhook redirects instead of accepting a redirected success", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "feedback_api")!;
+    await seedMonitoringComponents(new Date("2026-08-05T04:00:00Z"));
+    await applyObservation(definition, failureAtDate("2026-08-05T04:01:00Z"), ["webhook"]);
+    await applyObservation(definition, failureAtDate("2026-08-05T04:02:00Z"), ["webhook"]);
+    process.env.MONITOR_ALERT_WEBHOOK_URL = "https://alerts.example.test/hook";
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null, { status: 204 }));
+
+    expect(await dispatchPendingAlerts()).toMatchObject({ delivered: 1, failed: 0 });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://alerts.example.test/hook",
+      expect.objectContaining({ method: "POST", redirect: "error" }),
+    );
+    fetchMock.mockRestore();
   });
 });
 

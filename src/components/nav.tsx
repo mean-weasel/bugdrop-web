@@ -17,6 +17,9 @@ export function Nav() {
         <Link href="/compare" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Compare
         </Link>
+        <Link href="/status" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
+          Status
+        </Link>
         <a
           href={GITHUB_REPO_URL}
           target="_blank"

@@ -7,6 +7,19 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: bugdrop_monitoring_test
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d bugdrop_monitoring_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
 
@@ -16,6 +29,12 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Test monitoring
+        run: npm run monitoring:migrate && npm test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/bugdrop_monitoring_test
+          MONITORING_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/bugdrop_monitoring_test
 
       - name: Lint
         run: npx eslint .

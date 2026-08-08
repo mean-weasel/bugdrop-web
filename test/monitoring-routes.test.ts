@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { POST as heartbeat } from "@/app/api/monitor/heartbeat/route";
 import { GET as evaluate } from "@/app/api/monitor/run/route";
+import { GET as publicStatus } from "@/app/api/status/route";
 
 describe("monitoring route boundaries", () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -20,5 +21,11 @@ describe("monitoring route boundaries", () => {
       }),
     );
     expect(response.status).toBe(401);
+  });
+
+  it("rejects status query variants before they can bypass the shared cache", async () => {
+    const response = await publicStatus(new Request("https://bugdrop.dev/api/status?bust=1"));
+    expect(response.status).toBe(400);
+    expect(response.headers.get("cache-control")).toBe("no-store");
   });
 });

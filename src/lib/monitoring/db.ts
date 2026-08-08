@@ -10,6 +10,11 @@ export type D1Result = {
   meta?: Record<string, unknown>;
 };
 
+type D1WireStatement = {
+  sql: string;
+  params: string[];
+};
+
 export interface MonitoringDatabase {
   query(statement: D1Statement): Promise<D1Result>;
   batch(statements: D1Statement[]): Promise<D1Result[]>;
@@ -46,6 +51,43 @@ export function setMonitoringDatabaseForTests(database: MonitoringDatabase | nul
   testDatabase = database;
 }
 
+export function normalizeD1Statement(statement: D1Statement): D1WireStatement {
+  const params = statement.params || [];
+  const wireParams: string[] = [];
+  let paramIndex = 0;
+  let inQuotedString = false;
+  let sql = "";
+
+  for (let index = 0; index < statement.sql.length; index += 1) {
+    const character = statement.sql[index];
+    if (character === "'") {
+      if (inQuotedString && statement.sql[index + 1] === "'") {
+        sql += "''";
+        index += 1;
+        continue;
+      }
+      inQuotedString = !inQuotedString;
+      sql += character;
+      continue;
+    }
+    if (character !== "?" || inQuotedString) {
+      sql += character;
+      continue;
+    }
+    if (paramIndex >= params.length) throw new Error("D1 statement has too few parameters");
+    const value = params[paramIndex];
+    paramIndex += 1;
+    if (value === null) {
+      sql += "NULL";
+    } else {
+      sql += "?";
+      wireParams.push(String(value));
+    }
+  }
+  if (paramIndex !== params.length) throw new Error("D1 statement has too many parameters");
+  return { sql, params: wireParams };
+}
+
 function createCloudflareD1Database(
   accountId: string,
   databaseId: string,
@@ -80,17 +122,15 @@ function createCloudflareD1Database(
 
   return {
     async query(statement) {
-      const results = await request({ sql: statement.sql, params: statement.params || [] });
+      const normalized = normalizeD1Statement(statement);
+      const results = await request(normalized);
       if (results.length !== 1) throw new Error("Cloudflare D1 returned an unexpected result count");
       return results[0];
     },
     async batch(statements) {
       if (statements.length === 0) return [];
       return request({
-        batch: statements.map((statement) => ({
-          sql: statement.sql,
-          params: statement.params || [],
-        })),
+        batch: statements.map(normalizeD1Statement),
       });
     },
   };

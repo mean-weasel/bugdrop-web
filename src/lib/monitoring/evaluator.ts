@@ -40,6 +40,7 @@ export async function evaluateMonitoring(now = new Date()): Promise<EvaluationSu
     };
   }
 
+  let observationCommitted = false;
   try {
     const channels = configuredAlertChannels();
     const observations = await runHttpChecks(now);
@@ -50,6 +51,7 @@ export async function evaluateMonitoring(now = new Date()): Promise<EvaluationSu
       const definition = COMPONENTS.find((component) => component.id === result.componentId);
       if (!definition) throw new Error(`Unknown monitoring component ${result.componentId}`);
       await applyObservation(definition, result.observation, channels);
+      observationCommitted = true;
     }
 
     const completedAt = new Date();
@@ -72,7 +74,9 @@ export async function evaluateMonitoring(now = new Date()): Promise<EvaluationSu
       alerts,
     };
   } catch (error) {
-    await releaseFailedEvaluatorLease(now).catch(() => undefined);
+    if (!observationCommitted) {
+      await releaseFailedEvaluatorLease(now).catch(() => undefined);
+    }
     throw error;
   }
 }

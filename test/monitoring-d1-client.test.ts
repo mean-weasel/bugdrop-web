@@ -20,8 +20,8 @@ describe("Cloudflare D1 monitoring client", () => {
     }));
 
     const result = await monitoringDatabase().batch([
-      { sql: "SELECT ? AS id", params: ["first"] },
-      { sql: "DELETE FROM example WHERE id = ?", params: ["second"] },
+      { sql: "SELECT ? AS id, ? AS attempt, ? AS optional", params: ["first", 2, null] },
+      { sql: "DELETE FROM example WHERE id = ? AND note = '?'", params: ["second"] },
     ]);
 
     expect(result[0].results).toEqual([{ id: "first" }]);
@@ -33,8 +33,8 @@ describe("Cloudflare D1 monitoring client", () => {
         headers: expect.objectContaining({ authorization: "Bearer secret-d1-token" }),
         body: JSON.stringify({
           batch: [
-            { sql: "SELECT ? AS id", params: ["first"] },
-            { sql: "DELETE FROM example WHERE id = ?", params: ["second"] },
+            { sql: "SELECT ? AS id, ? AS attempt, NULL AS optional", params: ["first", "2"] },
+            { sql: "DELETE FROM example WHERE id = ? AND note = '?'", params: ["second"] },
           ],
         }),
       }),

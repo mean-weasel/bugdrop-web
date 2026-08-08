@@ -3,12 +3,18 @@ import { getPublicStatusSnapshot } from "@/lib/monitoring/store";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET(): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
+  if (new URL(request.url).search) {
+    return Response.json(
+      { error: "Status query parameters are not supported" },
+      { status: 400, headers: { "cache-control": "no-store" } },
+    );
+  }
   try {
     const snapshot = await getPublicStatusSnapshot();
     return Response.json(snapshot, {
       headers: {
-        "cache-control": "public, s-maxage=60, stale-while-revalidate=300",
+        "cache-control": "public, s-maxage=60, must-revalidate",
       },
     });
   } catch (error) {

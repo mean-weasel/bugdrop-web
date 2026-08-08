@@ -6,6 +6,9 @@ also receives a success-only check-in from the existing real-Issue production he
 
 The public surface is `/status`; sanitized JSON is available at `/api/status`. No feedback payload,
 screenshot, GitHub Issue body, token, run URL, repository credential, or response body is persisted.
+The status page is a static shell that reads the shared `/api/status` response. Vercel caches a
+successful snapshot for 60 seconds with mandatory synchronous revalidation and rejects query-string
+variants, so ordinary page traffic does not become Cloudflare administrative API traffic.
 
 ## Runtime architecture
 
@@ -13,10 +16,10 @@ screenshot, GitHub Issue body, token, run URL, repository credential, or respons
 - `CRON_SECRET` authenticates the invocation through its `Authorization` header.
 - Each HTTP component needs two consecutive failures to open an incident and two consecutive
   successes to recover. Checks run in parallel with a ten-second timeout.
-- Cloudflare D1 stores monitoring state using SQLite semantics. A short global writer lease
-  serializes heartbeat and evaluator transitions; each completed transition is committed as one D1
-  batch. A durable five-minute UTC window coalesces cron deliveries, while a four-minute evaluator
-  lease rejects overlapping work.
+- Cloudflare D1 stores monitoring state using SQLite semantics. A two-minute global writer lease is
+  renewed and ownership-checked immediately before each transition batch, serializing heartbeat and
+  evaluator writes. Each completed transition is committed as one D1 batch. A durable five-minute
+  UTC reservation coalesces cron deliveries and rejects overlapping work.
 - `POST /api/monitor/heartbeat` accepts a bearer-authenticated, success-only heartbeat. The optional
   `X-BugDrop-Heartbeat-Id` is validated, hashed before storage, and makes retries idempotent. The
   receipt and component transition commit atomically.
@@ -33,6 +36,9 @@ invocations, so the next invocation and the persisted evaluator freshness timest
 recovery model. Vercel may deliver the same cron more than once. The monitor coalesces calls received
 in the same UTC schedule window and rejects overlap; it cannot identify an arbitrarily delayed
 delivery that arrives in a later window, which is treated as a fresh availability observation.
+Once a run commits any component observation, later alert or cleanup failure does not reopen that UTC
+window; this preserves the distinct-window confirmation policy. A failure before the first committed
+observation releases the reservation so the same window can retry.
 
 ## Provisioning
 
@@ -126,5 +132,6 @@ feedback path.
 
 The storage choice intentionally accepts one correlated failure domain: a broad Cloudflare outage can
 make D1 unavailable while the Vercel status route itself is reachable. In that case `/api/status`
-returns Unknown rather than stale operational data, and Resend remains the independent alert
-destination for incidents committed before D1 became unavailable.
+can serve the most recent successful snapshot only for its remaining 60-second freshness lifetime;
+the next revalidation returns Unknown rather than using stale-while-revalidate. Resend remains the
+independent alert destination for incidents committed before D1 became unavailable.

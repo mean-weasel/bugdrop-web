@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
-import type { D1Statement, MonitoringDatabase } from "@/lib/monitoring/db";
+import { normalizeD1Statement, type D1Statement, type MonitoringDatabase } from "@/lib/monitoring/db";
 
 export function createTestMonitoringDatabase(): {
   adapter: MonitoringDatabase;
@@ -10,9 +10,12 @@ export function createTestMonitoringDatabase(): {
   const sqlite = new DatabaseSync(":memory:");
   sqlite.exec(readFileSync(new URL("../../monitoring/schema.sql", import.meta.url), "utf8"));
 
-  const execute = (statement: D1Statement) => ({
-    results: sqlite.prepare(statement.sql).all(...(statement.params || [])) as Record<string, unknown>[],
-  });
+  const execute = (statement: D1Statement) => {
+    const normalized = normalizeD1Statement(statement);
+    return {
+      results: sqlite.prepare(normalized.sql).all(...normalized.params) as Record<string, unknown>[],
+    };
+  };
 
   return {
     adapter: {

@@ -261,7 +261,6 @@ export async function markEvaluatorCompleted(completedAt: Date): Promise<void> {
 
 export async function acquireEvaluatorLease(now: Date): Promise<boolean> {
   const timestamp = now.toISOString();
-  const lockedUntil = new Date(now.getTime() + 4 * 60 * 1000).toISOString();
   const windowStart = new Date(Math.floor(now.getTime() / 300_000) * 300_000);
   const windowKey = evaluationWindowKey(windowStart);
   const window = await monitoringDatabase().query({
@@ -269,27 +268,16 @@ export async function acquireEvaluatorLease(now: Date): Promise<boolean> {
       ON CONFLICT (key) DO NOTHING RETURNING key`,
     params: [windowKey, JSON.stringify({ startedAt: timestamp }), timestamp],
   });
-  if (window.results.length === 0) return false;
-
-  const lease = await monitoringDatabase().query({
-    sql: `INSERT INTO monitoring_locks (name, token, locked_until, updated_at) VALUES ('evaluator', ?, ?, ?)
-      ON CONFLICT (name) DO UPDATE SET token = excluded.token, locked_until = excluded.locked_until,
-        updated_at = excluded.updated_at
-      WHERE monitoring_locks.locked_until < ? RETURNING name`,
-    params: [windowKey, lockedUntil, timestamp, timestamp],
-  });
-  if (lease.results.length > 0) return true;
-  await monitoringDatabase().query({ sql: "DELETE FROM monitoring_meta WHERE key = ?", params: [windowKey] });
-  return false;
+  return window.results.length === 1;
 }
 
 export async function releaseFailedEvaluatorLease(now: Date): Promise<void> {
   const windowStart = new Date(Math.floor(now.getTime() / 300_000) * 300_000);
   const windowKey = evaluationWindowKey(windowStart);
-  await monitoringDatabase().batch([
-    { sql: "DELETE FROM monitoring_meta WHERE key = ?", params: [windowKey] },
-    { sql: "DELETE FROM monitoring_locks WHERE name = 'evaluator' AND token = ?", params: [windowKey] },
-  ]);
+  await monitoringDatabase().query({
+    sql: "DELETE FROM monitoring_meta WHERE key = ?",
+    params: [windowKey],
+  });
 }
 
 export async function pruneMonitoringHistory(now = new Date()): Promise<void> {
@@ -408,7 +396,7 @@ async function withWriterLock<T>(work: () => Promise<LockedWrite<T>>): Promise<T
       sql: `INSERT INTO monitoring_locks (name, token, locked_until, updated_at) VALUES ('writer', ?, ?, ?)
         ON CONFLICT (name) DO UPDATE SET token = excluded.token, locked_until = excluded.locked_until,
           updated_at = excluded.updated_at WHERE monitoring_locks.locked_until < ? RETURNING token`,
-      params: [token, new Date(now.getTime() + 30_000).toISOString(), now.toISOString(), now.toISOString()],
+      params: [token, new Date(now.getTime() + 120_000).toISOString(), now.toISOString(), now.toISOString()],
     });
     acquired = result.results.length === 1;
     if (!acquired) await new Promise((resolve) => setTimeout(resolve, 50));
@@ -417,6 +405,13 @@ async function withWriterLock<T>(work: () => Promise<LockedWrite<T>>): Promise<T
 
   try {
     const write = await work();
+    const renewedAt = new Date();
+    const renewed = await monitoringDatabase().query({
+      sql: `UPDATE monitoring_locks SET locked_until = ?, updated_at = ?
+        WHERE name = 'writer' AND token = ? RETURNING token`,
+      params: [new Date(renewedAt.getTime() + 120_000).toISOString(), renewedAt.toISOString(), token],
+    });
+    if (renewed.results.length !== 1) throw new Error("Monitoring writer lease was lost");
     await monitoringDatabase().batch([
       ...write.statements,
       { sql: "DELETE FROM monitoring_locks WHERE name = 'writer' AND token = ?", params: [token] },

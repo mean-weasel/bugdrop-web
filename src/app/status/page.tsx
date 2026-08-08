@@ -1,9 +1,5 @@
-import { Suspense } from "react";
-import { connection } from "next/server";
 import type { Metadata } from "next";
-import { StatusDashboard, StatusUnavailable } from "@/components/status/status-dashboard";
-import { getPublicStatusSnapshot } from "@/lib/monitoring/store";
-import type { PublicStatusSnapshot } from "@/lib/monitoring/types";
+import { StatusLive } from "@/components/status/status-live";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -25,36 +21,7 @@ export default function StatusPage() {
           hosted BugDrop service.
         </p>
       </header>
-      <Suspense fallback={<StatusLoading />}>
-        <LiveStatus />
-      </Suspense>
+      <StatusLive />
     </main>
   );
-}
-
-async function LiveStatus() {
-  await connection();
-  let snapshot: PublicStatusSnapshot | null = null;
-  try {
-    snapshot = await getPublicStatusSnapshot();
-  } catch (error) {
-    console.error("[monitoring] status page unavailable", safeError(error));
-  }
-  return snapshot ? <StatusDashboard snapshot={snapshot} /> : <StatusUnavailable />;
-}
-
-function StatusLoading() {
-  return (
-    <div className="space-y-4" aria-label="Loading current status">
-      <div className="h-36 animate-pulse rounded-2xl border border-border bg-bg-surface" />
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="h-44 animate-pulse rounded-xl border border-border bg-bg-surface" />
-        <div className="h-44 animate-pulse rounded-xl border border-border bg-bg-surface" />
-      </div>
-    </div>
-  );
-}
-
-function safeError(error: unknown): string {
-  return (error instanceof Error ? error.message : String(error)).slice(0, 500);
 }

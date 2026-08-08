@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { dispatchPendingAlerts } from "@/lib/monitoring/alerts";
 import { COMPONENTS } from "@/lib/monitoring/config";
+import { evaluateMonitoring } from "@/lib/monitoring/evaluator";
 import { monitoringDatabase, setMonitoringDatabaseForTests } from "@/lib/monitoring/db";
 import {
   acquireEvaluatorLease,
@@ -129,6 +130,40 @@ describe("monitoring D1/SQLite integration", () => {
     expect(await acquireEvaluatorLease(now)).toBe(true);
     await releaseFailedEvaluatorLease(now);
     expect(await acquireEvaluatorLease(now)).toBe(true);
+  });
+
+  it("does not reopen a cron window after observations commit and alert delivery fails", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "feedback_api")!;
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00Z"));
+    await applyObservation(definition, failureAt(1), ["webhook"]);
+    await applyObservation(definition, failureAt(2), ["webhook"]);
+    vi.stubEnv("CLOUDFLARE_ACCOUNT_ID", "account-id");
+    vi.stubEnv("CLOUDFLARE_D1_DATABASE_ID", "database-id");
+    vi.stubEnv("CLOUDFLARE_D1_API_TOKEN", "api-token");
+    vi.stubEnv("CRON_SECRET", "c".repeat(16));
+    vi.stubEnv("MONITOR_HEARTBEAT_SECRET", "h".repeat(32));
+    vi.stubEnv("MONITOR_ALERT_WEBHOOK_URL", "https://alerts.example.test/hook");
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.includes("alerts.example.test")) return new Response(null, { status: 500 });
+      if (url.endsWith("widget.js")) {
+        return new Response("x".repeat(1200), { headers: { "content-type": "application/javascript" } });
+      }
+      if (url.includes("/api/health")) {
+        return Response.json({ status: "ok", environment: "production", buildSha: "a".repeat(40) });
+      }
+      if (url.includes("/api/check/")) {
+        return Response.json({ installed: true, repo: "mean-weasel/bugdrop-widget-test" });
+      }
+      return new Response(`BugDrop ${"x".repeat(600)}`);
+    });
+
+    const now = new Date("2026-08-05T00:05:00Z");
+    await expect(evaluateMonitoring(now)).rejects.toThrow("Alert delivery is impaired");
+    expect(await acquireEvaluatorLease(new Date("2026-08-05T00:05:30Z"))).toBe(false);
+
+    fetchMock.mockRestore();
+    vi.unstubAllEnvs();
   });
 
   it("keeps all open incidents visible beyond the resolved-history window", async () => {

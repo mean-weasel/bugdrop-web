@@ -133,5 +133,7 @@ feedback path.
 The storage choice intentionally accepts one correlated failure domain: a broad Cloudflare outage can
 make D1 unavailable while the Vercel status route itself is reachable. In that case `/api/status`
 can serve the most recent successful snapshot only for its remaining 60-second freshness lifetime;
-the next revalidation returns Unknown rather than using stale-while-revalidate. Resend remains the
-independent alert destination for incidents committed before D1 became unavailable.
+the next revalidation returns Unknown rather than using stale-while-revalidate. Resend is a separate
+delivery provider, but it is not independent of D1: every queued alert must be claimed from the D1
+outbox before it can be sent. If D1 becomes unavailable after an incident commits but before its
+alert is claimed, the alert remains pending and is delivered only after D1 recovers.

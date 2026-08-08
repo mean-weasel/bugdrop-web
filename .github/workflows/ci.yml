@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+  merge_group:
 
 jobs:
   check:
@@ -16,6 +16,9 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Test monitoring
+        run: npm test
 
       - name: Lint
         run: npx eslint .

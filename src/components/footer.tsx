@@ -14,6 +14,7 @@ const repoLinks = [
   { label: "Showcase", href: SHOWCASE_PATH },
   { label: "Use Cases", href: "/use-cases" },
   { label: "Compare", href: "/compare" },
+  { label: "Status", href: "/status" },
   { label: "API", href: GITHUB_REPO_URL },
   { label: "Landing Page", href: GITHUB_WEB_REPO_URL },
   { label: "Product Hunt", href: PRODUCT_HUNT_URL },

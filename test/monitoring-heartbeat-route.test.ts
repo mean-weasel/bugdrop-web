@@ -23,7 +23,9 @@ describe("heartbeat route validation", () => {
 
   it("fails closed before mutation when activation configuration is incomplete", async () => {
     process.env.MONITOR_HEARTBEAT_SECRET = "a".repeat(32);
-    delete process.env.DATABASE_URL;
+    delete process.env.CLOUDFLARE_ACCOUNT_ID;
+    delete process.env.CLOUDFLARE_D1_DATABASE_ID;
+    delete process.env.CLOUDFLARE_D1_API_TOKEN;
     delete process.env.MONITOR_ALERT_WEBHOOK_URL;
     delete process.env.RESEND_API_KEY;
     delete process.env.MONITOR_ALERT_EMAIL_FROM;

@@ -80,7 +80,13 @@ export function configurationIssues(): string[] {
     process.env.MONITOR_ALERT_EMAIL_TO,
   ].filter((value) => Boolean(value?.trim()));
 
-  if (!process.env.DATABASE_URL?.trim()) issues.push("DATABASE_URL is missing");
+  if (!process.env.CLOUDFLARE_ACCOUNT_ID?.trim()) issues.push("CLOUDFLARE_ACCOUNT_ID is missing");
+  if (!process.env.CLOUDFLARE_D1_DATABASE_ID?.trim()) {
+    issues.push("CLOUDFLARE_D1_DATABASE_ID is missing");
+  }
+  if (!process.env.CLOUDFLARE_D1_API_TOKEN?.trim()) {
+    issues.push("CLOUDFLARE_D1_API_TOKEN is missing");
+  }
   if (!cronSecret || cronSecret.length < 16) issues.push("CRON_SECRET must be at least 16 characters");
   if (!heartbeatSecret || heartbeatSecret.length < 32) {
     issues.push("MONITOR_HEARTBEAT_SECRET must be at least 32 characters");

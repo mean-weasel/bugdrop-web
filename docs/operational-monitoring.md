@@ -13,8 +13,10 @@ screenshot, GitHub Issue body, token, run URL, repository credential, or respons
 - `CRON_SECRET` authenticates the invocation through its `Authorization` header.
 - Each HTTP component needs two consecutive failures to open an incident and two consecutive
   successes to recover. Checks run in parallel with a ten-second timeout.
-- PostgreSQL transactions serialize each component transition. A durable five-minute UTC window
-  deduplicates cron deliveries, while a four-minute lease rejects overlapping work.
+- Cloudflare D1 stores monitoring state using SQLite semantics. A short global writer lease
+  serializes heartbeat and evaluator transitions; each completed transition is committed as one D1
+  batch. A durable five-minute UTC window coalesces cron deliveries, while a four-minute evaluator
+  lease rejects overlapping work.
 - `POST /api/monitor/heartbeat` accepts a bearer-authenticated, success-only heartbeat. The optional
   `X-BugDrop-Heartbeat-Id` is validated, hashed before storage, and makes retries idempotent. The
   receipt and component transition commit atomically.
@@ -34,14 +36,18 @@ delivery that arrives in a later window, which is treated as a fresh availabilit
 
 ## Provisioning
 
-Provision a PostgreSQL database reachable by the production Vercel deployment, then configure the
-values documented in `monitoring/env.example`. Secrets must be server-only variables; none use a
-`NEXT_PUBLIC_` prefix.
+Provision a dedicated Cloudflare D1 database, then configure the values documented in
+`monitoring/env.example`. Create a dedicated API token with D1 Read and D1 Write access, restricted
+to the BugDrop account. Vercel calls D1's authenticated query API directly; no D1 identifier or token
+is exposed to the browser. All values are server-only variables and none use a `NEXT_PUBLIC_` prefix.
 
 Apply the schema from an authorized operator environment:
 
 ```bash
-DATABASE_URL='postgresql://...' npm run monitoring:migrate
+CLOUDFLARE_ACCOUNT_ID='...' \
+CLOUDFLARE_D1_DATABASE_ID='...' \
+CLOUDFLARE_D1_API_TOKEN='...' \
+npm run monitoring:migrate
 ```
 
 Deploy only after the migration succeeds. The application deliberately does not run schema-changing
@@ -78,7 +84,7 @@ Do not exercise production checks by mutating feedback or creating Issues outsid
 authorized heartbeat.
 
 1. Run the schema migration and deploy with alert delivery temporarily routed to an authorized test
-   destination.
+   destination. Confirm the migration reports `Monitoring D1 schema is ready.`
 2. Invoke the evaluator with its bearer secret, confirm `status: completed`, and confirm all four
    HTTP components initialize. This successful initialization starts the heartbeat activation grace.
 3. Send one authorized heartbeat and confirm Issue delivery changes from Unknown to Operational.
@@ -91,7 +97,7 @@ authorized heartbeat.
 7. Make the authorized test alert destination return an error, provoke a preview incident using the
    same distinct-window procedure, restore the destination, and confirm a later evaluator window
    retries the pending outbox delivery successfully.
-8. Inspect `/api/status`, the database, logs, and alert content for secrets or response bodies.
+8. Inspect `/api/status`, D1, logs, and alert content for secrets or response bodies.
 9. Confirm `/status` reports Unknown or stale monitoring instead of claiming health when the database
    or evaluator is unavailable.
 
@@ -104,7 +110,7 @@ authorized heartbeat.
 
 Recovery is automatic only after the configured successful confirmations. A fresh health response
 cannot recover Issue delivery; only a successful authenticated E2E heartbeat can do that. Public
-incident content is intentionally generic. Error codes and delivery attempts remain in PostgreSQL;
+incident content is intentionally generic. Error codes and delivery attempts remain in D1;
 the authenticated evaluator response and existing GitHub heartbeat retain further diagnostic detail.
 
 ## Rollback
@@ -112,8 +118,13 @@ the authenticated evaluator response and existing GitHub heartbeat retain furthe
 1. Disable Vercel Cron to stop new evaluations.
 2. Remove alert environment variables to stop new deliveries.
 3. Remove the heartbeat call and its repository secret; this does not affect the existing E2E run.
-4. Roll back the web deployment. Keep the database for audit/recovery, or archive and delete it under
-   the database provider's retention process.
+4. Roll back the web deployment. Keep D1 for audit/recovery, or export and delete it under
+   Cloudflare's retention process.
 
 Disabling monitoring never changes the Cloudflare Worker, hosted widget, GitHub App, or customer
 feedback path.
+
+The storage choice intentionally accepts one correlated failure domain: a broad Cloudflare outage can
+make D1 unavailable while the Vercel status route itself is reachable. In that case `/api/status`
+returns Unknown rather than stale operational data, and Resend remains the independent alert
+destination for incidents committed before D1 became unavailable.

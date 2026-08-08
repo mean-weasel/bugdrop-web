@@ -1,7 +1,7 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { dispatchPendingAlerts } from "@/lib/monitoring/alerts";
 import { COMPONENTS } from "@/lib/monitoring/config";
-import { monitoringSql } from "@/lib/monitoring/db";
+import { monitoringDatabase, setMonitoringDatabaseForTests } from "@/lib/monitoring/db";
 import {
   acquireEvaluatorLease,
   applyObservation,
@@ -11,24 +11,25 @@ import {
   pruneMonitoringHistory,
   recordHeartbeatReceipt,
   recordHeartbeatSuccess,
+  releaseFailedEvaluatorLease,
   seedMonitoringComponents,
 } from "@/lib/monitoring/store";
+import { createTestMonitoringDatabase } from "./helpers/sqlite-monitoring";
 
-const testDatabaseUrl = process.env.MONITORING_TEST_DATABASE_URL;
+const testDatabase = createTestMonitoringDatabase();
 
-describe.skipIf(!testDatabaseUrl)("monitoring PostgreSQL integration", () => {
+describe("monitoring D1/SQLite integration", () => {
   beforeAll(() => {
-    process.env.DATABASE_URL = testDatabaseUrl;
+    setMonitoringDatabaseForTests(testDatabase.adapter);
   });
 
-  beforeEach(async () => {
-    const sql = monitoringSql();
-    await sql`
-      TRUNCATE monitoring_alert_outbox, monitoring_events, monitoring_check_results,
-        monitoring_heartbeat_receipts, monitoring_incidents, monitoring_components,
-        monitoring_meta, monitoring_locks
-      RESTART IDENTITY CASCADE
-    `;
+  afterAll(() => {
+    setMonitoringDatabaseForTests(null);
+    testDatabase.close();
+  });
+
+  beforeEach(() => {
+    testDatabase.clear();
   });
 
   it("opens, publishes, alerts, and resolves one stable incident", async () => {
@@ -72,8 +73,7 @@ describe.skipIf(!testDatabaseUrl)("monitoring PostgreSQL integration", () => {
     expect(await recordHeartbeatReceipt("12345:1", receivedAt)).toBe(true);
     expect(await recordHeartbeatReceipt("12345:1", receivedAt)).toBe(false);
 
-    const sql = monitoringSql();
-    const rows = await sql`SELECT request_id_hash FROM monitoring_heartbeat_receipts`;
+    const rows = (await monitoringDatabase().query({ sql: "SELECT request_id_hash FROM monitoring_heartbeat_receipts" })).results;
     expect(rows).toHaveLength(1);
     expect(rows[0].request_id_hash).toMatch(/^[a-f0-9]{64}$/);
     expect(rows[0].request_id_hash).not.toBe("12345:1");
@@ -94,9 +94,8 @@ describe.skipIf(!testDatabaseUrl)("monitoring PostgreSQL integration", () => {
       lastCheckedAt: receivedAt.toISOString(),
       lastVerifiedAt: receivedAt.toISOString(),
     });
-    const sql = monitoringSql();
-    expect(await sql`SELECT id FROM monitoring_heartbeat_receipts`).toHaveLength(1);
-    expect(await sql`SELECT id FROM monitoring_check_results WHERE component_id = ${definition.id}`).toHaveLength(1);
+    expect((await monitoringDatabase().query({ sql: "SELECT id FROM monitoring_heartbeat_receipts" })).results).toHaveLength(1);
+    expect((await monitoringDatabase().query({ sql: "SELECT id FROM monitoring_check_results WHERE component_id = ?", params: [definition.id] })).results).toHaveLength(1);
   });
 
   it("does not let an older observation overwrite newer component state", async () => {
@@ -123,6 +122,13 @@ describe.skipIf(!testDatabaseUrl)("monitoring PostgreSQL integration", () => {
     expect(await acquireEvaluatorLease(now)).toBe(false);
     expect(await acquireEvaluatorLease(new Date("2026-08-05T02:03:59Z"))).toBe(false);
     expect(await acquireEvaluatorLease(new Date("2026-08-05T02:05:00Z"))).toBe(true);
+  });
+
+  it("allows the same cron window to retry after an incomplete evaluator run", async () => {
+    const now = new Date("2026-08-05T02:30:00Z");
+    expect(await acquireEvaluatorLease(now)).toBe(true);
+    await releaseFailedEvaluatorLease(now);
+    expect(await acquireEvaluatorLease(now)).toBe(true);
   });
 
   it("keeps all open incidents visible beyond the resolved-history window", async () => {
@@ -158,10 +164,9 @@ describe.skipIf(!testDatabaseUrl)("monitoring PostgreSQL integration", () => {
     await applyObservation(definition, successAtDate("2025-01-01T00:04:00Z"), ["webhook"]);
 
     await pruneMonitoringHistory(new Date("2026-08-05T00:00:00Z"));
-    const sql = monitoringSql();
-    expect(await sql`SELECT id FROM monitoring_incidents`).toHaveLength(0);
-    expect(await sql`SELECT id FROM monitoring_events`).toHaveLength(0);
-    expect(await sql`SELECT id FROM monitoring_alert_outbox`).toHaveLength(0);
+    expect((await monitoringDatabase().query({ sql: "SELECT id FROM monitoring_incidents" })).results).toHaveLength(0);
+    expect((await monitoringDatabase().query({ sql: "SELECT id FROM monitoring_events" })).results).toHaveLength(0);
+    expect((await monitoringDatabase().query({ sql: "SELECT id FROM monitoring_alert_outbox" })).results).toHaveLength(0);
   });
 
   it("keeps alerts pending when their configured channel is temporarily absent", async () => {
@@ -172,8 +177,7 @@ describe.skipIf(!testDatabaseUrl)("monitoring PostgreSQL integration", () => {
     delete process.env.MONITOR_ALERT_WEBHOOK_URL;
 
     expect(await dispatchPendingAlerts()).toMatchObject({ failed: 1, skipped: 0 });
-    const sql = monitoringSql();
-    const rows = await sql`SELECT status, last_error FROM monitoring_alert_outbox`;
+    const rows = (await monitoringDatabase().query({ sql: "SELECT status, last_error FROM monitoring_alert_outbox" })).results;
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({
       status: "pending",

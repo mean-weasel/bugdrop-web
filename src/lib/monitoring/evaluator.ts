@@ -11,6 +11,7 @@ import {
   getHeartbeatBaseline,
   markEvaluatorCompleted,
   pruneMonitoringHistory,
+  releaseFailedEvaluatorLease,
   seedMonitoringComponents,
 } from "./store";
 
@@ -39,36 +40,41 @@ export async function evaluateMonitoring(now = new Date()): Promise<EvaluationSu
     };
   }
 
-  const channels = configuredAlertChannels();
-  const observations = await runHttpChecks(now);
-  const heartbeat = await heartbeatObservation(now);
-  if (heartbeat) observations.push(heartbeat);
+  try {
+    const channels = configuredAlertChannels();
+    const observations = await runHttpChecks(now);
+    const heartbeat = await heartbeatObservation(now);
+    if (heartbeat) observations.push(heartbeat);
 
-  for (const result of observations) {
-    const definition = COMPONENTS.find((component) => component.id === result.componentId);
-    if (!definition) throw new Error(`Unknown monitoring component ${result.componentId}`);
-    await applyObservation(definition, result.observation, channels);
-  }
+    for (const result of observations) {
+      const definition = COMPONENTS.find((component) => component.id === result.componentId);
+      if (!definition) throw new Error(`Unknown monitoring component ${result.componentId}`);
+      await applyObservation(definition, result.observation, channels);
+    }
 
-  const completedAt = new Date();
-  await pruneMonitoringHistory(completedAt);
-  const alerts = await dispatchPendingAlerts();
-  if (alerts.failed > 0 || alerts.skipped > 0) {
-    throw new Error(
-      `Alert delivery is impaired: ${alerts.failed} failed, ${alerts.skipped} skipped`,
-    );
+    const completedAt = new Date();
+    await pruneMonitoringHistory(completedAt);
+    const alerts = await dispatchPendingAlerts();
+    if (alerts.failed > 0 || alerts.skipped > 0) {
+      throw new Error(
+        `Alert delivery is impaired: ${alerts.failed} failed, ${alerts.skipped} skipped`,
+      );
+    }
+    await markEvaluatorCompleted(completedAt);
+    return {
+      status: "completed",
+      checkedAt: now.toISOString(),
+      observations: observations.map((result) => ({
+        componentId: result.componentId,
+        ok: result.observation.ok,
+        errorCode: result.observation.errorCode,
+      })),
+      alerts,
+    };
+  } catch (error) {
+    await releaseFailedEvaluatorLease(now).catch(() => undefined);
+    throw error;
   }
-  await markEvaluatorCompleted(completedAt);
-  return {
-    status: "completed",
-    checkedAt: now.toISOString(),
-    observations: observations.map((result) => ({
-      componentId: result.componentId,
-      ok: result.observation.ok,
-      errorCode: result.observation.errorCode,
-    })),
-    alerts,
-  };
 }
 
 async function heartbeatObservation(now: Date) {

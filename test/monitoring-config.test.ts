@@ -30,7 +30,9 @@ describe("monitoring configuration", () => {
 });
 
 function setRequiredConfiguration() {
-  vi.stubEnv("DATABASE_URL", "postgresql://example.invalid/bugdrop");
+  vi.stubEnv("CLOUDFLARE_ACCOUNT_ID", "account-id");
+  vi.stubEnv("CLOUDFLARE_D1_DATABASE_ID", "database-id");
+  vi.stubEnv("CLOUDFLARE_D1_API_TOKEN", "api-token");
   vi.stubEnv("CRON_SECRET", "a".repeat(16));
   vi.stubEnv("MONITOR_HEARTBEAT_SECRET", "b".repeat(32));
 }

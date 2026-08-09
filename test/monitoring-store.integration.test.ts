@@ -38,17 +38,20 @@ describe("monitoring D1/SQLite integration", () => {
     await seedMonitoringComponents(new Date("2026-08-05T00:00:00Z"));
 
     await applyObservation(definition, failureAt(1), ["webhook"]);
-    expect((await getPublicStatusSnapshot(new Date("2026-08-05T00:01:30Z"))).incidents).toHaveLength(
-      0,
-    );
+    expect((await getPublicStatusSnapshot(new Date("2026-08-05T00:01:30Z"))).incidents).toHaveLength(0);
 
     const opened = await applyObservation(definition, failureAt(2), ["webhook"]);
     expect(opened?.kind).toBe("opened");
     const failedSnapshot = await getPublicStatusSnapshot(new Date("2026-08-05T00:02:30Z"));
-    expect(failedSnapshot.components.find((component) => component.id === definition.id)?.status).toBe(
-      "outage",
-    );
+    expect(failedSnapshot.components.find((component) => component.id === definition.id)?.status).toBe("outage");
     expect(failedSnapshot.incidents).toHaveLength(1);
+    const failedDay = failedSnapshot.components.find((component) => component.id === definition.id)?.history30d.find((day) => day.date === "2026-08-05");
+    expect(failedDay).toMatchObject({
+      dataState: "monitored",
+      status: "outage",
+      checks: 2,
+      successfulChecks: 0,
+    });
 
     const delivery = await claimPendingAlert();
     expect(delivery?.channel).toBe("webhook");
@@ -61,12 +64,45 @@ describe("monitoring D1/SQLite integration", () => {
 
     await applyObservation(definition, successAt(3), ["webhook"]);
     const resolved = await applyObservation(definition, successAt(4), ["webhook"]);
-    expect(resolved).toEqual({ kind: "resolved", incidentId: opened?.incidentId });
+    expect(resolved).toEqual({
+      kind: "resolved",
+      incidentId: opened?.incidentId,
+    });
     const recoveredSnapshot = await getPublicStatusSnapshot(new Date("2026-08-05T00:04:30Z"));
     expect(recoveredSnapshot.incidents[0]).toMatchObject({ state: "resolved" });
-    expect(
-      recoveredSnapshot.components.find((component) => component.id === definition.id)?.status,
-    ).toBe("operational");
+    expect(recoveredSnapshot.components.find((component) => component.id === definition.id)?.status).toBe("operational");
+    expect(recoveredSnapshot.components.find((component) => component.id === definition.id)?.history30d.find((day) => day.date === "2026-08-05")).toMatchObject({
+      status: "outage",
+      uptime: 50,
+      checks: 4,
+      successfulChecks: 2,
+    });
+  });
+
+  it("distinguishes pre-monitoring days from later monitoring gaps", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "landing_page")!;
+    await seedMonitoringComponents(new Date("2026-08-05T12:00:00Z"));
+    await applyObservation(definition, successAtDate("2026-08-05T12:05:00Z"), []);
+
+    const snapshot = await getPublicStatusSnapshot(new Date("2026-08-07T12:00:00Z"));
+    const component = snapshot.components.find((item) => item.id === definition.id)!;
+    expect(snapshot.monitoringStartedAt).toBe("2026-08-05T12:00:00.000Z");
+    expect(component.history30d).toHaveLength(30);
+    expect(component.history30d.find((day) => day.date === "2026-08-04")).toMatchObject({
+      dataState: "pre_monitoring",
+      status: "unknown",
+    });
+    expect(component.history30d.find((day) => day.date === "2026-08-05")).toMatchObject({
+      dataState: "monitored",
+      status: "operational",
+      uptime: 100,
+    });
+    expect(component.history30d.find((day) => day.date === "2026-08-06")).toMatchObject({
+      dataState: "monitoring_gap",
+      status: "unknown",
+    });
+    expect(component.monitoredDays30d).toBe(1);
+    expect(component.uptime30d).toBe(100);
   });
 
   it("deduplicates retried heartbeat identifiers without storing the raw identifier", async () => {
@@ -74,7 +110,11 @@ describe("monitoring D1/SQLite integration", () => {
     expect(await recordHeartbeatReceipt("12345:1", receivedAt)).toBe(true);
     expect(await recordHeartbeatReceipt("12345:1", receivedAt)).toBe(false);
 
-    const rows = (await monitoringDatabase().query({ sql: "SELECT request_id_hash FROM monitoring_heartbeat_receipts" })).results;
+    const rows = (
+      await monitoringDatabase().query({
+        sql: "SELECT request_id_hash FROM monitoring_heartbeat_receipts",
+      })
+    ).results;
     expect(rows).toHaveLength(1);
     expect(rows[0].request_id_hash).toMatch(/^[a-f0-9]{64}$/);
     expect(rows[0].request_id_hash).not.toBe("12345:1");
@@ -95,18 +135,27 @@ describe("monitoring D1/SQLite integration", () => {
       lastCheckedAt: receivedAt.toISOString(),
       lastVerifiedAt: receivedAt.toISOString(),
     });
-    expect((await monitoringDatabase().query({ sql: "SELECT id FROM monitoring_heartbeat_receipts" })).results).toHaveLength(1);
-    expect((await monitoringDatabase().query({ sql: "SELECT id FROM monitoring_check_results WHERE component_id = ?", params: [definition.id] })).results).toHaveLength(1);
+    expect(
+      (
+        await monitoringDatabase().query({
+          sql: "SELECT id FROM monitoring_heartbeat_receipts",
+        })
+      ).results,
+    ).toHaveLength(1);
+    expect(
+      (
+        await monitoringDatabase().query({
+          sql: "SELECT id FROM monitoring_check_results WHERE component_id = ?",
+          params: [definition.id],
+        })
+      ).results,
+    ).toHaveLength(1);
   });
 
   it("does not let an older observation overwrite newer component state", async () => {
     const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
     await seedMonitoringComponents(new Date("2026-08-05T02:00:00Z"));
-    await applyObservation(
-      definition,
-      { ...successAt(4), markVerifiedSuccess: true },
-      ["webhook"],
-    );
+    await applyObservation(definition, { ...successAt(4), markVerifiedSuccess: true }, ["webhook"]);
     await applyObservation(definition, failureAt(3), ["webhook"]);
 
     const snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T02:05:00Z"));
@@ -147,13 +196,22 @@ describe("monitoring D1/SQLite integration", () => {
       const url = String(input);
       if (url.includes("alerts.example.test")) return new Response(null, { status: 500 });
       if (url.endsWith("widget.js")) {
-        return new Response("x".repeat(1200), { headers: { "content-type": "application/javascript" } });
+        return new Response("x".repeat(1200), {
+          headers: { "content-type": "application/javascript" },
+        });
       }
       if (url.includes("/api/health")) {
-        return Response.json({ status: "ok", environment: "production", buildSha: "a".repeat(40) });
+        return Response.json({
+          status: "ok",
+          environment: "production",
+          buildSha: "a".repeat(40),
+        });
       }
       if (url.includes("/api/check/")) {
-        return Response.json({ installed: true, repo: "mean-weasel/bugdrop-widget-test" });
+        return Response.json({
+          installed: true,
+          repo: "mean-weasel/bugdrop-widget-test",
+        });
       }
       return new Response(`BugDrop ${"x".repeat(600)}`);
     });
@@ -174,7 +232,10 @@ describe("monitoring D1/SQLite integration", () => {
 
     const snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T00:00:00Z"));
     expect(snapshot.incidents).toHaveLength(1);
-    expect(snapshot.incidents[0]).toMatchObject({ state: "open", componentId: definition.id });
+    expect(snapshot.incidents[0]).toMatchObject({
+      state: "open",
+      componentId: definition.id,
+    });
   });
 
   it("keeps recently resolved incidents even when they opened more than 90 days ago", async () => {
@@ -187,7 +248,10 @@ describe("monitoring D1/SQLite integration", () => {
 
     const snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T00:00:00Z"));
     expect(snapshot.incidents).toHaveLength(1);
-    expect(snapshot.incidents[0]).toMatchObject({ state: "resolved", componentId: definition.id });
+    expect(snapshot.incidents[0]).toMatchObject({
+      state: "resolved",
+      componentId: definition.id,
+    });
   });
 
   it("prunes resolved incident audit data after 365 days", async () => {
@@ -199,9 +263,27 @@ describe("monitoring D1/SQLite integration", () => {
     await applyObservation(definition, successAtDate("2025-01-01T00:04:00Z"), ["webhook"]);
 
     await pruneMonitoringHistory(new Date("2026-08-05T00:00:00Z"));
-    expect((await monitoringDatabase().query({ sql: "SELECT id FROM monitoring_incidents" })).results).toHaveLength(0);
-    expect((await monitoringDatabase().query({ sql: "SELECT id FROM monitoring_events" })).results).toHaveLength(0);
-    expect((await monitoringDatabase().query({ sql: "SELECT id FROM monitoring_alert_outbox" })).results).toHaveLength(0);
+    expect(
+      (
+        await monitoringDatabase().query({
+          sql: "SELECT id FROM monitoring_incidents",
+        })
+      ).results,
+    ).toHaveLength(0);
+    expect(
+      (
+        await monitoringDatabase().query({
+          sql: "SELECT id FROM monitoring_events",
+        })
+      ).results,
+    ).toHaveLength(0);
+    expect(
+      (
+        await monitoringDatabase().query({
+          sql: "SELECT id FROM monitoring_alert_outbox",
+        })
+      ).results,
+    ).toHaveLength(0);
   });
 
   it("keeps alerts pending when their configured channel is temporarily absent", async () => {
@@ -211,8 +293,15 @@ describe("monitoring D1/SQLite integration", () => {
     await applyObservation(definition, failureAtDate("2026-08-05T03:02:00Z"), ["webhook"]);
     delete process.env.MONITOR_ALERT_WEBHOOK_URL;
 
-    expect(await dispatchPendingAlerts()).toMatchObject({ failed: 1, skipped: 0 });
-    const rows = (await monitoringDatabase().query({ sql: "SELECT status, last_error FROM monitoring_alert_outbox" })).results;
+    expect(await dispatchPendingAlerts()).toMatchObject({
+      failed: 1,
+      skipped: 0,
+    });
+    const rows = (
+      await monitoringDatabase().query({
+        sql: "SELECT status, last_error FROM monitoring_alert_outbox",
+      })
+    ).results;
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({
       status: "pending",
@@ -228,11 +317,11 @@ describe("monitoring D1/SQLite integration", () => {
     process.env.MONITOR_ALERT_WEBHOOK_URL = "https://alerts.example.test/hook";
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null, { status: 204 }));
 
-    expect(await dispatchPendingAlerts()).toMatchObject({ delivered: 1, failed: 0 });
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://alerts.example.test/hook",
-      expect.objectContaining({ method: "POST", redirect: "error" }),
-    );
+    expect(await dispatchPendingAlerts()).toMatchObject({
+      delivered: 1,
+      failed: 0,
+    });
+    expect(fetchMock).toHaveBeenCalledWith("https://alerts.example.test/hook", expect.objectContaining({ method: "POST", redirect: "error" }));
     fetchMock.mockRestore();
   });
 });
@@ -256,9 +345,19 @@ function successAt(minute: number) {
 }
 
 function failureAtDate(checkedAt: string) {
-  return { ok: false, checkedAt: new Date(checkedAt), latencyMs: 500, errorCode: "http_503" };
+  return {
+    ok: false,
+    checkedAt: new Date(checkedAt),
+    latencyMs: 500,
+    errorCode: "http_503",
+  };
 }
 
 function successAtDate(checkedAt: string) {
-  return { ok: true, checkedAt: new Date(checkedAt), latencyMs: 100, errorCode: null };
+  return {
+    ok: true,
+    checkedAt: new Date(checkedAt),
+    latencyMs: 100,
+    errorCode: null,
+  };
 }

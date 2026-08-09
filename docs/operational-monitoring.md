@@ -28,8 +28,29 @@ variants, so ordinary page traffic does not become Cloudflare administrative API
   seven-hour activation grace even if no heartbeat has arrived yet.
 - Incident open and recovery alerts enter a transactional outbox. The evaluator retries failed
   deliveries with exponential backoff through either a generic webhook, Resend email, or both.
-- Check results and heartbeat receipts are retained for 90 days. Incident and event audit history is
-  retained for 365 days; the public page shows the latest 90 days.
+- Check results, daily component rollups, and heartbeat receipts are retained for 90 days. Incident
+  and event audit history is retained for 365 days; the public incident feed shows the latest 90
+  days.
+
+## Public status history
+
+The status page shows one UTC-day bar per component for the current day and the preceding 29 days.
+Daily severity follows the confirmed public component state: a suppressed first failure does not
+create an outage bar, while any confirmed incident keeps the affected day degraded or in outage.
+The displayed check uptime is the successful-check percentage calculated only from recorded
+monitoring samples, never from days before monitoring began or from days where monitoring data is
+missing. It retains the status page's existing uptime definition and is separate from the confirmed
+daily severity shown by each bar.
+
+Retained checks from before the daily-rollup deployment are labeled **Historical checks**. They
+contribute to check uptime, and incident audit history still marks confirmed degraded/outage days,
+but non-incident backfilled days do not claim an exact state-machine status that the retained data
+cannot prove.
+
+Days before the persisted `monitoring_started` timestamp are labeled **Before monitoring**. A day
+after that timestamp with no trustworthy samples is labeled **Monitoring gap** rather than being
+counted as healthy or unhealthy. Hovering, focusing, or tapping a day reveals its check summary;
+affected days link to the corresponding entry in the incident history.
 
 Vercel Cron requires a plan that supports five-minute schedules. Vercel does not retry failed cron
 invocations, so the next invocation and the persisted evaluator freshness timestamp are part of the
@@ -56,8 +77,18 @@ CLOUDFLARE_D1_API_TOKEN='...' \
 npm run monitoring:migrate
 ```
 
-Deploy only after the migration succeeds. The application deliberately does not run schema-changing
-DDL during normal requests.
+Before this migration, temporarily pause both observation writers: disable the Vercel monitoring
+cron and pause the BugDrop production-heartbeat workflow. No evaluator or heartbeat request may
+reach the old deployment between migration completion and the new deployment becoming active,
+because the old writer does not populate daily rollups.
+
+Deploy only after the migration succeeds. This release adds the daily-rollup table used by both new
+observation writes and `/api/status`, so the additive migration must reach production D1 before the
+application deployment. It backfills the retained history snapshot once and is safe to run again. The
+backfill labels retained samples as Historical checks, uses incident history for confirmed
+degraded/outage days, and preserves raw check success for the uptime percentage. The application
+deliberately does not run schema-changing DDL during normal requests. Re-enable the cron and
+production heartbeat only after the new deployment is serving production traffic.
 
 Configure at least one alert channel before activation; the evaluator fails closed if neither is
 present. For delivery redundancy, production should configure both. A generic HTTPS webhook receives
@@ -89,23 +120,31 @@ request; the absence of a success check-in is the dead-man signal.
 Do not exercise production checks by mutating feedback or creating Issues outside the existing
 authorized heartbeat.
 
-1. Run the schema migration and deploy with alert delivery temporarily routed to an authorized test
-   destination. Confirm the migration reports `Monitoring D1 schema is ready.`
-2. Invoke the evaluator with its bearer secret, confirm `status: completed`, and confirm all four
+1. Pause the Vercel monitoring cron and the BugDrop production-heartbeat workflow. Confirm no
+   evaluator or heartbeat request is in flight.
+2. Run the schema migration before deploying the status-history code, with alert delivery
+   temporarily routed to an authorized test destination. Confirm the migration reports
+   `Monitoring D1 schema is ready.`, then confirm a second migration run does not duplicate daily
+   rollup counts.
+3. Deploy the status-history code, then re-enable the cron and production-heartbeat workflow.
+4. Invoke the evaluator with its bearer secret, confirm `status: completed`, and confirm all four
    HTTP components initialize. This successful initialization starts the heartbeat activation grace.
-3. Send one authorized heartbeat and confirm Issue delivery changes from Unknown to Operational.
-4. Override one target in a preview deployment with a known 404. Vercel Cron does not invoke preview
+5. Send one authorized heartbeat and confirm Issue delivery changes from Unknown to Operational.
+6. Override one target in a preview deployment with a known 404. Vercel Cron does not invoke preview
    deployments, so manually invoke the authenticated evaluator once in each of four distinct
    five-minute UTC windows. Confirm the first failure is suppressed, the second opens one incident,
    and two later successes resolve the same incident. Require `status: completed` for each call.
-5. Retry one heartbeat with the same ID and confirm it creates only one receipt.
-6. Run overlapping evaluator requests and confirm one returns `already_running`.
-7. Make the authorized test alert destination return an error, provoke a preview incident using the
+7. Retry one heartbeat with the same ID and confirm it creates only one receipt.
+8. Run overlapping evaluator requests and confirm one returns `already_running`.
+9. Make the authorized test alert destination return an error, provoke a preview incident using the
    same distinct-window procedure, restore the destination, and confirm a later evaluator window
    retries the pending outbox delivery successfully.
-8. Inspect `/api/status`, D1, logs, and alert content for secrets or response bodies.
-9. Confirm `/status` reports Unknown or stale monitoring instead of claiming health when the database
-   or evaluator is unavailable.
+10. Inspect `/api/status`, D1, logs, and alert content for secrets or response bodies.
+11. Confirm `/status` shows exactly 30 UTC days per component, labels pre-activation days as Before
+   monitoring, labels an intentionally missing post-activation day as Monitoring gap, and links an
+   affected day to its incident.
+12. Confirm `/status` reports Unknown or stale monitoring instead of claiming health when the
+    database or evaluator is unavailable.
 
 ## Incident and recovery semantics
 

@@ -32,10 +32,7 @@ export type Observation = {
   markVerifiedSuccess?: boolean;
 };
 
-export type StateTransition =
-  | { kind: "opened"; impact: IncidentImpact }
-  | { kind: "resolved"; incidentId: string }
-  | null;
+export type StateTransition = { kind: "opened"; impact: IncidentImpact } | { kind: "resolved"; incidentId: string } | null;
 
 export type ReducedState = {
   state: ComponentState;
@@ -64,6 +61,18 @@ export type PublicComponent = {
   lastCheckedAt: string | null;
   lastVerifiedAt: string | null;
   uptime30d: number | null;
+  monitoredDays30d: number;
+  history30d: PublicDailyComponentStatus[];
+};
+
+export type PublicDailyComponentStatus = {
+  date: string;
+  status: ComponentStatus;
+  dataState: "pre_monitoring" | "historical" | "monitored" | "monitoring_gap";
+  uptime: number | null;
+  checks: number;
+  successfulChecks: number;
+  incidentIds: string[];
 };
 
 export type PublicIncident = {
@@ -83,6 +92,7 @@ export type PublicStatusSnapshot = {
   overall: ComponentStatus;
   generatedAt: string;
   lastEvaluatedAt: string | null;
+  monitoringStartedAt: string | null;
   evaluatorFresh: boolean;
   components: PublicComponent[];
   incidents: PublicIncident[];

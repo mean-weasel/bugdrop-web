@@ -1,8 +1,5 @@
-import type {
-  ComponentStatus,
-  PublicIncident,
-  PublicStatusSnapshot,
-} from "@/lib/monitoring/types";
+import type { ComponentStatus, PublicIncident, PublicStatusSnapshot } from "@/lib/monitoring/types";
+import { ComponentHistory, HistoryLegend } from "./component-history";
 
 const statusStyles: Record<ComponentStatus, string> = {
   operational: "border-accent-green/40 bg-accent-green/10 text-accent-green",
@@ -24,83 +21,44 @@ export function StatusDashboard({ snapshot }: { snapshot: PublicStatusSnapshot }
 
   return (
     <div className="space-y-10">
-      <section
-        className={`rounded-2xl border p-6 ${statusStyles[snapshot.overall]}`}
-        aria-live="polite"
-      >
+      <section className={`rounded-2xl border p-6 ${statusStyles[snapshot.overall]}`} aria-live="polite">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] opacity-80">
-              Current status
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-current">
-              {overallMessage(snapshot.overall)}
-            </h2>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] opacity-80">Current status</p>
+            <h2 className="mt-2 text-2xl font-semibold text-current">{overallMessage(snapshot.overall)}</h2>
           </div>
           <StatusPill status={snapshot.overall} />
         </div>
-        {!snapshot.evaluatorFresh && (
-          <p className="mt-4 text-sm text-current/80">
-            The monitoring evaluator has not completed recently. Component results may be stale.
-          </p>
-        )}
+        {!snapshot.evaluatorFresh && <p className="mt-4 text-sm text-current/80">The monitoring evaluator has not completed recently. Component results may be stale.</p>}
       </section>
 
       <section aria-labelledby="components-heading">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent-cyan">
-              Live components
-            </p>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent-cyan">30-day reliability</p>
             <h2 id="components-heading" className="mt-1 text-2xl font-semibold">
               BugDrop services
             </h2>
+            <p className="mt-2 max-w-2xl text-sm text-text-subtle">Daily confirmed status over the past 30 days. Continuous monitoring began {formatMonitoringStart(snapshot.monitoringStartedAt)}.</p>
           </div>
-          <p className="text-xs text-text-muted">
-            Last evaluated {formatRelativeTime(snapshot.lastEvaluatedAt)}
-          </p>
+          <p className="text-xs text-text-muted">Last evaluated {formatRelativeTime(snapshot.lastEvaluatedAt)}</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
+        <HistoryLegend />
+        <div className="mt-5 space-y-4">
           {snapshot.components.map((component) => (
-            <article key={component.id} className="rounded-xl border border-border bg-bg-surface p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="font-semibold text-text-primary">{component.name}</h3>
-                  <p className="mt-1 text-sm text-text-subtle">{component.description}</p>
-                </div>
-                <StatusPill status={component.status} />
-              </div>
-              <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-4 text-sm">
-                <div>
-                  <dt className="text-xs uppercase tracking-wider text-text-muted">30-day checks</dt>
-                  <dd className="mt-1 font-mono text-text-primary">
-                    {component.uptime30d === null ? "No data" : `${component.uptime30d.toFixed(3)}%`}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wider text-text-muted">Last verified</dt>
-                  <dd className="mt-1 font-mono text-text-primary">
-                    {formatRelativeTime(component.lastVerifiedAt)}
-                  </dd>
-                </div>
-              </dl>
-            </article>
+            <ComponentHistory key={component.id} component={component} />
           ))}
         </div>
       </section>
 
       <section aria-labelledby="incidents-heading">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent-warm">
-          Incident response
-        </p>
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent-warm">Incident response</p>
         <h2 id="incidents-heading" className="mt-1 text-2xl font-semibold">
           Current incidents
         </h2>
         <div className="mt-4">
           {openIncidents.length === 0 ? (
-            <div className="rounded-xl border border-accent-green/30 bg-accent-green/5 p-5 text-sm text-text-subtle">
-              No active incidents.
-            </div>
+            <div className="rounded-xl border border-accent-green/30 bg-accent-green/5 p-5 text-sm text-text-subtle">No active incidents.</div>
           ) : (
             <div className="space-y-4">
               {openIncidents.map((incident) => (
@@ -118,13 +76,9 @@ export function StatusDashboard({ snapshot }: { snapshot: PublicStatusSnapshot }
         <p className="mt-1 text-sm text-text-subtle">Resolved incidents from the last 90 days.</p>
         <div className="mt-4 space-y-3">
           {incidentHistory.length === 0 ? (
-            <p className="rounded-xl border border-border bg-bg-surface p-5 text-sm text-text-muted">
-              No resolved incidents have been recorded in this window.
-            </p>
+            <p className="rounded-xl border border-border bg-bg-surface p-5 text-sm text-text-muted">No resolved incidents have been recorded in this window.</p>
           ) : (
-            incidentHistory.map((incident) => (
-              <IncidentCard key={incident.id} incident={incident} />
-            ))
+            incidentHistory.map((incident) => <IncidentCard key={incident.id} incident={incident} />)
           )}
         </div>
       </section>
@@ -135,23 +89,16 @@ export function StatusDashboard({ snapshot }: { snapshot: PublicStatusSnapshot }
 export function StatusUnavailable() {
   return (
     <section className="rounded-2xl border border-text-muted/40 bg-bg-surface p-6">
-      <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-muted">
-        Status unavailable
-      </p>
+      <p className="font-mono text-xs uppercase tracking-[0.18em] text-text-muted">Status unavailable</p>
       <h2 className="mt-2 text-2xl font-semibold">Current monitoring data could not be loaded.</h2>
-      <p className="mt-3 text-sm text-text-subtle">
-        This page has failed closed instead of presenting stale services as healthy. Please try again
-        shortly.
-      </p>
+      <p className="mt-3 text-sm text-text-subtle">This page has failed closed instead of presenting stale services as healthy. Please try again shortly.</p>
     </section>
   );
 }
 
 function StatusPill({ status }: { status: ComponentStatus }) {
   return (
-    <span
-      className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusStyles[status]}`}
-    >
+    <span className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusStyles[status]}`}>
       <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
       {statusLabels[status]}
     </span>
@@ -160,19 +107,13 @@ function StatusPill({ status }: { status: ComponentStatus }) {
 
 function IncidentCard({ incident }: { incident: PublicIncident }) {
   return (
-    <article className="rounded-xl border border-border bg-bg-surface p-5">
+    <article id={`incident-${incident.id}`} className="scroll-mt-24 rounded-xl border border-border bg-bg-surface p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-wider text-text-muted">{incident.componentName}</p>
           <h3 className="mt-1 font-semibold text-text-primary">{incident.title}</h3>
         </div>
-        <span
-          className={`rounded-full border px-2.5 py-1 text-xs ${
-            incident.state === "open"
-              ? statusStyles[incident.impact]
-              : "border-accent-green/30 text-accent-green"
-          }`}
-        >
+        <span className={`rounded-full border px-2.5 py-1 text-xs ${incident.state === "open" ? statusStyles[incident.impact] : "border-accent-green/30 text-accent-green"}`}>
           {incident.state === "open" ? "Investigating" : "Resolved"}
         </span>
       </div>
@@ -207,4 +148,12 @@ function formatRelativeTime(value: string | null): string {
   if (elapsedMs < 60 * 60_000) return `${Math.floor(elapsedMs / 60_000)} minutes ago`;
   if (elapsedMs < 24 * 60 * 60_000) return `${Math.floor(elapsedMs / 3_600_000)} hours ago`;
   return `${Math.floor(elapsedMs / 86_400_000)} days ago`;
+}
+
+function formatMonitoringStart(value: string | null): string {
+  if (!value) return "when the first trustworthy sample is recorded";
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "long",
+    timeZone: "UTC",
+  }).format(new Date(value));
 }

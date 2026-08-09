@@ -55,6 +55,67 @@ CREATE TABLE IF NOT EXISTS monitoring_check_results (
 );
 CREATE INDEX IF NOT EXISTS monitoring_check_results_component_time_idx ON monitoring_check_results (component_id, checked_at DESC);
 
+CREATE TABLE IF NOT EXISTS monitoring_meta (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS monitoring_daily_component_rollups (
+  component_id TEXT NOT NULL REFERENCES monitoring_components(id),
+  day TEXT NOT NULL,
+  total_samples INTEGER NOT NULL DEFAULT 0 CHECK (total_samples >= 0),
+  operational_samples INTEGER NOT NULL DEFAULT 0 CHECK (operational_samples >= 0),
+  degraded_samples INTEGER NOT NULL DEFAULT 0 CHECK (degraded_samples >= 0),
+  outage_samples INTEGER NOT NULL DEFAULT 0 CHECK (outage_samples >= 0),
+  unknown_samples INTEGER NOT NULL DEFAULT 0 CHECK (unknown_samples >= 0),
+  successful_checks INTEGER NOT NULL DEFAULT 0 CHECK (successful_checks >= 0),
+  source TEXT NOT NULL DEFAULT 'live' CHECK (source IN ('live', 'backfill')),
+  first_checked_at TEXT NOT NULL,
+  last_checked_at TEXT NOT NULL,
+  PRIMARY KEY (component_id, day)
+);
+CREATE INDEX IF NOT EXISTS monitoring_daily_rollups_day_idx ON monitoring_daily_component_rollups (day DESC);
+
+WITH daily_checks AS (
+  SELECT
+    component_id,
+    substr(checked_at, 1, 10) AS day,
+    COUNT(*) AS total_samples,
+    SUM(ok) AS successful_checks,
+    MIN(checked_at) AS first_checked_at,
+    MAX(checked_at) AS last_checked_at
+  FROM monitoring_check_results
+  GROUP BY component_id, substr(checked_at, 1, 10)
+)
+INSERT INTO monitoring_daily_component_rollups (
+  component_id, day, total_samples, operational_samples, degraded_samples, outage_samples,
+  unknown_samples, successful_checks, source, first_checked_at, last_checked_at
+)
+SELECT
+  daily.component_id,
+  daily.day,
+  daily.total_samples,
+  0,
+  0,
+  0,
+  daily.total_samples,
+  daily.successful_checks,
+  'backfill',
+  daily.first_checked_at,
+  daily.last_checked_at
+FROM daily_checks daily
+WHERE NOT EXISTS (
+  SELECT 1 FROM monitoring_meta WHERE key = 'daily_rollups_backfilled'
+)
+ON CONFLICT (component_id, day) DO NOTHING;
+
+INSERT INTO monitoring_meta (key, value, updated_at)
+SELECT 'daily_rollups_backfilled', '{"schemaVersion":1}', strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+WHERE NOT EXISTS (
+  SELECT 1 FROM monitoring_meta WHERE key = 'daily_rollups_backfilled'
+);
+
 CREATE TABLE IF NOT EXISTS monitoring_heartbeat_receipts (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   received_at TEXT NOT NULL,
@@ -79,12 +140,6 @@ CREATE TABLE IF NOT EXISTS monitoring_alert_outbox (
   UNIQUE (incident_id, event_kind, channel)
 );
 CREATE INDEX IF NOT EXISTS monitoring_alert_pending_idx ON monitoring_alert_outbox (status, next_attempt_at);
-
-CREATE TABLE IF NOT EXISTS monitoring_meta (
-  key TEXT PRIMARY KEY,
-  value TEXT NOT NULL,
-  updated_at TEXT NOT NULL
-);
 
 CREATE TABLE IF NOT EXISTS monitoring_locks (
   name TEXT PRIMARY KEY,

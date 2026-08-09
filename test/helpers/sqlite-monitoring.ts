@@ -38,6 +38,7 @@ export function createTestMonitoringDatabase(): {
       sqlite.exec(`
         DELETE FROM monitoring_alert_outbox;
         DELETE FROM monitoring_events;
+        DELETE FROM monitoring_daily_component_rollups;
         DELETE FROM monitoring_check_results;
         DELETE FROM monitoring_heartbeat_receipts;
         DELETE FROM monitoring_incidents;

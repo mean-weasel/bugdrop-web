@@ -30,7 +30,7 @@
 - `src/components/variants-lab/variants-lab.module.css`: Owns the simplified visual hierarchy, fixed accessible demo surface, compact preview, CTA, and responsive behavior.
 - `test/variants-lab-model.test.ts`: Locks the five visible block names and preserves model/Issue parity tests while removing obsolete configuration/appearance expectations.
 - `test/variants-lab-content.test.ts`: Locks the approved hero, removed-control absence, recipe count, and GitHub CTA in the rendered component source.
-- `src/app/labs/variants/page.tsx`: Must remain unchanged; its metadata already supplies `noindex, nofollow`.
+- `src/app/labs/variants/page.tsx`: Existing untracked route file to stage unchanged with Task 2; its metadata already supplies `noindex, nofollow`.
 
 ---
 
@@ -131,6 +131,7 @@ git commit -m "refactor: simplify variants lab model"
 
 **Files:**
 - Create: `test/variants-lab-content.test.ts`
+- Add unchanged: `src/app/labs/variants/page.tsx`
 - Modify: `src/components/variants-lab/variants-lab.tsx:1-159`
 
 **Interfaces:**
@@ -401,7 +402,10 @@ Expected: PASS with no unused imports, state, or dead configuration references.
 - [ ] **Step 8: Commit the simplified hierarchy**
 
 ```bash
-git add src/components/variants-lab/variants-lab.tsx test/variants-lab-content.test.ts
+git add \
+  src/app/labs/variants/page.tsx \
+  src/components/variants-lab/variants-lab.tsx \
+  test/variants-lab-content.test.ts
 git commit -m "feat: simplify composable feedback lab"
 ```
 

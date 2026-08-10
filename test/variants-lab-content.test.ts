@@ -5,6 +5,10 @@ const component = readFileSync(
   "src/components/variants-lab/variants-lab.tsx",
   "utf8",
 );
+const styles = readFileSync(
+  "src/components/variants-lab/variants-lab.module.css",
+  "utf8",
+);
 
 describe("simplified variants lab content", () => {
   it("uses the approved compact hero and missing-block CTA", () => {
@@ -33,5 +37,22 @@ describe("simplified variants lab content", () => {
     expect(component).toContain("LAB_DISCLOSURE");
     expect(component).toContain("PRIMITIVE_COPY");
     expect(component).toContain("RECIPE_IDS.map");
+  });
+
+  it("removes obsolete customization styles", () => {
+    for (const obsolete of [
+      ".secondary",
+      ".controls",
+      ".configPreview",
+      ".themeLight",
+      ".themeDark",
+      ".themeAuto",
+      ".comfortable",
+      ".compact",
+    ]) {
+      expect(styles).not.toContain(obsolete);
+    }
+    expect(styles).toContain(".requestBlock");
+    expect(styles).toContain(".primitiveList");
   });
 });

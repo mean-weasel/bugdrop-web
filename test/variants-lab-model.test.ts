@@ -3,6 +3,7 @@ import {
   collapseTitle,
   compileIssueDraft,
   defaultLabels,
+  emptyAnswers,
   formatIssueSection,
   initialInteractionState,
   normalizeAnswers,
@@ -16,7 +17,7 @@ import {
 } from "@/components/variants-lab/model";
 
 describe("composable variants lab model", () => {
-  it("presents exactly five plain-language blocks across exactly three recipes", () => {
+  it("presents exactly five plain-language blocks across exactly four recipes", () => {
     expect(PRIMITIVE_IDS).toEqual([
       "shortText",
       "longText",
@@ -31,7 +32,12 @@ describe("composable variants lab model", () => {
       "Single choice",
       "Multiple choice",
     ]);
-    expect(RECIPE_IDS).toHaveLength(3);
+    expect(RECIPE_IDS).toEqual([
+      "bugReport",
+      "productReview",
+      "roadmapVote",
+      "featurePriorities",
+    ]);
     const used = new Set(
       RECIPE_IDS.flatMap((id) => RECIPES[id].fields.map((field) => field.type)),
     );
@@ -40,6 +46,31 @@ describe("composable variants lab model", () => {
       (field) => field.type === "rating",
     );
     expect(rating).toMatchObject({ lowLabel: "Rough", highLabel: "Excellent" });
+  });
+
+  it("validates and compiles the multiple-choice Feature priorities recipe", () => {
+    expect(emptyAnswers("featurePriorities")).toEqual({ priorities: [] });
+    expect(normalizeAnswers("featurePriorities", { priorities: [] })).toEqual({
+      ok: false,
+      field: "priorities",
+      message: "Choose at least one improvement areas.",
+    });
+
+    const result = compileIssueDraft("featurePriorities", {
+      priorities: ["integrations", "performance"],
+    });
+    expect(result).toMatchObject({
+      ok: true,
+      draft: {
+        title: "Feature priorities: performance, integrations",
+        labels: ["enhancement", "bugdrop"],
+        sections: [{
+          heading: "Priorities",
+          format: "text",
+          value: "Performance, Integrations",
+        }],
+      },
+    });
   });
 
   it("normalizes multiSelect values to configured order", () => {

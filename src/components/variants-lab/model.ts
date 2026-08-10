@@ -17,7 +17,12 @@ export const PRIMITIVE_COPY: Record<
   singleChoice: { label: "Single choice", note: "Choose exactly one" },
   multiSelect: { label: "Multiple choice", note: "Choose several" },
 };
-export const RECIPE_IDS = ["bugReport", "productReview", "roadmapVote"] as const;
+export const RECIPE_IDS = [
+  "bugReport",
+  "productReview",
+  "roadmapVote",
+  "featurePriorities",
+] as const;
 export type RecipeId = (typeof RECIPE_IDS)[number];
 export type LabStatus = "idle" | "failure" | "success";
 export type AnswerValue = string | number | string[];
@@ -162,6 +167,40 @@ export const RECIPES: Record<RecipeId, Recipe> = {
       sections: [
         { heading: "Priority", field: "priority", format: "choice" },
         { heading: "Team context", field: "team", format: "text" },
+      ],
+    },
+  },
+  featurePriorities: {
+    id: "featurePriorities",
+    name: "Feature priorities",
+    summary: "Choose several improvements for the next release.",
+    eyebrow: "Recipe 04 · Priorities",
+    presentation: { kind: "inline" },
+    content: {
+      title: "What should we improve together?",
+      description: "Choose every area that would make the biggest difference.",
+      submitLabel: "Preview priorities",
+      successTitle: "Priorities ready",
+      successMessage: "The local Issue draft is ready for review.",
+    },
+    fields: [{
+      id: "priorities",
+      type: "multiSelect",
+      label: "Improvement areas",
+      required: true,
+      display: "checkboxes",
+      options: [
+        { value: "performance", label: "Performance" },
+        { value: "documentation", label: "Documentation" },
+        { value: "integrations", label: "Integrations" },
+        { value: "notifications", label: "Notifications" },
+      ],
+    }],
+    issue: {
+      classification: "feature",
+      title: "Feature priorities: {{priorities}}",
+      sections: [
+        { heading: "Priorities", field: "priorities", format: "choice" },
       ],
     },
   },

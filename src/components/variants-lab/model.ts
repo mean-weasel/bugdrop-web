@@ -214,6 +214,18 @@ export function normalizeAnswers(recipeId: RecipeId, input: Record<string, unkno
     if (typeof raw !== "string" && raw !== undefined && raw !== null) {
       return { ok: false, field: field.id, message: `${field.label} must be text.` };
     }
+    if (
+      (field.type === "shortText" || field.type === "longText") &&
+      field.maxLength !== undefined &&
+      typeof raw === "string" &&
+      raw.length > field.maxLength
+    ) {
+      return {
+        ok: false,
+        field: field.id,
+        message: `${field.label} must be ${field.maxLength} characters or fewer.`,
+      };
+    }
     const value = typeof raw === "string" ? raw.trim() : "";
     if (field.type === "singleChoice" && value && !field.options.some((option) => option.value === value)) {
       return { ok: false, field: field.id, message: `${field.label} contains an unknown option.` };

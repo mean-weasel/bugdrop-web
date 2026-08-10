@@ -94,6 +94,7 @@ export function VariantsLab() {
         },
         value: String(interaction.answers[field.id] ?? ""),
         placeholder: field.placeholder,
+        maxLength: field.maxLength,
         disabled,
         "aria-invalid": invalid || undefined,
         "aria-describedby": invalid ? errorId : undefined,
@@ -112,16 +113,21 @@ export function VariantsLab() {
       );
     }
     if (field.type === "rating") {
+      const ratingScaleId = `${recipeId}-${field.id}-scale`;
       return (
-        <fieldset className={styles.fieldset} key={field.id} aria-invalid={invalid || undefined} aria-describedby={invalid ? errorId : undefined}>
+        <fieldset className={styles.fieldset} key={field.id} aria-invalid={invalid || undefined} aria-describedby={`${ratingScaleId}${invalid ? ` ${errorId}` : ""}`}>
           <legend>{field.label}{field.required ? <b>Required</b> : null}</legend>
           <div className={styles.rating}>
             {Array.from({ length: field.scale }, (_, index) => index + 1).map((value) => (
               <label key={value}>
-                <input ref={(element) => { if (value === 1) fieldRefs.current[field.id] = element; }} type="radio" name={`${recipeId}-${field.id}`} checked={interaction.answers[field.id] === value} disabled={disabled} onChange={() => update(field.id, value)} />
+                <input ref={(element) => { if (value === 1) fieldRefs.current[field.id] = element; }} type="radio" name={`${recipeId}-${field.id}`} aria-label={`${value} of ${field.scale}`} checked={interaction.answers[field.id] === value} disabled={disabled} onChange={() => update(field.id, value)} />
                 <span aria-hidden="true">★</span><i>{value}</i>
               </label>
             ))}
+          </div>
+          <div id={ratingScaleId} className={styles.ratingScale}>
+            <span>{field.lowLabel}</span>
+            <span>{field.highLabel}</span>
           </div>
           {invalid ? <em id={errorId}>Choose a rating before submitting.</em> : null}
         </fieldset>
@@ -215,8 +221,8 @@ export function VariantsLab() {
       </section>
 
       {recipe.presentation.kind === "modal" ? (
-        <dialog ref={dialogRef} className={`${styles.dialog} ${styles.surface}`} onClose={() => modalTriggerRef.current?.focus()}>
-          <header><div><p className={styles.eyebrow}>{recipe.eyebrow}</p><h2>{recipe.content.title}</h2></div><button type="button" className={styles.iconButton} aria-label="Close feedback recipe" onClick={closeDialog}><X aria-hidden="true" /></button></header>
+        <dialog ref={dialogRef} className={`${styles.dialog} ${styles.surface}`} aria-labelledby={`${recipeId}-dialog-title`} onClose={() => modalTriggerRef.current?.focus()}>
+          <header><div><p className={styles.eyebrow}>{recipe.eyebrow}</p><h2 id={`${recipeId}-dialog-title`}>{recipe.content.title}</h2></div><button type="button" className={styles.iconButton} aria-label="Close feedback recipe" onClick={closeDialog}><X aria-hidden="true" /></button></header>
           <p className={styles.prompt}>{recipe.content.description}</p>
           {form}
         </dialog>

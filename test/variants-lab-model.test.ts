@@ -36,11 +36,46 @@ describe("composable variants lab model", () => {
       RECIPE_IDS.flatMap((id) => RECIPES[id].fields.map((field) => field.type)),
     );
     expect([...used].sort()).toEqual([...PRIMITIVE_IDS].sort());
+    const rating = RECIPES.productReview.fields.find(
+      (field) => field.type === "rating",
+    );
+    expect(rating).toMatchObject({ lowLabel: "Rough", highLabel: "Excellent" });
   });
 
   it("normalizes multiSelect values to configured order", () => {
     const result = normalizeAnswers("bugReport", { summary: "Broken", details: "", areas: ["integrations", "dashboard"] });
     expect(result).toEqual({ ok: true, answers: { summary: "Broken", details: "", areas: ["dashboard", "integrations"] } });
+  });
+
+  it("accepts configured text length boundaries and rejects overlong values", () => {
+    const summaryAtLimit = "s".repeat(120);
+    const detailsAtLimit = "d".repeat(1000);
+    expect(normalizeAnswers("bugReport", {
+      summary: summaryAtLimit,
+      details: detailsAtLimit,
+      areas: ["dashboard"],
+    })).toMatchObject({
+      ok: true,
+      answers: { summary: summaryAtLimit, details: detailsAtLimit },
+    });
+    expect(normalizeAnswers("bugReport", {
+      summary: "s".repeat(121),
+      details: "",
+      areas: ["dashboard"],
+    })).toEqual({
+      ok: false,
+      field: "summary",
+      message: "Summary must be 120 characters or fewer.",
+    });
+    expect(normalizeAnswers("bugReport", {
+      summary: "Broken",
+      details: "d".repeat(1001),
+      areas: ["dashboard"],
+    })).toEqual({
+      ok: false,
+      field: "details",
+      message: "What happened? must be 1000 characters or fewer.",
+    });
   });
 
   it("allows optional empty arrays but rejects required empty, non-array, unknown, and duplicate selections", () => {

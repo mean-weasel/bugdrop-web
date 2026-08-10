@@ -49,6 +49,7 @@
 .rating input:checked + span, .rating label:has(input:checked) ~ label span { color: var(--muted); }
 .rating input:checked + span { color: var(--lab-accent); }
 .rating i { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.ratingScale { display: flex; justify-content: space-between; color: var(--muted); font-size: .66rem; }
 .primaryButton, .actions button:not(.primaryButton), .iconButton { min-height: 44px; border-radius: 9px; font: inherit; font-size: .74rem; font-weight: 780; cursor: pointer; }
 .primaryButton { border: 1px solid var(--ink); background: var(--lab-accent); padding: 9px 14px; color: var(--lab-accent-foreground); }
 .widget > .primaryButton { width: 100%; margin-top: 18px; }
@@ -59,7 +60,7 @@
 .failure, .success { display: flex; gap: 8px; margin-top: 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface-soft); padding: 10px; }
 .failure { flex-direction: column; }
 .failure strong { color: var(--danger); font-size: .72rem; }
-.failure span, .success span { color: var(--muted); font-size: .66rem; }
+.failure span, .success span { color: #5b6577; font-size: .66rem; }
 .success { color: var(--success); }
 .success svg { width: 17px; height: 17px; flex: none; }
 .success strong, .success span { display: block; }
@@ -67,7 +68,7 @@
 .issuePreview { min-height: 280px; border: 1px solid #3b4261; border-radius: 16px; background: #202333; padding: 16px; color: #e9ecff; }
 .previewHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid #393e5d; }
 .previewHeader span, .previewHeader strong { display: block; }
-.previewHeader span { color: #8087a8; font-size: .58rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.previewHeader span { color: #a0a9cc; font-size: .58rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .previewHeader strong { margin-top: 2px; font-size: .8rem; }
 .previewHeader b { border: 1px solid rgb(255 158 100 / 32%); border-radius: 999px; padding: 4px 8px; color: #ffad79; font-size: .56rem; text-transform: uppercase; }
 .issuePreview h3 { margin: 16px 0 9px; font-size: .95rem; }

@@ -39,6 +39,16 @@ describe("simplified variants lab content", () => {
     expect(component).toContain("RECIPE_IDS.map");
   });
 
+  it("carries model constraints and accessible labels into native controls", () => {
+    expect(component).toContain("maxLength: field.maxLength");
+    expect(component).toContain('aria-labelledby={`${recipeId}-dialog-title`}');
+    expect(component).toContain('id={`${recipeId}-dialog-title`}');
+    expect(component).toContain("field.lowLabel");
+    expect(component).toContain("field.highLabel");
+    expect(component).toContain("ratingScaleId");
+    expect(component).toContain('aria-label={`${value} of ${field.scale}`}');
+  });
+
   it("removes obsolete customization styles", () => {
     for (const obsolete of [
       ".secondary",

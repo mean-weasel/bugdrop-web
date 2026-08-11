@@ -46,6 +46,7 @@ export function VariantsLab() {
   );
 
   function chooseRecipe(next: RecipeId) {
+    if (next === recipeId) return;
     dialogRef.current?.close();
     setRecipeId(next);
     setInteraction(initialInteractionState(next));

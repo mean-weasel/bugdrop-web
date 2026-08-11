@@ -39,6 +39,10 @@ describe("simplified variants lab content", () => {
     expect(component).toContain("RECIPE_IDS.map");
   });
 
+  it("does not reset answers when the active recipe is selected again", () => {
+    expect(component).toContain("if (next === recipeId) return;");
+  });
+
   it("derives the fourth picker and cumulative rating state", () => {
     expect(component).toContain("RECIPE_IDS.map");
     expect(component).toContain("PRIMITIVE_COPY[field.type].label");

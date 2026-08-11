@@ -50,6 +50,16 @@ describe("simplified variants lab content", () => {
     );
   });
 
+  it("previews the hovered rating range without changing selection state", () => {
+    expect(styles).toContain(".rating:has(label:hover) label span");
+    expect(styles).toContain(
+      "color-mix(in srgb, var(--lab-accent) 45%, var(--muted))",
+    );
+    expect(styles).toContain(
+      ".rating:has(label:hover) label:hover ~ label span",
+    );
+  });
+
   it("carries model constraints and accessible labels into native controls", () => {
     expect(component).toContain("maxLength: field.maxLength");
     expect(component).toContain('aria-labelledby={`${recipeId}-dialog-title`}');

@@ -39,6 +39,17 @@ describe("simplified variants lab content", () => {
     expect(component).toContain("RECIPE_IDS.map");
   });
 
+  it("derives the fourth picker and cumulative rating state", () => {
+    expect(component).toContain("RECIPE_IDS.map");
+    expect(component).toContain("PRIMITIVE_COPY[field.type].label");
+    expect(component).toContain("const selectedRating");
+    expect(component).toContain("data-filled={value <= selectedRating}");
+    expect(styles).toContain('.rating label[data-filled="true"] span');
+    expect(styles).not.toContain(
+      ".rating input:checked + span { color: var(--lab-accent); }",
+    );
+  });
+
   it("carries model constraints and accessible labels into native controls", () => {
     expect(component).toContain("maxLength: field.maxLength");
     expect(component).toContain('aria-labelledby={`${recipeId}-dialog-title`}');

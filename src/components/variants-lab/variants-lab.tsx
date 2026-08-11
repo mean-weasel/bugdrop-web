@@ -113,13 +113,17 @@ export function VariantsLab() {
       );
     }
     if (field.type === "rating") {
+      const selectedRating: number =
+        typeof interaction.answers[field.id] === "number"
+          ? (interaction.answers[field.id] as number)
+          : 0;
       const ratingScaleId = `${recipeId}-${field.id}-scale`;
       return (
         <fieldset className={styles.fieldset} key={field.id} aria-invalid={invalid || undefined} aria-describedby={`${ratingScaleId}${invalid ? ` ${errorId}` : ""}`}>
           <legend>{field.label}{field.required ? <b>Required</b> : null}</legend>
           <div className={styles.rating}>
             {Array.from({ length: field.scale }, (_, index) => index + 1).map((value) => (
-              <label key={value}>
+              <label key={value} data-filled={value <= selectedRating}>
                 <input ref={(element) => { if (value === 1) fieldRefs.current[field.id] = element; }} type="radio" name={`${recipeId}-${field.id}`} aria-label={`${value} of ${field.scale}`} checked={interaction.answers[field.id] === value} disabled={disabled} onChange={() => update(field.id, value)} />
                 <span aria-hidden="true">★</span><i>{value}</i>
               </label>

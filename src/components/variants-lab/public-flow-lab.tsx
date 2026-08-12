@@ -48,7 +48,7 @@ function publicFlowWindow() {
 }
 
 const RUNTIME_SRC =
-  "/vendor/bugdrop/e034909426e6903ef7750dc45cc63ad9d99fec3b/widget.js";
+  "/vendor/bugdrop/fde15f781584509fbc1cf59d50b086f163d2ecd7/widget.js";
 
 export function PublicFlowLab() {
   const [runtimeState, setRuntimeState] = useState<

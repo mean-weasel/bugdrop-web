@@ -2,7 +2,12 @@
 
 import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, CheckCircle2, LoaderCircle, ShieldCheck } from "lucide-react";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  LoaderCircle,
+  ShieldCheck,
+} from "lucide-react";
 import {
   DEFAULT_SHAPED_FLOW_CONFIG,
   LAB_CONTEXT_SENTINEL,
@@ -15,9 +20,12 @@ type FlowOutcome =
   | { status: "closed" | "busy" };
 
 interface FlowHandle {
-  open(options?: { context?: Record<string, string> }): {
-    result: Promise<FlowOutcome>;
-  };
+  open(options?: { context?: Record<string, string> }): OpenedFlow;
+}
+
+interface OpenedFlow {
+  close(): void;
+  result: Promise<FlowOutcome>;
 }
 
 interface LabHandles {
@@ -40,16 +48,33 @@ function publicFlowWindow() {
 }
 
 const RUNTIME_SRC =
-  "/vendor/bugdrop/32ee17fbbf3f1dce617ac06042c25c5707dd8d94/widget.js";
+  "/vendor/bugdrop/7b1ef4c27e70021ad012f94ea461f73638a31a32/widget.js";
 
 export function PublicFlowLab() {
-  const [runtimeState, setRuntimeState] = useState<"loading" | "ready" | "failed">("loading");
+  const [runtimeState, setRuntimeState] = useState<
+    "loading" | "ready" | "failed"
+  >("loading");
   const [activeFlow, setActiveFlow] = useState<keyof LabHandles | null>(null);
-  const [latest, setLatest] = useState<Partial<Record<keyof LabHandles, number>>>({});
-  const [announcement, setAnnouncement] = useState("Loading the pinned BugDrop runtime.");
+  const [latest, setLatest] = useState<
+    Partial<Record<keyof LabHandles, number>>
+  >({});
+  const [announcement, setAnnouncement] = useState(
+    "Loading the pinned BugDrop runtime.",
+  );
   const defaultShapedLauncher = useRef<HTMLButtonElement>(null);
   const productTriageLauncher = useRef<HTMLButtonElement>(null);
   const focusAfterClose = useRef<keyof LabHandles | null>(null);
+  const activeOpenedFlow = useRef<OpenedFlow | null>(null);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      activeOpenedFlow.current?.close();
+      activeOpenedFlow.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (activeFlow !== null || focusAfterClose.current === null) return;
@@ -76,9 +101,16 @@ export function PublicFlowLab() {
     }
 
     if (!runtimeWindow.__bugDropPublicFlowLabHandles) {
-      const defaultShaped = runtimeWindow.BugDrop.registerFlow(DEFAULT_SHAPED_FLOW_CONFIG);
-      const productTriage = runtimeWindow.BugDrop.registerFlow(PRODUCT_TRIAGE_FLOW_CONFIG);
-      runtimeWindow.__bugDropPublicFlowLabHandles = { defaultShaped, productTriage };
+      const defaultShaped = runtimeWindow.BugDrop.registerFlow(
+        DEFAULT_SHAPED_FLOW_CONFIG,
+      );
+      const productTriage = runtimeWindow.BugDrop.registerFlow(
+        PRODUCT_TRIAGE_FLOW_CONFIG,
+      );
+      runtimeWindow.__bugDropPublicFlowLabHandles = {
+        defaultShaped,
+        productTriage,
+      };
     }
 
     setRuntimeState("ready");
@@ -90,24 +122,40 @@ export function PublicFlowLab() {
     if (!handles || activeFlow) return;
 
     setActiveFlow(kind);
-    setAnnouncement(`Opened the ${kind === "defaultShaped" ? "default-shaped" : "product-triage"} flow.`);
-    const opened = handles[kind].open({ context: { lab_context: LAB_CONTEXT_SENTINEL } });
+    setAnnouncement(
+      `Opened the ${kind === "defaultShaped" ? "default-shaped" : "product-triage"} flow.`,
+    );
+    const opened = handles[kind].open({
+      context: { lab_context: LAB_CONTEXT_SENTINEL },
+    });
+    activeOpenedFlow.current = opened;
     const outcome = await opened.result;
+    if (activeOpenedFlow.current === opened) activeOpenedFlow.current = null;
+    if (!mounted.current) return;
 
     if (outcome.status === "submitted") {
       const id = outcome.result.issueNumber;
       setLatest((current) => ({ ...current, [kind]: id }));
-      setAnnouncement(`Submission ${id} is stored only in the local inspector.`);
+      setAnnouncement(
+        `Submission ${id} is stored only in the local inspector.`,
+      );
     } else {
       if (outcome.status === "closed") focusAfterClose.current = kind;
-      setAnnouncement(outcome.status === "busy" ? "Another BugDrop dialog is already open." : "Flow closed without submitting.");
+      setAnnouncement(
+        outcome.status === "busy"
+          ? "Another BugDrop dialog is already open."
+          : "Flow closed without submitting.",
+      );
     }
 
     setActiveFlow(null);
   }
 
   return (
-    <section className={styles.runtimeLab} aria-labelledby="public-runtime-heading">
+    <section
+      className={styles.runtimeLab}
+      aria-labelledby="public-runtime-heading"
+    >
       <Script
         id="bugdrop-public-flow-runtime"
         src={RUNTIME_SRC}
@@ -120,7 +168,9 @@ export function PublicFlowLab() {
         onReady={registerFlows}
         onError={() => {
           setRuntimeState("failed");
-          setAnnouncement("The checksum-pinned BugDrop runtime could not load.");
+          setAnnouncement(
+            "The checksum-pinned BugDrop runtime could not load.",
+          );
         }}
       />
 
@@ -129,8 +179,9 @@ export function PublicFlowLab() {
           <span className={styles.kicker}>Pinned public runtime</span>
           <h2 id="public-runtime-heading">Run the real FlowConfig examples</h2>
           <p>
-            These launch through the vendored public <code>registerFlow</code> API. Submissions stay
-            in this development process and open in a raw-payload inspector.
+            These launch through the vendored public <code>registerFlow</code>{" "}
+            API. Submissions stay in this development process and open in a
+            raw-payload inspector.
           </p>
         </div>
         <p className={styles.safety}>
@@ -142,19 +193,29 @@ export function PublicFlowLab() {
         <article>
           <span>Message → details → screenshot</span>
           <h3>Default-shaped feedback</h3>
-          <p>Exercise the familiar BugDrop journey through a registered public flow.</p>
+          <p>
+            Exercise the familiar BugDrop journey through a registered public
+            flow.
+          </p>
           <button
             ref={defaultShapedLauncher}
             type="button"
             disabled={runtimeState !== "ready" || activeFlow !== null}
             onClick={() => void launch("defaultShaped")}
           >
-            {activeFlow === "defaultShaped" ? <LoaderCircle aria-hidden="true" /> : null}
+            {activeFlow === "defaultShaped" ? (
+              <LoaderCircle aria-hidden="true" />
+            ) : null}
             Run default-shaped flow
           </button>
           {latest.defaultShaped ? (
-            <a href={`/labs/variants/submissions/${latest.defaultShaped}`} target="_blank" rel="noreferrer">
-              <CheckCircle2 aria-hidden="true" /> Inspect stored payload #{latest.defaultShaped}
+            <a
+              href={`/labs/variants/submissions/${latest.defaultShaped}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <CheckCircle2 aria-hidden="true" /> Inspect stored payload #
+              {latest.defaultShaped}
               <ArrowUpRight aria-hidden="true" />
             </a>
           ) : null}
@@ -163,19 +224,29 @@ export function PublicFlowLab() {
         <article>
           <span>Conditional forms and evidence</span>
           <h3>Product triage</h3>
-          <p>Watch diagnostic detail appear for a bug or low rating, then clear when hidden.</p>
+          <p>
+            Watch diagnostic detail appear for a bug or low rating, then clear
+            when hidden.
+          </p>
           <button
             ref={productTriageLauncher}
             type="button"
             disabled={runtimeState !== "ready" || activeFlow !== null}
             onClick={() => void launch("productTriage")}
           >
-            {activeFlow === "productTriage" ? <LoaderCircle aria-hidden="true" /> : null}
+            {activeFlow === "productTriage" ? (
+              <LoaderCircle aria-hidden="true" />
+            ) : null}
             Run product-triage flow
           </button>
           {latest.productTriage ? (
-            <a href={`/labs/variants/submissions/${latest.productTriage}`} target="_blank" rel="noreferrer">
-              <CheckCircle2 aria-hidden="true" /> Inspect stored payload #{latest.productTriage}
+            <a
+              href={`/labs/variants/submissions/${latest.productTriage}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <CheckCircle2 aria-hidden="true" /> Inspect stored payload #
+              {latest.productTriage}
               <ArrowUpRight aria-hidden="true" />
             </a>
           ) : null}
@@ -183,7 +254,9 @@ export function PublicFlowLab() {
       </div>
 
       <p className={styles.status} role="status" aria-live="polite">
-        {runtimeState === "loading" ? <LoaderCircle aria-hidden="true" /> : null}
+        {runtimeState === "loading" ? (
+          <LoaderCircle aria-hidden="true" />
+        ) : null}
         {announcement}
       </p>
     </section>

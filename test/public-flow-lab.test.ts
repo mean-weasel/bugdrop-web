@@ -1,10 +1,11 @@
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { POST } from "@/app/vendor/bugdrop/32ee17fbbf3f1dce617ac06042c25c5707dd8d94/api/feedback/route";
+import { POST } from "@/app/vendor/bugdrop/7b1ef4c27e70021ad012f94ea461f73638a31a32/api/feedback/route";
 import {
   clearLocalSubmissionsForTests,
   createLocalSubmission,
   getLocalSubmission,
+  isLocalInspectorMutationRequest,
   isLocalInspectorRequest,
 } from "@/lib/public-flow-lab/local-submissions";
 
@@ -13,20 +14,32 @@ describe("public runtime lab boundary", () => {
   afterEach(() => vi.unstubAllEnvs());
 
   it("is available only on the exact development origin", () => {
-    expect(isLocalInspectorRequest("bugdrop.localhost:3000", "development")).toBe(true);
-    expect(isLocalInspectorRequest("localhost:3000", "development")).toBe(false);
-    expect(isLocalInspectorRequest("bugdrop.localhost:3001", "development")).toBe(false);
-    expect(isLocalInspectorRequest("bugdrop.localhost:3000", "production")).toBe(false);
+    expect(
+      isLocalInspectorRequest("bugdrop.localhost:3000", "development"),
+    ).toBe(true);
+    expect(isLocalInspectorRequest("localhost:3000", "development")).toBe(
+      false,
+    );
+    expect(
+      isLocalInspectorRequest("bugdrop.localhost:3001", "development"),
+    ).toBe(false);
+    expect(
+      isLocalInspectorRequest("bugdrop.localhost:3000", "production"),
+    ).toBe(false);
   });
 
   it("returns a private local result with a canonical synthetic Issue URL", async () => {
     vi.stubEnv("NODE_ENV", "development");
     const response = await POST(
       new Request(
-        "http://bugdrop.localhost:3000/vendor/bugdrop/32ee17fbbf3f1dce617ac06042c25c5707dd8d94/api/feedback",
+        "http://bugdrop.localhost:3000/vendor/bugdrop/7b1ef4c27e70021ad012f94ea461f73638a31a32/api/feedback",
         {
           method: "POST",
-          headers: { "content-type": "application/json", host: "bugdrop.localhost:3000" },
+          headers: {
+            "content-type": "application/json",
+            host: "bugdrop.localhost:3000",
+            origin: "http://bugdrop.localhost:3000",
+          },
           body: JSON.stringify({ repo: "mean-weasel/bugdrop-widget-test" }),
         },
       ),
@@ -39,6 +52,50 @@ describe("public runtime lab boundary", () => {
       issueUrl: "https://github.com/mean-weasel/bugdrop-widget-test/issues/1",
       isPublic: false,
     });
+  });
+
+  it("rejects cross-origin and simple-content-type mutations", async () => {
+    expect(
+      isLocalInspectorMutationRequest(
+        "bugdrop.localhost:3000",
+        "http://bugdrop.localhost:3000",
+        "application/json; charset=utf-8",
+        "development",
+      ),
+    ).toBe(true);
+    expect(
+      isLocalInspectorMutationRequest(
+        "bugdrop.localhost:3000",
+        "http://evil.localhost:4000",
+        "application/json",
+        "development",
+      ),
+    ).toBe(false);
+    expect(
+      isLocalInspectorMutationRequest(
+        "bugdrop.localhost:3000",
+        "http://bugdrop.localhost:3000",
+        "text/plain",
+        "development",
+      ),
+    ).toBe(false);
+    vi.stubEnv("NODE_ENV", "development");
+    const response = await POST(
+      new Request(
+        "http://bugdrop.localhost:3000/vendor/bugdrop/7b1ef4c27e70021ad012f94ea461f73638a31a32/api/feedback",
+        {
+          method: "POST",
+          headers: {
+            "content-type": "text/plain",
+            host: "bugdrop.localhost:3000",
+            origin: "http://evil.localhost:4000",
+          },
+          body: JSON.stringify({ attacker: true }),
+        },
+      ),
+    );
+    expect(response.status).toBe(404);
+    expect(getLocalSubmission(1)).toBeNull();
   });
 
   it("rejects the feedback route off-host and in production", async () => {
@@ -94,6 +151,8 @@ describe("public runtime lab boundary", () => {
     expect(runtime.match(/\.registerFlow\(/g)).toHaveLength(2);
     expect(runtime).toContain('data-show-issue-link="never"');
     expect(runtime).not.toContain("shadowRoot");
+    expect(runtime).toContain("activeOpenedFlow.current?.close()");
+    expect(runtime).toContain("if (!mounted.current) return;");
   });
 
   it("preserves generated agent guidance and ignores browser artifacts", () => {

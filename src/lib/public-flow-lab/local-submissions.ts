@@ -25,7 +25,23 @@ export function isLocalInspectorRequest(
   host: string | null,
   environment = process.env.NODE_ENV,
 ) {
-  return environment === "development" && host?.toLowerCase() === "bugdrop.localhost:3000";
+  return (
+    environment === "development" &&
+    host?.toLowerCase() === "bugdrop.localhost:3000"
+  );
+}
+
+export function isLocalInspectorMutationRequest(
+  host: string | null,
+  origin: string | null,
+  contentType: string | null,
+  environment = process.env.NODE_ENV,
+) {
+  return (
+    isLocalInspectorRequest(host, environment) &&
+    origin === "http://bugdrop.localhost:3000" &&
+    contentType?.split(";", 1)[0]?.trim().toLowerCase() === "application/json"
+  );
 }
 
 export function createLocalSubmission(payload: Record<string, unknown>) {

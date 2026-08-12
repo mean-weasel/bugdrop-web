@@ -1,0 +1,23 @@
+.runtimeLab { margin-top: 36px; border: 1px solid #3b4261; border-radius: 18px; background: linear-gradient(135deg, rgb(125 207 255 / 7%), transparent 42%), #202333; padding: 24px; }
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 28px; }
+.kicker { color: #9bdcff; font-size: .66rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
+.header h2 { margin: 7px 0 8px; color: #f4f5ff; font-size: 1.5rem; }
+.header > div > p { max-width: 660px; margin: 0; color: #a7acc7; font-size: .8rem; line-height: 1.6; }
+.header code { color: #cdb7ff; }
+.safety { display: inline-flex; flex: none; align-items: center; gap: 7px; margin: 0; border: 1px solid rgb(109 211 161 / 28%); border-radius: 999px; padding: 7px 10px; color: #8ee0b4; font-size: .66rem; font-weight: 750; }
+.safety svg { width: 15px; height: 15px; }
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+.cards article { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; border: 1px solid #414764; border-radius: 14px; background: #171924; padding: 18px; }
+.cards article > span { color: #9bdcff; font-size: .62rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.cards h3 { margin: 7px 0 5px; color: #f0f2ff; font-size: 1rem; }
+.cards p { min-height: 42px; margin: 0; color: #939ab8; font-size: .72rem; line-height: 1.5; }
+.cards button { display: inline-flex; min-height: 44px; align-items: center; gap: 7px; margin-top: 16px; border: 1px solid #7dcfff; border-radius: 9px; background: rgb(125 207 255 / 12%); padding: 9px 13px; color: #e9f7ff; font: inherit; font-size: .72rem; font-weight: 800; cursor: pointer; }
+.cards button:disabled { border-color: #414764; color: #727a99; cursor: wait; }
+.cards button svg, .status svg { width: 15px; height: 15px; animation: spin 1s linear infinite; }
+.cards a { display: inline-flex; min-height: 44px; align-items: center; gap: 6px; margin-top: 9px; color: #8ee0b4; font-size: .7rem; font-weight: 750; text-underline-offset: 3px; }
+.cards a svg { width: 14px; height: 14px; flex: none; }
+.status { display: flex; align-items: center; gap: 7px; min-height: 20px; margin: 14px 0 0; color: #a7acc7; font-size: .68rem; }
+.cards button:focus-visible, .cards a:focus-visible { outline: 3px solid #7dcfff; outline-offset: 3px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 760px) { .runtimeLab { padding: 17px; } .header { flex-direction: column; gap: 14px; } .safety { align-self: flex-start; white-space: normal; } .cards { grid-template-columns: 1fr; } .cards p { min-height: 0; } .cards button, .cards a { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .cards button svg, .status svg { animation: none; } }

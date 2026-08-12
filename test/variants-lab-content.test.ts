@@ -9,6 +9,10 @@ const styles = readFileSync(
   "src/components/variants-lab/variants-lab.module.css",
   "utf8",
 );
+const publicRuntime = readFileSync(
+  "src/components/variants-lab/public-flow-lab.tsx",
+  "utf8",
+);
 
 describe("simplified variants lab content", () => {
   it("uses the approved compact hero and missing-block CTA", () => {
@@ -37,6 +41,13 @@ describe("simplified variants lab content", () => {
     expect(component).toContain("LAB_DISCLOSURE");
     expect(component).toContain("PRIMITIVE_COPY");
     expect(component).toContain("RECIPE_IDS.map");
+  });
+
+  it("keeps the simulated recipes and adds the public runtime separately", () => {
+    expect(component).toContain("<PublicFlowLab />");
+    expect(component).toContain("RECIPE_IDS.map");
+    expect(publicRuntime).toContain("Run the real FlowConfig examples");
+    expect(publicRuntime.match(/\.registerFlow\(/g)).toHaveLength(2);
   });
 
   it("does not reset answers when the active recipe is selected again", () => {

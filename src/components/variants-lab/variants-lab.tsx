@@ -27,6 +27,7 @@ import {
   type RecipeId,
 } from "./model";
 import styles from "./variants-lab.module.css";
+import { PublicFlowLab } from "./public-flow-lab";
 
 export function VariantsLab() {
   const [recipeId, setRecipeId] = useState<RecipeId>("bugReport");
@@ -219,6 +220,8 @@ export function VariantsLab() {
           </aside>
         </div>
       </section>
+
+      <PublicFlowLab />
 
       <section className={styles.requestBlock}>
         <div><h2>Missing a building block?</h2><p>Tell us what feedback experience your product needs.</p></div>

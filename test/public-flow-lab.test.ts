@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { POST } from "@/app/vendor/bugdrop/b307db46c1e315d9b4e12a21e09d8106fd8ab97b/api/feedback/route";
+import { POST } from "@/app/vendor/bugdrop/b307db46d895ae141f34befbc8cfcd107b155bc9/api/feedback/route";
 import {
   clearLocalSubmissionsForTests,
   createLocalSubmission,
@@ -32,7 +32,7 @@ describe("public runtime lab boundary", () => {
     vi.stubEnv("NODE_ENV", "development");
     const response = await POST(
       new Request(
-        "http://bugdrop.localhost:3000/vendor/bugdrop/b307db46c1e315d9b4e12a21e09d8106fd8ab97b/api/feedback",
+        "http://bugdrop.localhost:3000/vendor/bugdrop/b307db46d895ae141f34befbc8cfcd107b155bc9/api/feedback",
         {
           method: "POST",
           headers: {
@@ -82,7 +82,7 @@ describe("public runtime lab boundary", () => {
     vi.stubEnv("NODE_ENV", "development");
     const response = await POST(
       new Request(
-        "http://bugdrop.localhost:3000/vendor/bugdrop/b307db46c1e315d9b4e12a21e09d8106fd8ab97b/api/feedback",
+        "http://bugdrop.localhost:3000/vendor/bugdrop/b307db46d895ae141f34befbc8cfcd107b155bc9/api/feedback",
         {
           method: "POST",
           headers: {

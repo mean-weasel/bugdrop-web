@@ -58,6 +58,7 @@ export type PublicComponent = {
   name: string;
   description: string;
   status: ComponentStatus;
+  statusDetail: "verification_delayed" | null;
   lastCheckedAt: string | null;
   lastVerifiedAt: string | null;
   uptime30d: number | null;
@@ -81,6 +82,7 @@ export type PublicIncident = {
   componentName: string;
   state: "open" | "resolved";
   impact: IncidentImpact;
+  statusDetail: "verification_delayed" | null;
   title: string;
   message: string;
   startedAt: string;

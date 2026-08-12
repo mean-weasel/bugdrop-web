@@ -8,9 +8,10 @@ const historyStyles = {
   pre_monitoring: "bg-text-muted/15 hover:bg-text-muted/25",
   historical: "bg-accent-cyan/35 ring-1 ring-inset ring-accent-cyan/30 hover:bg-accent-cyan/50",
   monitoring_gap: "bg-text-muted/45 ring-1 ring-inset ring-text-muted/30 hover:bg-text-muted/60",
+  verification_delayed: "bg-text-muted/45 ring-1 ring-inset ring-text-muted/30 hover:bg-text-muted/60",
 } as const;
 
-export function ComponentHistory({ component }: { component: PublicComponent }) {
+export function ComponentHistory({ component, delayedIncidentIds = new Set() }: { component: PublicComponent; delayedIncidentIds?: ReadonlySet<string> }) {
   return (
     <article className="rounded-xl border border-border bg-bg-surface p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -26,7 +27,7 @@ export function ComponentHistory({ component }: { component: PublicComponent }) 
 
       <div className="mt-5 grid gap-1" style={{ gridTemplateColumns: "repeat(30, minmax(3px, 1fr))" }} aria-label={`${component.name} daily status over the past 30 days`}>
         {component.history30d.map((day, index) => (
-          <HistoryDay key={day.date} day={day} index={index} />
+          <HistoryDay key={day.date} day={day} index={index} verificationDelayedIncidentId={day.incidentIds.find((incidentId) => delayedIncidentIds.has(incidentId))} />
         ))}
       </div>
 
@@ -38,7 +39,7 @@ export function ComponentHistory({ component }: { component: PublicComponent }) 
       <dl className="mt-5 grid gap-4 border-t border-border pt-4 text-sm sm:grid-cols-3">
         <div>
           <dt className="text-xs uppercase tracking-wider text-text-muted">Current status</dt>
-          <dd className="mt-1 text-text-primary">{statusLabel(component.status)}</dd>
+          <dd className="mt-1 text-text-primary">{component.statusDetail === "verification_delayed" ? "Verification delayed" : statusLabel(component.status)}</dd>
         </div>
         <div>
           <dt className="text-xs uppercase tracking-wider text-text-muted">Monitored days</dt>
@@ -59,6 +60,7 @@ export function HistoryLegend() {
       <LegendItem className={historyStyles.operational} label="Operational" />
       <LegendItem className={historyStyles.degraded} label="Degraded" />
       <LegendItem className={historyStyles.outage} label="Outage" />
+      <LegendItem className={historyStyles.verification_delayed} label="Verification delayed" />
       <LegendItem className={historyStyles.pre_monitoring} label="Before monitoring" />
       <LegendItem className={historyStyles.historical} label="Historical checks" />
       <LegendItem className={historyStyles.monitoring_gap} label="Monitoring gap" />
@@ -66,13 +68,15 @@ export function HistoryLegend() {
   );
 }
 
-function HistoryDay({ day, index }: { day: PublicDailyComponentStatus; index: number }) {
-  const incidentId = day.incidentIds[0];
-  const description = historyDescription(day);
+function HistoryDay({ day, index, verificationDelayedIncidentId }: { day: PublicDailyComponentStatus; index: number; verificationDelayedIncidentId?: string }) {
+  const incidentId = verificationDelayedIncidentId || day.incidentIds[0];
+  const verificationDelayed = Boolean(verificationDelayedIncidentId);
+  const description = historyDescription(day, verificationDelayed);
   const incidentDuringGap = day.dataState === "monitoring_gap" && Boolean(incidentId) && day.status !== "unknown";
   const incidentDuringBackfill = day.dataState === "historical" && Boolean(incidentId) && day.status !== "unknown";
-  const barClass =
-    day.dataState === "pre_monitoring"
+  const barClass = verificationDelayed
+    ? historyStyles.verification_delayed
+    : day.dataState === "pre_monitoring"
       ? historyStyles.pre_monitoring
       : incidentDuringBackfill
         ? `${historyStyles[day.status]} ring-2 ring-inset ring-accent-cyan/70`
@@ -94,7 +98,7 @@ function HistoryDay({ day, index }: { day: PublicDailyComponentStatus; index: nu
         className={`pointer-events-none absolute bottom-full z-20 mb-2 hidden w-52 rounded-lg border border-border bg-bg-elevated p-3 text-left text-xs shadow-xl group-hover:block group-focus-within:block ${tooltipPosition}`}
       >
         <p className="font-semibold text-text-primary">{formatDay(day.date)}</p>
-        <p className="mt-1 text-text-subtle">{descriptionAfterDate(day)}</p>
+        <p className="mt-1 text-text-subtle">{descriptionAfterDate(day, verificationDelayed)}</p>
         {incidentId && <p className="mt-2 text-accent-cyan">View incident details</p>}
       </div>
     </div>
@@ -110,11 +114,12 @@ function LegendItem({ className, label }: { className: string; label: string }) 
   );
 }
 
-function historyDescription(day: PublicDailyComponentStatus): string {
-  return `${formatDay(day.date)}: ${descriptionAfterDate(day)}`;
+function historyDescription(day: PublicDailyComponentStatus, verificationDelayed: boolean): string {
+  return `${formatDay(day.date)}: ${descriptionAfterDate(day, verificationDelayed)}`;
 }
 
-function descriptionAfterDate(day: PublicDailyComponentStatus): string {
+function descriptionAfterDate(day: PublicDailyComponentStatus, verificationDelayed = false): string {
+  if (verificationDelayed) return "Verification delayed · Recent end-to-end delivery proof is unavailable.";
   if (day.dataState === "pre_monitoring") return "No monitoring data was collected yet.";
   if (day.dataState === "historical") {
     const checks = `${day.successfulChecks} of ${day.checks} checks passed`;

@@ -362,6 +362,7 @@ export async function getPublicStatusSnapshot(now = new Date()): Promise<PublicS
   const rowsById = new Map(componentResult.results.map((row) => [String(row.id), row]));
   const components = COMPONENTS.map((definition) => {
     const row = rowsById.get(definition.id);
+    const status = row ? asStatus(row.status) : ("unknown" as ComponentStatus);
     const componentRollups = rollupsByComponent.get(definition.id) || new Map();
     const history30d = buildComponentHistory(definition.id, historyDates, componentRollups, historyIncidents, monitoringStartedAt);
     const totals = [...componentRollups.values()].reduce(
@@ -375,7 +376,8 @@ export async function getPublicStatusSnapshot(now = new Date()): Promise<PublicS
       id: definition.id,
       name: definition.name,
       description: definition.description,
-      status: row ? asStatus(row.status) : ("unknown" as ComponentStatus),
+      status,
+      statusDetail: definition.id === "issue_delivery" && status === "degraded" && row?.last_error_code === "heartbeat_stale" ? ("verification_delayed" as const) : null,
       lastCheckedAt: asDate(row?.last_checked_at)?.toISOString() || null,
       lastVerifiedAt: asDate(row?.last_verified_at)?.toISOString() || null,
       uptime30d: totals.samples > 0 ? roundUptime((100 * totals.successful) / totals.samples) : null,

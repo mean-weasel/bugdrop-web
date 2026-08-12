@@ -152,6 +152,33 @@ describe("monitoring D1/SQLite integration", () => {
     ).toHaveLength(1);
   });
 
+  it("publishes verification_delayed only for heartbeat-stale degraded Issue delivery", async () => {
+    await seedMonitoringComponents(new Date("2026-08-05T01:30:00Z"));
+    await monitoringDatabase().query({
+      sql: "UPDATE monitoring_components SET status = 'degraded', last_error_code = 'heartbeat_stale' WHERE id = 'issue_delivery'",
+    });
+
+    const delayed = await getPublicStatusSnapshot(new Date("2026-08-05T01:31:00Z"));
+    expect(delayed.schemaVersion).toBe(1);
+    expect(delayed.overall).toBe("degraded");
+    expect(delayed.components.find((item) => item.id === "issue_delivery")).toMatchObject({
+      status: "degraded",
+      statusDetail: "verification_delayed",
+    });
+
+    await monitoringDatabase().batch([
+      {
+        sql: "UPDATE monitoring_components SET last_error_code = 'http_503' WHERE id = 'issue_delivery'",
+      },
+      {
+        sql: "UPDATE monitoring_components SET status = 'degraded', last_error_code = 'heartbeat_stale' WHERE id = 'github_integration'",
+      },
+    ]);
+    const unrelated = await getPublicStatusSnapshot(new Date("2026-08-05T01:32:00Z"));
+    expect(unrelated.components.find((item) => item.id === "issue_delivery")?.statusDetail).toBeNull();
+    expect(unrelated.components.find((item) => item.id === "github_integration")?.statusDetail).toBeNull();
+  });
+
   it("does not let an older observation overwrite newer component state", async () => {
     const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
     await seedMonitoringComponents(new Date("2026-08-05T02:00:00Z"));

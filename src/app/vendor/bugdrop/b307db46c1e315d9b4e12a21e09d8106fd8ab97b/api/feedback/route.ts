@@ -24,7 +24,8 @@ export async function POST(request: Request) {
   }
 
   const text = await request.text();
-  if (new TextEncoder().encode(text).byteLength > MAX_LOCAL_SUBMISSION_BYTES) {
+  const byteSize = new TextEncoder().encode(text).byteLength;
+  if (byteSize > MAX_LOCAL_SUBMISSION_BYTES) {
     return Response.json(
       { success: false, error: "Local payload is too large." },
       { status: 413 },
@@ -52,7 +53,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const record = createLocalSubmission(payload as Record<string, unknown>);
+  const record = createLocalSubmission(
+    payload as Record<string, unknown>,
+    byteSize,
+  );
   const repo =
     typeof record.payload.repo === "string"
       ? record.payload.repo

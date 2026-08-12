@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { POST } from "@/app/vendor/bugdrop/721782e93d53a46e37040833836912bacb991f51/api/feedback/route";
+import { POST } from "@/app/vendor/bugdrop/b307db46c1e315d9b4e12a21e09d8106fd8ab97b/api/feedback/route";
 import {
   clearLocalSubmissionsForTests,
   createLocalSubmission,
@@ -32,7 +32,7 @@ describe("public runtime lab boundary", () => {
     vi.stubEnv("NODE_ENV", "development");
     const response = await POST(
       new Request(
-        "http://bugdrop.localhost:3000/vendor/bugdrop/721782e93d53a46e37040833836912bacb991f51/api/feedback",
+        "http://bugdrop.localhost:3000/vendor/bugdrop/b307db46c1e315d9b4e12a21e09d8106fd8ab97b/api/feedback",
         {
           method: "POST",
           headers: {
@@ -82,7 +82,7 @@ describe("public runtime lab boundary", () => {
     vi.stubEnv("NODE_ENV", "development");
     const response = await POST(
       new Request(
-        "http://bugdrop.localhost:3000/vendor/bugdrop/721782e93d53a46e37040833836912bacb991f51/api/feedback",
+        "http://bugdrop.localhost:3000/vendor/bugdrop/b307db46c1e315d9b4e12a21e09d8106fd8ab97b/api/feedback",
         {
           method: "POST",
           headers: {
@@ -132,6 +132,14 @@ describe("public runtime lab boundary", () => {
     expect(record?.payload).toEqual({ index: 23 });
     if (record) record.payload.index = -1;
     expect(getLocalSubmission(24)?.payload).toEqual({ index: 23 });
+  });
+
+  it("evicts older records to keep retained payload bytes bounded", () => {
+    createLocalSubmission({ value: "first" }, 40 * 1024 * 1024);
+    createLocalSubmission({ value: "second" }, 40 * 1024 * 1024);
+
+    expect(getLocalSubmission(1)).toBeNull();
+    expect(getLocalSubmission(2)?.payload).toEqual({ value: "second" });
   });
 
   it("accepts screenshot-sized local inspection payloads", async () => {

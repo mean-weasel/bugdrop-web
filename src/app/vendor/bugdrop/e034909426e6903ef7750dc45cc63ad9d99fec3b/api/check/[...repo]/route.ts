@@ -2,7 +2,7 @@ import { isLocalInspectorRequest } from "@/lib/public-flow-lab/local-submissions
 
 export async function GET(
   request: Request,
-  context: RouteContext<"/vendor/bugdrop/661e81ae3bbb2f2e8512c98b17ee347b1e4caad5/api/check/[...repo]">,
+  context: RouteContext<"/vendor/bugdrop/e034909426e6903ef7750dc45cc63ad9d99fec3b/api/check/[...repo]">,
 ) {
   const { repo } = await context.params;
   if (

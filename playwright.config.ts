@@ -16,7 +16,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      "env -u NEXT_PUBLIC_GA_MEASUREMENT_ID -u NEXT_PUBLIC_POSTHOG_KEY npm run dev -- --hostname 0.0.0.0 --port 3000",
+      "env -u NEXT_PUBLIC_GA_MEASUREMENT_ID -u NEXT_PUBLIC_POSTHOG_KEY npm run dev -- --port 3000",
     url: `${localOrigin}/labs/variants`,
     reuseExistingServer: false,
     timeout: 120_000,
@@ -24,7 +24,10 @@ export default defineConfig({
   projects: [
     {
       name: "desktop-chromium",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1440, height: 900 },
+      },
     },
     {
       name: "mobile-chromium",

@@ -48,7 +48,7 @@ function publicFlowWindow() {
 }
 
 const RUNTIME_SRC =
-  "/vendor/bugdrop/7b1ef4c27e70021ad012f94ea461f73638a31a32/widget.js";
+  "/vendor/bugdrop/bcb13c3ddfd1ecacd9e26fcbb87d8b9fea2f9560/widget.js";
 
 export function PublicFlowLab() {
   const [runtimeState, setRuntimeState] = useState<
@@ -130,7 +130,6 @@ export function PublicFlowLab() {
     });
     activeOpenedFlow.current = opened;
     const outcome = await opened.result;
-    if (activeOpenedFlow.current === opened) activeOpenedFlow.current = null;
     if (!mounted.current) return;
 
     if (outcome.status === "submitted") {

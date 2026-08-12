@@ -261,3 +261,32 @@ test("client navigation closes an active public flow and restores page scrolling
     "hidden",
   );
 });
+
+test("client navigation closes a submitted success dialog and restores page scrolling", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  await page.goto("/labs/variants");
+  await page.getByRole("button", { name: "Run default-shaped flow" }).click();
+  const host = page.locator('[data-bugdrop-flow="lab-default-shaped-flow"]');
+  await host.getByRole("button", { name: "Continue" }).click();
+  await host.getByLabel("Title").fill("Submitted before navigation");
+  await host.getByRole("button", { name: "Continue" }).click();
+  await host.getByLabel("Include a screenshot", { exact: true }).uncheck();
+  await host.getByRole("button", { name: "Submit" }).click();
+  await expect(
+    host.getByRole("heading", { name: "Thanks for your feedback!" }),
+  ).toBeVisible();
+  await page
+    .locator('a[href="/docs"]')
+    .first()
+    .evaluate((link: HTMLAnchorElement) => link.click());
+  await page.waitForURL("**/docs");
+  await expect(
+    page.getByRole("heading", { name: "Getting Started" }),
+  ).toBeVisible();
+  await expect(host).toHaveCount(0);
+  expect(await page.evaluate(() => document.body.style.overflow)).not.toBe(
+    "hidden",
+  );
+});

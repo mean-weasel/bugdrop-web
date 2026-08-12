@@ -82,6 +82,7 @@ export type PublicIncident = {
   componentName: string;
   state: "open" | "resolved";
   impact: IncidentImpact;
+  statusDetail: "verification_delayed" | null;
   title: string;
   message: string;
   startedAt: string;

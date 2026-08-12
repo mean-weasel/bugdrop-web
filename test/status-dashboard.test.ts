@@ -33,8 +33,9 @@ describe("StatusDashboard", () => {
           componentName: "Issue delivery",
           state: "open",
           impact: "degraded",
+          statusDetail: "verification_delayed",
           title: "Issue delivery is degraded",
-          message: "BugDrop has not received recent end-to-end verification.",
+          message: "BugDrop has not received a recent end-to-end delivery verification.",
           startedAt: "2026-08-05T07:00:00.000Z",
           resolvedAt: null,
         },
@@ -75,6 +76,50 @@ describe("StatusDashboard", () => {
     const outage = snapshotWithComponents([component("feedback_api", "outage", null)]);
     expect(renderToStaticMarkup(StatusDashboard({ snapshot: outage }))).toContain("A service outage is in progress");
   });
+
+  it("keeps resolved stale verification neutral after current Issue delivery recovers", () => {
+    const snapshot = snapshotWithComponents([component("issue_delivery", "degraded", null)]);
+    snapshot.overall = "operational";
+    snapshot.components[0] = {
+      ...snapshot.components[0],
+      status: "operational",
+      statusDetail: null,
+      lastVerifiedAt: "2026-08-05T08:00:00.000Z",
+    };
+    snapshot.incidents[0] = {
+      ...snapshot.incidents[0],
+      state: "resolved",
+      impact: "degraded",
+      statusDetail: "verification_delayed",
+      message: "BugDrop has not received a recent end-to-end delivery verification.",
+      resolvedAt: "2026-08-05T08:00:00.000Z",
+    };
+
+    const html = renderToStaticMarkup(StatusDashboard({ snapshot }));
+    expect(html).toContain("All systems are operational");
+    expect(html).toContain("Verification delayed");
+    expect(html).toContain("Resolved");
+    expect(html).toContain("Aug 3, 2026: Verification delayed · Recent end-to-end delivery proof is unavailable.");
+    expect(html).not.toContain("Issue delivery is degraded");
+  });
+
+  it("keeps genuine open and resolved Issue delivery incidents degraded", () => {
+    const snapshot = snapshotWithComponents([component("issue_delivery", "degraded", null)]);
+    snapshot.incidents.push({
+      ...snapshot.incidents[0],
+      id: "issue-delivery-resolved",
+      state: "resolved",
+      statusDetail: null,
+      resolvedAt: "2026-08-05T08:00:00.000Z",
+    });
+
+    const html = renderToStaticMarkup(StatusDashboard({ snapshot }));
+    expect(html).toContain("Some systems are degraded");
+    expect(html.match(/Issue delivery is degraded/g)).toHaveLength(2);
+    expect(html).toContain("Investigating");
+    expect(html).toContain("Resolved");
+    expect(html).toContain("Aug 3, 2026: Degraded · No trustworthy monitoring samples were recorded · 1 confirmed incident.");
+  });
 });
 
 function component(id: string, status: "degraded" | "outage", statusDetail: "verification_delayed" | null) {
@@ -108,6 +153,7 @@ function snapshotWithComponents(components: ReturnType<typeof component>[]): Pub
       componentName: item.name,
       state: "open" as const,
       impact: item.status === "outage" ? ("outage" as const) : ("degraded" as const),
+      statusDetail: null,
       title: `${item.name} is ${item.status}`,
       message: "A confirmed component failure is under investigation.",
       startedAt: "2026-08-05T07:00:00.000Z",

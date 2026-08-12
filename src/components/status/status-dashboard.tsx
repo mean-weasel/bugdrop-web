@@ -23,7 +23,10 @@ export function StatusDashboard({ snapshot }: { snapshot: PublicStatusSnapshot }
   const openIncidents = snapshot.incidents.filter((incident) => incident.state === "open");
   const incidentHistory = snapshot.incidents.filter((incident) => incident.state === "resolved");
   const delayedComponentIds = new Set(snapshot.components.filter((component) => component.statusDetail === "verification_delayed").map((component) => component.id));
-  const delayedIncidentIds = new Set(openIncidents.filter((incident) => delayedComponentIds.has(incident.componentId)).map((incident) => incident.id));
+  const delayedIncidentIds = new Set([
+    ...snapshot.incidents.filter((incident) => incident.statusDetail === "verification_delayed").map((incident) => incident.id),
+    ...openIncidents.filter((incident) => delayedComponentIds.has(incident.componentId)).map((incident) => incident.id),
+  ]);
   const bannerStatus: PresentedStatus = isVerificationDelayedOnly(snapshot) ? "verification_delayed" : snapshot.overall;
 
   return (
@@ -85,7 +88,7 @@ export function StatusDashboard({ snapshot }: { snapshot: PublicStatusSnapshot }
           {incidentHistory.length === 0 ? (
             <p className="rounded-xl border border-border bg-bg-surface p-5 text-sm text-text-muted">No resolved incidents have been recorded in this window.</p>
           ) : (
-            incidentHistory.map((incident) => <IncidentCard key={incident.id} incident={incident} />)
+            incidentHistory.map((incident) => <IncidentCard key={incident.id} incident={incident} verificationDelayed={delayedIncidentIds.has(incident.id)} />)
           )}
         </div>
       </section>

@@ -515,12 +515,15 @@ function dailyRollupStatement(componentId: string, checkedAt: string, status: Co
 }
 
 function publicIncidentFromRow(row: Record<string, unknown>): PublicIncident {
+  const staleVerificationMessage = COMPONENTS.find((component) => component.id === "issue_delivery")?.failureMessage;
   return {
     id: String(row.id),
     componentId: String(row.component_id),
     componentName: String(row.component_name),
     state: row.state === "open" ? "open" : "resolved",
     impact: row.impact === "outage" ? "outage" : "degraded",
+    statusDetail:
+      row.component_id === "issue_delivery" && row.impact === "degraded" && row.public_message === staleVerificationMessage ? ("verification_delayed" as const) : null,
     title: String(row.title),
     message: String(row.public_message),
     startedAt: String(row.started_at),

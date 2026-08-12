@@ -179,6 +179,81 @@ describe("monitoring D1/SQLite integration", () => {
     expect(unrelated.components.find((item) => item.id === "github_integration")?.statusDetail).toBeNull();
   });
 
+  it("preserves stale-verification incident detail and raw history after heartbeat recovery", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    const failedAt = new Date("2026-08-05T01:31:00Z");
+    const recoveredAt = new Date("2026-08-05T01:32:00Z");
+    await seedMonitoringComponents(new Date("2026-08-05T01:30:00Z"));
+
+    const opened = await applyObservation(
+      definition,
+      {
+        ok: false,
+        checkedAt: failedAt,
+        latencyMs: null,
+        errorCode: "heartbeat_stale",
+      },
+      [],
+    );
+    expect(opened?.kind).toBe("opened");
+
+    const failedSnapshot = await getPublicStatusSnapshot(new Date("2026-08-05T01:31:30Z"));
+    expect(failedSnapshot.incidents[0]).toMatchObject({
+      id: opened?.incidentId,
+      state: "open",
+      impact: "degraded",
+      statusDetail: "verification_delayed",
+      message: definition.failureMessage,
+      resolvedAt: null,
+    });
+
+    expect(await recordHeartbeatSuccess("recovery:1", recoveredAt, definition, [])).toBe(true);
+    const recoveredSnapshot = await getPublicStatusSnapshot(new Date("2026-08-05T01:33:00Z"));
+    expect(recoveredSnapshot.schemaVersion).toBe(1);
+    expect(recoveredSnapshot.components.find((item) => item.id === definition.id)).toMatchObject({
+      status: "operational",
+      statusDetail: null,
+      lastVerifiedAt: recoveredAt.toISOString(),
+    });
+    expect(recoveredSnapshot.incidents[0]).toMatchObject({
+      id: opened?.incidentId,
+      state: "resolved",
+      impact: "degraded",
+      statusDetail: "verification_delayed",
+      message: definition.failureMessage,
+      resolvedAt: recoveredAt.toISOString(),
+    });
+    expect(recoveredSnapshot.components.find((item) => item.id === definition.id)?.history30d.find((day) => day.date === "2026-08-05")).toMatchObject({
+      status: "degraded",
+      incidentIds: [opened?.incidentId],
+    });
+  });
+
+  it("does not classify genuine open or resolved Issue delivery incidents as verification delayed", async () => {
+    const definition = { ...COMPONENTS.find((component) => component.id === "issue_delivery")!, failureMessage: "Issue delivery failed after confirmed GitHub verification." };
+    await seedMonitoringComponents(new Date("2026-08-05T02:00:00Z"));
+    const opened = await applyObservation(definition, failureAtDate("2026-08-05T02:01:00Z"), []);
+
+    const openSnapshot = await getPublicStatusSnapshot(new Date("2026-08-05T02:01:30Z"));
+    expect(openSnapshot.incidents[0]).toMatchObject({
+      id: opened?.incidentId,
+      state: "open",
+      impact: "degraded",
+      statusDetail: null,
+      message: definition.failureMessage,
+    });
+
+    await recordHeartbeatSuccess("genuine-recovery:1", new Date("2026-08-05T02:02:00Z"), definition, []);
+    const resolvedSnapshot = await getPublicStatusSnapshot(new Date("2026-08-05T02:03:00Z"));
+    expect(resolvedSnapshot.incidents[0]).toMatchObject({
+      id: opened?.incidentId,
+      state: "resolved",
+      impact: "degraded",
+      statusDetail: null,
+      message: definition.failureMessage,
+    });
+  });
+
   it("does not let an older observation overwrite newer component state", async () => {
     const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
     await seedMonitoringComponents(new Date("2026-08-05T02:00:00Z"));

@@ -2,9 +2,9 @@
   "sourceRepository": "mean-weasel/bugdrop",
   "sourceWorktree": "/Users/neonwatty/.codex/worktrees/bugdrop-public-composable-feedback-flow-v1/bugdrop",
   "sourcePath": "public/widget.js",
-  "sourceHead": "d4b989b5acc568ffcc54dc6f7409a3dc20bc89db",
+  "sourceHead": "721782e93d53a46e37040833836912bacb991f51",
   "sourceTreeState": "clean",
-  "artifactSha256": "d94d58d2f69a099ee5d13259925d9bd9ab99d33951b31adf5222419fd9a72aa5",
-  "artifactBytes": 223676,
+  "artifactSha256": "dc53f534bf0d2bc61d8fa4074173a6f4052190a15156c769ae6b7ff57a5b0419",
+  "artifactBytes": 224302,
   "vendoringRule": "Byte-identical copy; do not rebuild or edit in bugdrop-web."
 }

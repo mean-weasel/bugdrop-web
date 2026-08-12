@@ -1,5 +1,5 @@
 const MAX_LOCAL_SUBMISSIONS = 20;
-export const MAX_LOCAL_SUBMISSION_BYTES = 256 * 1024;
+export const MAX_LOCAL_SUBMISSION_BYTES = 48 * 1024 * 1024;
 
 export interface LocalSubmissionRecord {
   id: number;

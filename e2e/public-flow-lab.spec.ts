@@ -167,6 +167,13 @@ test("both pinned public flows submit only to inspectable local payloads", async
     page.getByRole("button", { name: "Run product-triage flow" }),
   ).toBeFocused();
 
+  await expect(
+    page
+      .getByRole("article")
+      .filter({ hasText: "Default-shaped feedback" })
+      .getByRole("link", { name: /Inspect stored payload/ }),
+  ).toHaveCount(0);
+
   const triageViewer = await openRawPayload(page, "Run product-triage flow");
   expect(triageViewer.payload).toMatchObject({
     repo: "mean-weasel/bugdrop-widget-test",
@@ -184,6 +191,44 @@ test("both pinned public flows submit only to inspectable local payloads", async
   expect(triageRaw).not.toContain(contextSentinel);
   await triageViewer.viewer.close();
 
+  expect(escaped).toEqual([]);
+});
+
+test("the default-shaped flow stores a full-page screenshot in the local inspector", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  const escaped = watchContextForEscapes(page.context());
+  await page.goto("/labs/variants");
+
+  await page.getByRole("button", { name: "Run default-shaped flow" }).click();
+  const flow = page.locator('[data-bugdrop-flow="lab-default-shaped-flow"]');
+  await flow.getByRole("button", { name: "Continue" }).click();
+  await flow.getByLabel("Title").fill("Full-page screenshot feedback");
+  await flow.getByRole("button", { name: "Continue" }).click();
+  await flow.getByRole("button", { name: "Submit" }).click();
+
+  const capture = page.locator("#bugdrop-host .bd-overlay");
+  await expect(
+    capture.getByRole("heading", { name: "Capture Screenshot" }),
+  ).toBeVisible();
+  await capture.getByRole("button", { name: "Full Page" }).click();
+  await expect(
+    capture.getByRole("heading", { name: "Review Screenshot" }),
+  ).toBeVisible({ timeout: 30_000 });
+  await capture.getByRole("button", { name: "Submit Feedback" }).click();
+
+  await expect(
+    flow.getByRole("heading", { name: "Thanks for your feedback!" }),
+  ).toBeVisible();
+  await flow.getByRole("button", { name: "Done" }).click();
+
+  const stored = await openRawPayload(page, "Run default-shaped flow");
+  expect(stored.payload.screenshot).toEqual(
+    expect.stringMatching(/^data:image\/png;base64,/),
+  );
+  expect(JSON.stringify(stored.payload).length).toBeGreaterThan(256 * 1024);
+  await stored.viewer.close();
   expect(escaped).toEqual([]);
 });
 

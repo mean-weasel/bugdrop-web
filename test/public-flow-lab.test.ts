@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { POST } from "@/app/vendor/bugdrop/d4b989b5acc568ffcc54dc6f7409a3dc20bc89db/api/feedback/route";
+import { POST } from "@/app/vendor/bugdrop/721782e93d53a46e37040833836912bacb991f51/api/feedback/route";
 import {
   clearLocalSubmissionsForTests,
   createLocalSubmission,
@@ -32,7 +32,7 @@ describe("public runtime lab boundary", () => {
     vi.stubEnv("NODE_ENV", "development");
     const response = await POST(
       new Request(
-        "http://bugdrop.localhost:3000/vendor/bugdrop/d4b989b5acc568ffcc54dc6f7409a3dc20bc89db/api/feedback",
+        "http://bugdrop.localhost:3000/vendor/bugdrop/721782e93d53a46e37040833836912bacb991f51/api/feedback",
         {
           method: "POST",
           headers: {
@@ -82,7 +82,7 @@ describe("public runtime lab boundary", () => {
     vi.stubEnv("NODE_ENV", "development");
     const response = await POST(
       new Request(
-        "http://bugdrop.localhost:3000/vendor/bugdrop/d4b989b5acc568ffcc54dc6f7409a3dc20bc89db/api/feedback",
+        "http://bugdrop.localhost:3000/vendor/bugdrop/721782e93d53a46e37040833836912bacb991f51/api/feedback",
         {
           method: "POST",
           headers: {
@@ -132,6 +132,28 @@ describe("public runtime lab boundary", () => {
     expect(record?.payload).toEqual({ index: 23 });
     if (record) record.payload.index = -1;
     expect(getLocalSubmission(24)?.payload).toEqual({ index: 23 });
+  });
+
+  it("accepts screenshot-sized local inspection payloads", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    const screenshot = `data:image/png;base64,${"A".repeat(1_500_000)}`;
+    const response = await POST(
+      new Request(
+        "http://bugdrop.localhost:3000/vendor/bugdrop/runtime/api/feedback",
+        {
+          method: "POST",
+          headers: {
+            host: "bugdrop.localhost:3000",
+            origin: "http://bugdrop.localhost:3000",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({ repo: "owner/repo", screenshot }),
+        },
+      ),
+    );
+
+    expect(response.status).toBe(200);
+    expect(getLocalSubmission(1)?.payload.screenshot).toBe(screenshot);
   });
 
   it("vendors configs as examples without importing SDK source or declarations", () => {

@@ -33,6 +33,11 @@ interface LabHandles {
   productTriage: FlowHandle;
 }
 
+interface LatestSubmission {
+  kind: keyof LabHandles;
+  id: number;
+}
+
 declare global {
   interface Window {
     __bugDropPublicFlowLabHandles?: LabHandles;
@@ -48,16 +53,14 @@ function publicFlowWindow() {
 }
 
 const RUNTIME_SRC =
-  "/vendor/bugdrop/d4b989b5acc568ffcc54dc6f7409a3dc20bc89db/widget.js";
+  "/vendor/bugdrop/721782e93d53a46e37040833836912bacb991f51/widget.js";
 
 export function PublicFlowLab() {
   const [runtimeState, setRuntimeState] = useState<
     "loading" | "ready" | "failed"
   >("loading");
   const [activeFlow, setActiveFlow] = useState<keyof LabHandles | null>(null);
-  const [latest, setLatest] = useState<
-    Partial<Record<keyof LabHandles, number>>
-  >({});
+  const [latest, setLatest] = useState<LatestSubmission | null>(null);
   const [announcement, setAnnouncement] = useState(
     "Loading the pinned BugDrop runtime.",
   );
@@ -134,7 +137,7 @@ export function PublicFlowLab() {
 
     if (outcome.status === "submitted") {
       const id = outcome.result.issueNumber;
-      setLatest((current) => ({ ...current, [kind]: id }));
+      setLatest({ kind, id });
       setAnnouncement(
         `Submission ${id} is stored only in the local inspector.`,
       );
@@ -207,14 +210,14 @@ export function PublicFlowLab() {
             ) : null}
             Run default-shaped flow
           </button>
-          {latest.defaultShaped ? (
+          {latest?.kind === "defaultShaped" ? (
             <a
-              href={`/labs/variants/submissions/${latest.defaultShaped}`}
+              href={`/labs/variants/submissions/${latest.id}`}
               target="_blank"
               rel="noreferrer"
             >
               <CheckCircle2 aria-hidden="true" /> Inspect stored payload #
-              {latest.defaultShaped}
+              {latest.id}
               <ArrowUpRight aria-hidden="true" />
             </a>
           ) : null}
@@ -238,14 +241,14 @@ export function PublicFlowLab() {
             ) : null}
             Run product-triage flow
           </button>
-          {latest.productTriage ? (
+          {latest?.kind === "productTriage" ? (
             <a
-              href={`/labs/variants/submissions/${latest.productTriage}`}
+              href={`/labs/variants/submissions/${latest.id}`}
               target="_blank"
               rel="noreferrer"
             >
               <CheckCircle2 aria-hidden="true" /> Inspect stored payload #
-              {latest.productTriage}
+              {latest.id}
               <ArrowUpRight aria-hidden="true" />
             </a>
           ) : null}

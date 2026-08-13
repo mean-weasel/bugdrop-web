@@ -1,5 +1,12 @@
 export type ComponentStatus = "unknown" | "operational" | "degraded" | "outage";
 export type IncidentImpact = "degraded" | "outage";
+export type HeartbeatOutcome = "verified" | "delivery_failed" | "inconclusive";
+export type HeartbeatOutcomeReport = {
+  schemaVersion: 1;
+  outcome: HeartbeatOutcome;
+  reasonCode: string;
+  observedAt: Date;
+};
 
 export type ComponentDefinition = {
   id: string;

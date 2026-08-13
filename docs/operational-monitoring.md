@@ -2,7 +2,8 @@
 
 BugDrop's operational monitor runs with the `bugdrop-web` production deployment. It checks the
 landing page, hosted widget, production health identity, and the BugDrop GitHub App installation. It
-also receives a success-only check-in from the existing real-Issue production heartbeat.
+currently receives legacy success check-ins from the real-Issue production heartbeat. The receiver
+also supports explicit v1 outcomes, but sender activation is a separate, later release step.
 
 The public surface is `/status`; sanitized JSON is available at `/api/status`. No feedback payload,
 screenshot, GitHub Issue body, token, run URL, repository credential, or response body is persisted.
@@ -20,12 +21,12 @@ variants, so ordinary page traffic does not become Cloudflare administrative API
   renewed and ownership-checked immediately before each transition batch, serializing heartbeat and
   evaluator writes. Each completed transition is committed as one D1 batch. A durable five-minute
   UTC reservation coalesces cron deliveries and rejects overlapping work.
-- `POST /api/monitor/heartbeat` accepts a bearer-authenticated, success-only heartbeat. The optional
-  `X-BugDrop-Heartbeat-Id` is validated, hashed before storage, and makes retries idempotent. The
-  receipt and component transition commit atomically.
-- Issue delivery becomes degraded seven hours after the last successful E2E proof: four-hour
-  frequency plus a three-hour grace period. Successful monitor initialization starts the same
-  seven-hour activation grace even if no heartbeat has arrived yet.
+- `POST /api/monitor/heartbeat` retains authenticated empty-body legacy success and accepts JSON v1
+  outcomes. JSON requires `X-BugDrop-Heartbeat-Id`; exact ID/payload replays are idempotent and
+  conflicting reuse returns HTTP 409. Only hashed identifiers and normalized fields persist. The
+  production sender remains on the legacy protocol until receiver compatibility is proven.
+- Issue delivery uses an eleven-hour dead-man threshold. Exactly eleven hours remains fresh and the
+  first later instant is stale. Successful initialization starts the same activation grace.
 - Incident open and recovery alerts enter a transactional outbox. The evaluator retries failed
   deliveries with exponential backoff through either a generic webhook, Resend email, or both.
 - Check results, daily component rollups, and heartbeat receipts are retained for 90 days. Incident
@@ -98,7 +99,19 @@ A partial Resend configuration is rejected by the evaluator.
 ## Production heartbeat integration
 
 Store the same random `MONITOR_HEARTBEAT_SECRET` value in Vercel and as a narrowly scoped secret in
-the BugDrop repository. After every currently required production-heartbeat outcome succeeds, send:
+the BugDrop repository. Legacy empty-body success remains accepted and is the currently deployed
+sender behavior. After the receiver migration and deployment are compatibility-proven, a separately
+reviewed sender change may post exactly
+`schemaVersion`, `outcome`, `reasonCode`, and ISO `observedAt` as JSON. Verified uses
+`issue_verified`; confirmed failure uses `issue_absent`, `issue_duplicate`, or
+`issue_contract_invalid`; inconclusive uses `github_network`, `github_5xx`, `github_rate_limited`,
+`github_auth_failed`, `setup_failed`, `identity_failed`, `venue_failed`, `browser_inconclusive`,
+`cleanup_failed`, `sweep_failed`, `artifact_failed`, `incident_failed`, or `classification_failed`.
+
+Verified advances proof and recovers. Confirmed failure degrades immediately without advancing
+proof. Inconclusive remains neutral without changing raw state or resolving incidents. Confirmed
+failure remains authoritative until newer verification. The following is the later sender contract;
+do not activate it as part of the receiver release:
 
 ```bash
 curl --fail --silent --show-error --max-time 10 \
@@ -106,14 +119,16 @@ curl --fail --silent --show-error --max-time 10 \
   --request POST \
   --header "Authorization: Bearer $MONITOR_HEARTBEAT_SECRET" \
   --header "X-BugDrop-Heartbeat-Id: ${GITHUB_RUN_ID}:${GITHUB_RUN_ATTEMPT}" \
+  --header "Content-Type: application/json" \
+  --data "$NORMALIZED_HEARTBEAT_OUTCOME" \
   https://bugdrop.dev/api/monitor/heartbeat
 ```
 
-The secret belongs only in a success-only conclusion step after every authoritative outcome has
-passed. Configure that delivery step with GitHub Actions `continue-on-error: true`: heartbeat
-transport failure must be logged but must never change the E2E job conclusion. The secret must not
-reach Playwright, artifacts, summaries, or shell tracing. Failed workflows do not send a failure
-request; the absence of a success check-in is the dead-man signal.
+The secret belongs only in the isolated outcome-delivery conclusion step. Configure that delivery
+step with GitHub Actions `continue-on-error: true`: heartbeat transport failure must be logged but
+must never change the E2E job conclusion. The secret must not reach Playwright, artifacts, summaries,
+or shell tracing. Until the later sender change is reviewed and activated, failed workflows send no
+request and absence of the legacy success check-in remains the dead-man signal.
 
 ## Activation exercises
 

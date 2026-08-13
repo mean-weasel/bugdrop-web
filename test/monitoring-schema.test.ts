@@ -3,6 +3,28 @@ import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 
 describe("monitoring schema migration", () => {
+  it("adds normalized outcome persistence idempotently without raw payload columns", () => {
+    const schema = readFileSync(new URL("../monitoring/schema.sql", import.meta.url), "utf8");
+    const database = new DatabaseSync(":memory:");
+    try {
+      database.exec(schema);
+      database.exec(schema);
+      const columns = database.prepare("PRAGMA table_info(monitoring_heartbeat_outcomes)").all() as Array<{ name: string }>;
+      expect(columns.map((column) => column.name)).toEqual([
+        "id",
+        "request_id_hash",
+        "schema_version",
+        "outcome",
+        "reason_code",
+        "observed_at",
+        "received_at",
+      ]);
+      expect(columns.map((column) => column.name)).not.toEqual(expect.arrayContaining(["payload", "payload_hash", "run_url", "issue_body", "secret"]));
+    } finally {
+      database.close();
+    }
+  });
+
   it("backfills retained checks once and remains idempotent", () => {
     const schema = readFileSync(new URL("../monitoring/schema.sql", import.meta.url), "utf8");
     const rollupStart = schema.indexOf("CREATE TABLE IF NOT EXISTS monitoring_daily_component_rollups");

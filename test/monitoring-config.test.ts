@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { configurationIssues } from "@/lib/monitoring/config";
+import { HEARTBEAT_STALE_AFTER_MS, configurationIssues } from "@/lib/monitoring/config";
+import { isHeartbeatStale } from "@/lib/monitoring/evaluator";
 
 describe("monitoring configuration", () => {
   afterEach(() => vi.unstubAllEnvs());
@@ -26,6 +27,13 @@ describe("monitoring configuration", () => {
     vi.stubEnv("MONITOR_ALERT_EMAIL_FROM", "status@bugdrop.dev");
     vi.stubEnv("MONITOR_ALERT_EMAIL_TO", "operator@example.com");
     expect(configurationIssues()).toEqual([]);
+  });
+
+  it("uses an exact eleven-hour dead-man boundary", () => {
+    expect(HEARTBEAT_STALE_AFTER_MS).toBe(11 * 60 * 60 * 1000);
+    const reference = new Date("2026-08-05T00:00:00.000Z");
+    expect(isHeartbeatStale(reference, new Date("2026-08-05T11:00:00.000Z"))).toBe(false);
+    expect(isHeartbeatStale(reference, new Date("2026-08-05T11:00:00.001Z"))).toBe(true);
   });
 });
 

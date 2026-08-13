@@ -1,8 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
-import { COMPONENTS, EVALUATOR_STALE_AFTER_MS, STATUS_URL } from "./config";
+import { COMPONENTS, EVALUATOR_STALE_AFTER_MS, HEARTBEAT_STALE_AFTER_MS, STATUS_URL } from "./config";
 import { monitoringDatabase, type D1Statement } from "./db";
 import { reduceComponentState } from "./state-machine";
-import type { AlertPayload, ComponentDefinition, ComponentState, ComponentStatus, Observation, PublicDailyComponentStatus, PublicIncident, PublicStatusSnapshot } from "./types";
+import type { AlertPayload, ComponentDefinition, ComponentState, ComponentStatus, HeartbeatOutcomeReport, Observation, PublicDailyComponentStatus, PublicIncident, PublicStatusSnapshot } from "./types";
 
 export type AlertChannel = "webhook" | "email";
 
@@ -181,6 +181,18 @@ export async function recordHeartbeatSuccess(requestId: string | null, receivedA
       if (existing.length > 0) return { value: false, statements: [] };
     }
 
+    const latest = await latestAuthoritativeEvidence();
+    if (latest && compareEvidence("verified", receivedAt, latest.outcome, latest.observedAt) <= 0) {
+      return {
+        value: true,
+        statements: [{
+          sql: `INSERT INTO monitoring_heartbeat_receipts (received_at, request_id_hash)
+            VALUES (?, ?) ON CONFLICT (request_id_hash) DO NOTHING`,
+          params: [receivedAt.toISOString(), requestIdHash],
+        }],
+      };
+    }
+
     const observationWrite = await buildObservationWrite(
       definition,
       {
@@ -206,6 +218,223 @@ export async function recordHeartbeatSuccess(requestId: string | null, receivedA
   });
 }
 
+export type HeartbeatOutcomeEffect = "verified" | "degraded" | "recorded_only";
+export type HeartbeatOutcomeRecordResult = {
+  status: "inserted" | "duplicate" | "conflict";
+  effect: HeartbeatOutcomeEffect;
+};
+
+export async function recordHeartbeatOutcome(
+  requestId: string,
+  report: HeartbeatOutcomeReport,
+  receivedAt: Date,
+  definition: ComponentDefinition,
+  alertChannels: AlertChannel[],
+): Promise<HeartbeatOutcomeRecordResult> {
+  return withWriterLock<HeartbeatOutcomeRecordResult>(async () => {
+    const heartbeatIdHash = hashRequestId(requestId)!;
+    const existing = (
+      await monitoringDatabase().query({
+        sql: `SELECT schema_version, outcome, reason_code, observed_at
+          FROM monitoring_heartbeat_outcomes WHERE request_id_hash = ?`,
+        params: [heartbeatIdHash],
+      })
+    ).results[0];
+    if (existing) {
+      const duplicate =
+        existing.schema_version === report.schemaVersion &&
+        existing.outcome === report.outcome &&
+        existing.reason_code === report.reasonCode &&
+        existing.observed_at === report.observedAt.toISOString();
+      return { value: { status: duplicate ? "duplicate" : "conflict", effect: "recorded_only" }, statements: [] };
+    }
+
+    const latestAuthoritative = await latestAuthoritativeEvidence();
+    const isNewerAuthoritative =
+      report.outcome !== "inconclusive" &&
+      (!latestAuthoritative || compareEvidence(report.outcome, report.observedAt, latestAuthoritative.outcome, latestAuthoritative.observedAt) > 0);
+    let observationWrite: LockedWrite<IncidentTransitionResult> = { value: null, statements: [] };
+    let effect: HeartbeatOutcomeEffect = "recorded_only";
+    if (isNewerAuthoritative) {
+      const outcomeDefinition =
+        report.outcome === "delivery_failed"
+          ? { ...definition, failureMessage: "BugDrop confirmed that end-to-end Issue delivery failed." }
+          : definition;
+      const component = (
+        await monitoringDatabase().query({
+          sql: "SELECT * FROM monitoring_components WHERE id = ?",
+          params: [definition.id],
+        })
+      ).results[0];
+      if (!component) throw new Error(`Monitoring component ${definition.id} has not been seeded`);
+      const application = await buildOutcomeApplicationWrite(
+        outcomeDefinition,
+        componentStateFromRow(component),
+        report,
+        receivedAt,
+        alertChannels,
+      );
+      observationWrite = application.write;
+      effect = application.effect;
+    }
+
+    return {
+      value: { status: "inserted", effect },
+      statements: [
+        {
+          sql: `INSERT INTO monitoring_heartbeat_outcomes
+            (request_id_hash, schema_version, outcome, reason_code, observed_at, received_at)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+          params: [heartbeatIdHash, report.schemaVersion, report.outcome, report.reasonCode, report.observedAt.toISOString(), receivedAt.toISOString()],
+        },
+        ...observationWrite.statements,
+      ],
+    };
+  });
+}
+
+async function buildOutcomeApplicationWrite(
+  definition: ComponentDefinition,
+  current: ComponentState,
+  report: HeartbeatOutcomeReport,
+  receivedAt: Date,
+  alertChannels: AlertChannel[],
+): Promise<{ write: LockedWrite<IncidentTransitionResult>; effect: HeartbeatOutcomeEffect }> {
+  const openIncident = current.openIncidentId
+    ? (await monitoringDatabase().query({
+        sql: "SELECT title, public_message, started_at FROM monitoring_incidents WHERE id = ? AND state = 'open'",
+        params: [current.openIncidentId],
+      })).results[0]
+    : undefined;
+  const applicationAt = applicationTimestamp(receivedAt, current.lastCheckedAt, asDate(openIncident?.started_at));
+  const checkedAt = applicationAt.toISOString();
+  if (report.outcome === "verified") {
+    const statements: D1Statement[] = [];
+    if (current.openIncidentId && openIncident) {
+      const recoveryMessage = `${definition.name} has recovered and passed its confirmation policy.`;
+      statements.push(
+        {
+          sql: `UPDATE monitoring_incidents SET state = 'resolved', resolved_at = ?, updated_at = ? WHERE id = ? AND state = 'open'`,
+          params: [checkedAt, checkedAt, current.openIncidentId],
+        },
+        eventStatement(definition.id, current.openIncidentId, "incident_resolved", recoveryMessage, checkedAt),
+        ...alertStatements(alertChannels, {
+          schemaVersion: 1, event: "resolved", incidentId: current.openIncidentId,
+          component: definition.name, componentId: definition.id, impact: definition.impactOnFailure,
+          title: String(openIncident.title), message: recoveryMessage, startedAt: String(openIncident.started_at),
+          resolvedAt: checkedAt, statusUrl: STATUS_URL,
+        }, checkedAt),
+      );
+    }
+    statements.push(
+      outcomeComponentStatement(definition.id, "operational", checkedAt, report.observedAt.toISOString(), null, null),
+      checkResultStatement(definition.id, checkedAt, true, null),
+      dailyRollupStatement(definition.id, checkedAt, "operational", true),
+    );
+    return { write: { value: current.openIncidentId ? { kind: "resolved", incidentId: current.openIncidentId } : null, statements }, effect: "verified" };
+  }
+
+  if (current.status === "degraded" && current.lastErrorCode !== "heartbeat_stale") {
+    return { write: { value: null, statements: [] }, effect: "recorded_only" };
+  }
+
+  const staleIncidentId = current.lastErrorCode === "heartbeat_stale" ? current.openIncidentId : null;
+  const confirmedIncidentId = randomUUID();
+  const title = `${definition.name} is ${definition.impactOnFailure}`;
+  const statements: D1Statement[] = [];
+  if (staleIncidentId && openIncident) {
+    const recoveryMessage = `${definition.name} stale verification was superseded by confirmed delivery evidence.`;
+    statements.push(
+      {
+        sql: `UPDATE monitoring_incidents SET state = 'resolved', resolved_at = ?, updated_at = ?
+          WHERE id = ? AND state = 'open'`,
+        params: [checkedAt, checkedAt, staleIncidentId],
+      },
+      eventStatement(definition.id, staleIncidentId, "incident_resolved", recoveryMessage, checkedAt),
+      ...alertStatements(alertChannels, {
+        schemaVersion: 1, event: "resolved", incidentId: staleIncidentId,
+        component: definition.name, componentId: definition.id, impact: definition.impactOnFailure,
+        title: String(openIncident.title), message: recoveryMessage, startedAt: String(openIncident.started_at),
+        resolvedAt: checkedAt, statusUrl: STATUS_URL,
+      }, checkedAt),
+    );
+  }
+  statements.push(
+      {
+        sql: `INSERT INTO monitoring_incidents (
+          id, component_id, state, impact, title, public_message, started_at, created_at, updated_at
+        ) VALUES (?, ?, 'open', ?, ?, ?, ?, ?, ?)`,
+        params: [confirmedIncidentId, definition.id, definition.impactOnFailure, title, definition.failureMessage, checkedAt, checkedAt, checkedAt],
+      },
+      eventStatement(definition.id, confirmedIncidentId, "incident_opened", definition.failureMessage, checkedAt),
+      ...alertStatements(alertChannels, {
+        schemaVersion: 1,
+        event: "opened",
+        incidentId: confirmedIncidentId,
+        component: definition.name,
+        componentId: definition.id,
+        impact: definition.impactOnFailure,
+        title,
+        message: definition.failureMessage,
+        startedAt: checkedAt,
+        resolvedAt: null,
+        statusUrl: STATUS_URL,
+      }, checkedAt),
+      {
+        sql: `UPDATE monitoring_components SET status = 'degraded', consecutive_failures = 1,
+          consecutive_successes = 0, last_checked_at = ?, last_failure_at = ?, last_latency_ms = NULL,
+          last_error_code = ?, open_incident_id = ?, updated_at = ? WHERE id = ?`,
+        params: [checkedAt, checkedAt, report.reasonCode, confirmedIncidentId, checkedAt, definition.id],
+      },
+      {
+        sql: `INSERT INTO monitoring_check_results (component_id, checked_at, ok, latency_ms, error_code)
+          VALUES (?, ?, 0, NULL, ?)`,
+        params: [definition.id, checkedAt, report.reasonCode],
+      },
+      dailyRollupStatement(definition.id, checkedAt, "degraded", false),
+  );
+  return { write: { value: { kind: "opened", incidentId: confirmedIncidentId }, statements }, effect: "degraded" };
+}
+
+function outcomeComponentStatement(componentId: string, status: ComponentStatus, checkedAt: string, lastVerifiedAt: string | null, errorCode: string | null, incidentId: string | null): D1Statement {
+  return {
+    sql: `UPDATE monitoring_components SET status = ?, consecutive_failures = ?, consecutive_successes = ?,
+      last_checked_at = ?, last_verified_at = COALESCE(?, last_verified_at),
+      last_failure_at = CASE WHEN ? IS NULL THEN last_failure_at ELSE ? END,
+      last_latency_ms = NULL, last_error_code = ?, open_incident_id = ?, updated_at = ? WHERE id = ?`,
+    params: [status, status === "degraded" ? 1 : 0, status === "operational" ? 1 : 0, checkedAt,
+      lastVerifiedAt, errorCode, checkedAt, errorCode, incidentId, checkedAt, componentId],
+  };
+}
+
+function checkResultStatement(componentId: string, checkedAt: string, ok: boolean, errorCode: string | null): D1Statement {
+  return { sql: `INSERT INTO monitoring_check_results (component_id, checked_at, ok, latency_ms, error_code) VALUES (?, ?, ?, NULL, ?)`, params: [componentId, checkedAt, ok ? 1 : 0, errorCode] };
+}
+
+function applicationTimestamp(receivedAt: Date, lastCheckedAt: Date | null, incidentStartedAt: Date | null): Date {
+  return new Date(Math.max(receivedAt.getTime(), (lastCheckedAt?.getTime() ?? 0) + 1, (incidentStartedAt?.getTime() ?? 0) + 1));
+}
+
+async function latestAuthoritativeEvidence(): Promise<{ outcome: "verified" | "delivery_failed"; observedAt: Date } | null> {
+  const row = (await monitoringDatabase().query({
+    sql: `SELECT outcome, observed_at FROM (
+      SELECT outcome, observed_at FROM monitoring_heartbeat_outcomes WHERE outcome IN ('verified', 'delivery_failed')
+      UNION ALL SELECT 'verified' AS outcome, received_at AS observed_at FROM monitoring_heartbeat_receipts
+    ) ORDER BY observed_at DESC, CASE outcome WHEN 'delivery_failed' THEN 2 ELSE 1 END DESC LIMIT 1`,
+  })).results[0];
+  return row ? { outcome: row.outcome === "delivery_failed" ? "delivery_failed" : "verified", observedAt: new Date(String(row.observed_at)) } : null;
+}
+
+function compareEvidence(leftOutcome: HeartbeatOutcomeReport["outcome"], leftAt: Date, rightOutcome: HeartbeatOutcomeReport["outcome"], rightAt: Date): number {
+  const time = leftAt.getTime() - rightAt.getTime();
+  if (time !== 0) return time;
+  return evidencePriority(leftOutcome) - evidencePriority(rightOutcome);
+}
+
+function evidencePriority(outcome: HeartbeatOutcomeReport["outcome"]): number {
+  return outcome === "delivery_failed" ? 3 : outcome === "verified" ? 2 : 1;
+}
+
 export async function recordHeartbeatReceipt(requestId: string | null, receivedAt: Date): Promise<boolean> {
   const requestIdHash = hashRequestId(requestId);
   if (requestIdHash) {
@@ -228,10 +457,19 @@ export async function recordHeartbeatReceipt(requestId: string | null, receivedA
 export async function getHeartbeatBaseline(): Promise<{
   lastReceivedAt: Date | null;
   monitoringStartedAt: Date;
+  confirmedFailureActive: boolean;
 }> {
-  const [heartbeat, started] = await monitoringDatabase().batch([
+  const [heartbeat, outcome, authoritative, started] = await monitoringDatabase().batch([
     {
       sql: "SELECT received_at FROM monitoring_heartbeat_receipts ORDER BY received_at DESC LIMIT 1",
+    },
+    {
+      sql: "SELECT observed_at FROM monitoring_heartbeat_outcomes WHERE outcome = 'verified' ORDER BY observed_at DESC LIMIT 1",
+    },
+    {
+      sql: `SELECT outcome, observed_at FROM monitoring_heartbeat_outcomes
+        WHERE outcome IN ('verified', 'delivery_failed') ORDER BY observed_at DESC,
+        CASE outcome WHEN 'delivery_failed' THEN 2 ELSE 1 END DESC LIMIT 1`,
     },
     {
       sql: "SELECT value FROM monitoring_meta WHERE key = 'monitoring_started'",
@@ -239,9 +477,41 @@ export async function getHeartbeatBaseline(): Promise<{
   ]);
   const startedValue = parseJsonRecord(started.results[0]?.value);
   return {
-    lastReceivedAt: asDate(heartbeat.results[0]?.received_at),
+    lastReceivedAt: latestDate(asDate(heartbeat.results[0]?.received_at), asDate(outcome.results[0]?.observed_at)),
     monitoringStartedAt: asDate(startedValue.startedAt) || new Date(),
+    confirmedFailureActive:
+      authoritative.results[0]?.outcome === "delivery_failed" &&
+      (!heartbeat.results[0]?.received_at ||
+        new Date(String(authoritative.results[0].observed_at)) >= new Date(String(heartbeat.results[0].received_at))),
   };
+}
+
+export async function applyHeartbeatEvaluation(
+  checkedAt: Date,
+  definition: ComponentDefinition,
+  alertChannels: AlertChannel[],
+): Promise<{ componentId: string; observation: Observation } | null> {
+  return withWriterLock(async () => {
+    const baseline = await getHeartbeatBaseline();
+    if (baseline.confirmedFailureActive) return { value: null, statements: [] };
+
+    const reference = baseline.lastReceivedAt || baseline.monitoringStartedAt;
+    const stale = checkedAt.getTime() - reference.getTime() > HEARTBEAT_STALE_AFTER_MS;
+    if (!baseline.lastReceivedAt && !stale) return { value: null, statements: [] };
+
+    const observation: Observation = {
+      ok: Boolean(baseline.lastReceivedAt) && !stale,
+      checkedAt,
+      latencyMs: null,
+      errorCode: stale ? "heartbeat_stale" : null,
+      markVerifiedSuccess: false,
+    };
+    const write = await buildObservationWrite(definition, observation, alertChannels);
+    return {
+      value: { componentId: definition.id, observation },
+      statements: write.statements,
+    };
+  });
 }
 
 export async function markEvaluatorCompleted(completedAt: Date): Promise<void> {
@@ -321,7 +591,7 @@ export async function getPublicStatusSnapshot(now = new Date()): Promise<PublicS
   const historyDates = utcDateKeys(now, 30);
   const historySince = historyDates[0];
   const historyEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)).toISOString();
-  const [componentResult, openResult, resolvedResult, rollupResult, historyIncidentResult, evaluatedResult, startedResult] = await monitoringDatabase().batch([
+  const [componentResult, openResult, resolvedResult, rollupResult, historyIncidentResult, evaluatedResult, startedResult, outcomeResult, legacyHeartbeatResult, authoritativeResult] = await monitoringDatabase().batch([
     { sql: "SELECT * FROM monitoring_components" },
     {
       sql: `SELECT i.*, c.name AS component_name FROM monitoring_incidents i
@@ -350,6 +620,19 @@ export async function getPublicStatusSnapshot(now = new Date()): Promise<PublicS
     {
       sql: "SELECT value FROM monitoring_meta WHERE key = 'monitoring_started'",
     },
+    {
+      sql: `SELECT outcome, observed_at FROM monitoring_heartbeat_outcomes
+        ORDER BY observed_at DESC,
+        CASE outcome WHEN 'delivery_failed' THEN 3 WHEN 'verified' THEN 2 ELSE 1 END DESC LIMIT 1`,
+    },
+    {
+      sql: "SELECT received_at FROM monitoring_heartbeat_receipts ORDER BY received_at DESC LIMIT 1",
+    },
+    {
+      sql: `SELECT outcome, observed_at FROM monitoring_heartbeat_outcomes
+        WHERE outcome IN ('verified', 'delivery_failed') ORDER BY observed_at DESC,
+        CASE outcome WHEN 'delivery_failed' THEN 2 ELSE 1 END DESC LIMIT 1`,
+    },
   ]);
 
   const historyIncidents = historyIncidentResult.results.map(publicIncidentFromRow);
@@ -360,6 +643,17 @@ export async function getPublicStatusSnapshot(now = new Date()): Promise<PublicS
   const monitoringStartedAt = asDate(startedValue.startedAt);
   const rollupsByComponent = groupRollupsByComponent(rollupResult.results);
   const rowsById = new Map(componentResult.results.map((row) => [String(row.id), row]));
+  const latestOutcome = outcomeResult.results[0];
+  const latestAuthoritative = authoritativeResult.results[0];
+  const confirmedFailureActive =
+    latestAuthoritative?.outcome === "delivery_failed" &&
+    (!legacyHeartbeatResult.results[0]?.received_at ||
+      new Date(String(latestAuthoritative.observed_at)) >= new Date(String(legacyHeartbeatResult.results[0].received_at)));
+  const inconclusiveIsCurrent =
+    latestOutcome?.outcome === "inconclusive" &&
+    !confirmedFailureActive &&
+    (!legacyHeartbeatResult.results[0]?.received_at ||
+      new Date(String(latestOutcome.observed_at)) > new Date(String(legacyHeartbeatResult.results[0].received_at)));
   const components = COMPONENTS.map((definition) => {
     const row = rowsById.get(definition.id);
     const status = row ? asStatus(row.status) : ("unknown" as ComponentStatus);
@@ -377,7 +671,12 @@ export async function getPublicStatusSnapshot(now = new Date()): Promise<PublicS
       name: definition.name,
       description: definition.description,
       status,
-      statusDetail: definition.id === "issue_delivery" && status === "degraded" && row?.last_error_code === "heartbeat_stale" ? ("verification_delayed" as const) : null,
+      statusDetail:
+        definition.id === "issue_delivery" &&
+        ((status === "degraded" && row?.last_error_code === "heartbeat_stale") ||
+          ((status === "operational" || status === "unknown") && inconclusiveIsCurrent))
+          ? ("verification_delayed" as const)
+          : null,
       lastCheckedAt: asDate(row?.last_checked_at)?.toISOString() || null,
       lastVerifiedAt: asDate(row?.last_verified_at)?.toISOString() || null,
       uptime30d: totals.samples > 0 ? roundUptime((100 * totals.successful) / totals.samples) : null,
@@ -658,4 +957,10 @@ function aggregateOverallStatus(statuses: ComponentStatus[], evaluatorFresh: boo
 }
 function roundUptime(value: number): number {
   return Math.round(value * 1000) / 1000;
+}
+
+function latestDate(left: Date | null, right: Date | null): Date | null {
+  if (!left) return right;
+  if (!right) return left;
+  return left > right ? left : right;
 }

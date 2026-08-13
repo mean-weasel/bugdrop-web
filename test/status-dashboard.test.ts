@@ -120,6 +120,18 @@ describe("StatusDashboard", () => {
     expect(html).toContain("Resolved");
     expect(html).toContain("Aug 3, 2026: Degraded · No trustworthy monitoring samples were recorded · 1 confirmed incident.");
   });
+
+  it("presents an inconclusive report neutrally without changing raw operational state", () => {
+    const snapshot = snapshotWithComponents([component("issue_delivery", "degraded", "verification_delayed")]);
+    snapshot.overall = "operational";
+    snapshot.components[0] = { ...snapshot.components[0], status: "operational" };
+    snapshot.incidents = [];
+    const html = renderToStaticMarkup(StatusDashboard({ snapshot }));
+    expect(html).toContain("Issue delivery verification is delayed");
+    expect(html).toContain("Verification delayed");
+    expect(html).not.toContain("All systems are operational");
+    expect(snapshot.components[0].status).toBe("operational");
+  });
 });
 
 function component(id: string, status: "degraded" | "outage", statusDetail: "verification_delayed" | null) {

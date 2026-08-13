@@ -102,7 +102,9 @@ Store the same random `MONITOR_HEARTBEAT_SECRET` value in Vercel and as a narrow
 the BugDrop repository. Legacy empty-body success remains accepted and is the currently deployed
 sender behavior. After the receiver migration and deployment are compatibility-proven, a separately
 reviewed sender change may post exactly
-`schemaVersion`, `outcome`, `reasonCode`, and ISO `observedAt` as JSON. Verified uses
+`schemaVersion`, `outcome`, `reasonCode`, and UTC RFC3339 `observedAt` as JSON. `observedAt` may omit
+fractional seconds or include one to three digits; greater-than-millisecond precision is rejected so
+accepted evidence retains exact ordering. Verified uses
 `issue_verified`; confirmed failure uses `issue_absent`, `issue_duplicate`, or
 `issue_contract_invalid`; inconclusive uses `github_network`, `github_5xx`, `github_rate_limited`,
 `github_auth_failed`, `setup_failed`, `identity_failed`, `venue_failed`, `browser_inconclusive`,

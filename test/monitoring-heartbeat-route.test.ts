@@ -181,12 +181,34 @@ describe("heartbeat route validation", () => {
   it.each([
     "2026-08-05T01:00:00+00:00",
     "2026-08-05T01:00:00-07:00",
+    "2026-08-05T01:00:00.0000Z",
+    "2026-08-05T01:00:00.000000001Z",
+    "2026-08-05T01:00:00.000000002Z",
     "2026-02-30T01:00:00Z",
     "2999-08-05T01:00:00Z",
-  ])("rejects non-UTC, invalid, or future observedAt %s", async (observedAt) => {
+  ])("rejects non-UTC, sub-millisecond, invalid, or future observedAt %s", async (observedAt) => {
     setCompleteConfiguration();
     const response = await POST(jsonRequest(`time:${observedAt}`, { schemaVersion: 1, outcome: "inconclusive", reasonCode: "setup_failed", observedAt }));
     expect(response.status).toBe(400);
+  });
+
+  it("preserves accepted millisecond ordering so newer verification recovers failure", async () => {
+    setCompleteConfiguration();
+    const failure = await POST(jsonRequest("ordering:failure", {
+      schemaVersion: 1,
+      outcome: "delivery_failed",
+      reasonCode: "issue_absent",
+      observedAt: "2026-08-05T01:00:00.001Z",
+    }));
+    expect(await failure.json()).toMatchObject({ effect: "degraded", observedAt: "2026-08-05T01:00:00.001Z" });
+
+    const recovery = await POST(jsonRequest("ordering:recovery", {
+      schemaVersion: 1,
+      outcome: "verified",
+      reasonCode: "issue_verified",
+      observedAt: "2026-08-05T01:00:00.002Z",
+    }));
+    expect(await recovery.json()).toMatchObject({ effect: "verified", observedAt: "2026-08-05T01:00:00.002Z" });
   });
 
   it("returns recorded_only for authoritative audit-only evidence", async () => {

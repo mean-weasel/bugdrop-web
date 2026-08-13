@@ -113,7 +113,7 @@ function parseOutcomeReport(body: string, receivedAt: Date): HeartbeatOutcomeRep
   if (Object.keys(record).sort().join(",") !== "observedAt,outcome,reasonCode,schemaVersion") return null;
   if (record.schemaVersion !== 1 || !isOutcome(record.outcome) || typeof record.reasonCode !== "string" || typeof record.observedAt !== "string") return null;
   if (!(HEARTBEAT_REASON_CODES[record.outcome] as readonly string[]).includes(record.reasonCode)) return null;
-  const timestamp = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?Z$/.exec(record.observedAt);
+  const timestamp = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?Z$/.exec(record.observedAt);
   if (!timestamp) return null;
   const observedAt = new Date(record.observedAt);
   if (

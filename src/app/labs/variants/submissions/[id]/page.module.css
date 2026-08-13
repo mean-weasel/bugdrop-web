@@ -1,0 +1,10 @@
+.viewer { width: min(980px, calc(100% - 32px)); margin: 0 auto; padding: 42px 0 72px; color: #e9ecff; }
+.viewer > a { color: #9bdcff; font-size: .85rem; text-underline-offset: 4px; }
+.viewer header { margin-top: 34px; }
+.viewer header span { color: #ffad79; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.viewer h1 { margin: 10px 0 8px; font-size: clamp(2rem, 5vw, 3.4rem); letter-spacing: -.04em; }
+.viewer p { margin: 0; color: #a7acc7; line-height: 1.6; }
+.viewer section { margin-top: 30px; }
+.viewer h2 { font-size: 1rem; }
+.viewer pre { max-height: 70vh; overflow: auto; border: 1px solid #3b4261; border-radius: 14px; background: #171924; padding: 18px; color: #c7cee8; font-family: var(--font-jetbrains-mono), monospace; font-size: .75rem; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.viewer a:focus-visible, .viewer pre:focus-visible { outline: 3px solid #7dcfff; outline-offset: 4px; }

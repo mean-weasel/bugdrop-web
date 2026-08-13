@@ -9,6 +9,10 @@ const styles = readFileSync(
   "src/components/variants-lab/variants-lab.module.css",
   "utf8",
 );
+const publicRuntime = readFileSync(
+  "src/components/variants-lab/public-flow-lab.tsx",
+  "utf8",
+);
 
 describe("simplified variants lab content", () => {
   it("uses the approved compact hero and missing-block CTA", () => {
@@ -39,6 +43,15 @@ describe("simplified variants lab content", () => {
     expect(component).toContain("RECIPE_IDS.map");
   });
 
+  it("keeps the simulated recipes and adds the public runtime separately", () => {
+    expect(component).toContain(
+      'process.env.NODE_ENV === "development" ? <PublicFlowLab /> : null',
+    );
+    expect(component).toContain("RECIPE_IDS.map");
+    expect(publicRuntime).toContain("Run the real FlowConfig examples");
+    expect(publicRuntime.match(/\.registerFlow\(/g)).toHaveLength(2);
+  });
+
   it("does not reset answers when the active recipe is selected again", () => {
     expect(component).toContain("if (next === recipeId) return;");
   });
@@ -66,12 +79,12 @@ describe("simplified variants lab content", () => {
 
   it("carries model constraints and accessible labels into native controls", () => {
     expect(component).toContain("maxLength: field.maxLength");
-    expect(component).toContain('aria-labelledby={`${recipeId}-dialog-title`}');
-    expect(component).toContain('id={`${recipeId}-dialog-title`}');
+    expect(component).toContain("aria-labelledby={`${recipeId}-dialog-title`}");
+    expect(component).toContain("id={`${recipeId}-dialog-title`}");
     expect(component).toContain("field.lowLabel");
     expect(component).toContain("field.highLabel");
     expect(component).toContain("ratingScaleId");
-    expect(component).toContain('aria-label={`${value} of ${field.scale}`}');
+    expect(component).toContain("aria-label={`${value} of ${field.scale}`}");
   });
 
   it("removes obsolete customization styles", () => {

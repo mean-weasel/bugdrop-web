@@ -7,8 +7,8 @@ import {
 import { runHttpChecks } from "./checks";
 import {
   acquireEvaluatorLease,
+  applyHeartbeatEvaluation,
   applyObservation,
-  getHeartbeatBaseline,
   markEvaluatorCompleted,
   pruneMonitoringHistory,
   releaseFailedEvaluatorLease,
@@ -44,13 +44,18 @@ export async function evaluateMonitoring(now = new Date()): Promise<EvaluationSu
   try {
     const channels = configuredAlertChannels();
     const observations = await runHttpChecks(now);
-    const heartbeat = await heartbeatObservation(now);
-    if (heartbeat) observations.push(heartbeat);
 
     for (const result of observations) {
       const definition = COMPONENTS.find((component) => component.id === result.componentId);
       if (!definition) throw new Error(`Unknown monitoring component ${result.componentId}`);
       await applyObservation(definition, result.observation, channels);
+      observationCommitted = true;
+    }
+    const heartbeatDefinition = COMPONENTS.find((component) => component.id === "issue_delivery");
+    if (!heartbeatDefinition) throw new Error("Issue delivery component is not configured");
+    const heartbeat = await applyHeartbeatEvaluation(now, heartbeatDefinition, channels);
+    if (heartbeat) {
+      observations.push(heartbeat);
       observationCommitted = true;
     }
 
@@ -81,21 +86,6 @@ export async function evaluateMonitoring(now = new Date()): Promise<EvaluationSu
   }
 }
 
-async function heartbeatObservation(now: Date) {
-  const baseline = await getHeartbeatBaseline();
-  const reference = baseline.lastReceivedAt || baseline.monitoringStartedAt;
-  const ageMs = now.getTime() - reference.getTime();
-
-  if (!baseline.lastReceivedAt && ageMs < HEARTBEAT_STALE_AFTER_MS) return null;
-
-  return {
-    componentId: "issue_delivery",
-    observation: {
-      ok: Boolean(baseline.lastReceivedAt) && ageMs <= HEARTBEAT_STALE_AFTER_MS,
-      checkedAt: now,
-      latencyMs: null,
-      errorCode: ageMs > HEARTBEAT_STALE_AFTER_MS ? "heartbeat_stale" : null,
-      markVerifiedSuccess: false,
-    },
-  };
+export function isHeartbeatStale(reference: Date, now: Date): boolean {
+  return now.getTime() - reference.getTime() > HEARTBEAT_STALE_AFTER_MS;
 }

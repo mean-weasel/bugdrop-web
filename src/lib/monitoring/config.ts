@@ -3,8 +3,28 @@ import type { ComponentDefinition } from "./types";
 export const STATUS_URL = "https://bugdrop.dev/status";
 export const EVALUATOR_STALE_AFTER_MS = 15 * 60 * 1000;
 export const HEARTBEAT_FREQUENCY_MS = 4 * 60 * 60 * 1000;
-export const HEARTBEAT_GRACE_MS = 3 * 60 * 60 * 1000;
+export const HEARTBEAT_GRACE_MS = 7 * 60 * 60 * 1000;
 export const HEARTBEAT_STALE_AFTER_MS = HEARTBEAT_FREQUENCY_MS + HEARTBEAT_GRACE_MS;
+
+export const HEARTBEAT_REASON_CODES = {
+  verified: ["issue_verified"],
+  delivery_failed: ["issue_absent", "issue_duplicate", "issue_contract_invalid"],
+  inconclusive: [
+    "setup_failed",
+    "identity_failed",
+    "venue_failed",
+    "browser_inconclusive",
+    "github_network",
+    "github_5xx",
+    "github_rate_limited",
+    "github_auth_failed",
+    "cleanup_failed",
+    "sweep_failed",
+    "artifact_failed",
+    "incident_failed",
+    "classification_failed",
+  ],
+} as const;
 
 export const COMPONENTS: ComponentDefinition[] = [
   {

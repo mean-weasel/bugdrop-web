@@ -123,6 +123,17 @@ CREATE TABLE IF NOT EXISTS monitoring_heartbeat_receipts (
 );
 CREATE INDEX IF NOT EXISTS monitoring_heartbeat_recent_idx ON monitoring_heartbeat_receipts (received_at DESC);
 
+CREATE TABLE IF NOT EXISTS monitoring_heartbeat_outcomes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  request_id_hash TEXT NOT NULL UNIQUE,
+  schema_version INTEGER NOT NULL CHECK (schema_version = 1),
+  outcome TEXT NOT NULL CHECK (outcome IN ('verified', 'delivery_failed', 'inconclusive')),
+  reason_code TEXT NOT NULL,
+  observed_at TEXT NOT NULL,
+  received_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS monitoring_heartbeat_outcomes_observed_idx ON monitoring_heartbeat_outcomes (observed_at DESC);
+
 CREATE TABLE IF NOT EXISTS monitoring_alert_outbox (
   id TEXT PRIMARY KEY,
   incident_id TEXT NOT NULL REFERENCES monitoring_incidents(id),

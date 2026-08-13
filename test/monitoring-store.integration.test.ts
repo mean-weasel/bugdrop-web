@@ -5,12 +5,15 @@ import { evaluateMonitoring } from "@/lib/monitoring/evaluator";
 import { monitoringDatabase, setMonitoringDatabaseForTests } from "@/lib/monitoring/db";
 import {
   acquireEvaluatorLease,
+  applyHeartbeatEvaluation,
   applyObservation,
   claimPendingAlert,
   getPublicStatusSnapshot,
+  getHeartbeatBaseline,
   markAlertDelivered,
   pruneMonitoringHistory,
   recordHeartbeatReceipt,
+  recordHeartbeatOutcome,
   recordHeartbeatSuccess,
   releaseFailedEvaluatorLease,
   seedMonitoringComponents,
@@ -150,6 +153,381 @@ describe("monitoring D1/SQLite integration", () => {
         })
       ).results,
     ).toHaveLength(1);
+  });
+
+  it("records normalized outcomes idempotently and rejects conflicting ID reuse", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    const observedAt = new Date("2026-08-05T01:30:00.000Z");
+    await seedMonitoringComponents(observedAt);
+    const report = { schemaVersion: 1 as const, outcome: "verified" as const, reasonCode: "issue_verified", observedAt };
+    expect(await recordHeartbeatOutcome("run:1", report, observedAt, definition, [])).toEqual({ status: "inserted", effect: "verified" });
+    expect(await recordHeartbeatOutcome("run:1", report, observedAt, definition, [])).toEqual({ status: "duplicate", effect: "recorded_only" });
+    expect(await recordHeartbeatOutcome("run:1", { ...report, reasonCode: "different" }, observedAt, definition, [])).toEqual({ status: "conflict", effect: "recorded_only" });
+
+    const rows = (await monitoringDatabase().query({ sql: "SELECT * FROM monitoring_heartbeat_outcomes" })).results;
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ schema_version: 1, outcome: "verified", reason_code: "issue_verified" });
+    expect(rows[0].request_id_hash).toMatch(/^[a-f0-9]{64}$/);
+    expect(rows[0]).not.toHaveProperty("payload_hash");
+    expect(JSON.stringify(rows)).not.toContain("run:1");
+  });
+
+  it("preserves confirmed failure through inconclusive reports until newer verification", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    const started = new Date("2026-08-05T00:00:00.000Z");
+    await seedMonitoringComponents(started);
+    await recordHeartbeatOutcome("run:verified", { schemaVersion: 1, outcome: "verified", reasonCode: "issue_verified", observedAt: new Date("2026-08-05T01:00:00.000Z") }, new Date("2026-08-05T01:00:01.000Z"), definition, []);
+    await recordHeartbeatOutcome("run:failed", { schemaVersion: 1, outcome: "delivery_failed", reasonCode: "issue_absent", observedAt: new Date("2026-08-05T02:00:00.000Z") }, new Date("2026-08-05T02:00:01.000Z"), definition, []);
+    const failed = await getPublicStatusSnapshot(new Date("2026-08-05T02:01:00.000Z"));
+    expect(failed.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "degraded",
+      statusDetail: null,
+      lastVerifiedAt: "2026-08-05T01:00:00.000Z",
+    });
+    expect(failed.incidents[0]).toMatchObject({ impact: "degraded", statusDetail: null });
+
+    await recordHeartbeatOutcome("run:unknown", { schemaVersion: 1, outcome: "inconclusive", reasonCode: "github_rate_limited", observedAt: new Date("2026-08-05T03:00:00.000Z") }, new Date("2026-08-05T03:00:01.000Z"), definition, []);
+    const inconclusive = await getPublicStatusSnapshot(new Date("2026-08-05T03:01:00.000Z"));
+    expect(inconclusive.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "degraded",
+      statusDetail: null,
+      lastVerifiedAt: "2026-08-05T01:00:00.000Z",
+    });
+    expect(inconclusive.incidents[0].state).toBe("open");
+    expect((await getHeartbeatBaseline()).confirmedFailureActive).toBe(true);
+
+    await recordHeartbeatOutcome("run:recovered", { schemaVersion: 1, outcome: "verified", reasonCode: "issue_verified", observedAt: new Date("2026-08-05T04:00:00.000Z") }, new Date("2026-08-05T04:00:01.000Z"), definition, []);
+    const recovered = await getPublicStatusSnapshot(new Date("2026-08-05T04:01:00.000Z"));
+    expect(recovered.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "operational",
+      statusDetail: null,
+      lastVerifiedAt: "2026-08-05T04:00:00.000Z",
+    });
+    expect(recovered.incidents[0].state).toBe("resolved");
+  });
+
+  it("records inconclusive evidence neutrally without changing raw component truth", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    await recordHeartbeatOutcome("run:verified", { schemaVersion: 1, outcome: "verified", reasonCode: "issue_verified", observedAt: new Date("2026-08-05T01:00:00.000Z") }, new Date("2026-08-05T01:00:01.000Z"), definition, []);
+    await recordHeartbeatOutcome("run:unknown", { schemaVersion: 1, outcome: "inconclusive", reasonCode: "github_network", observedAt: new Date("2026-08-05T02:00:00.000Z") }, new Date("2026-08-05T02:00:01.000Z"), definition, []);
+    const snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T02:01:00.000Z"));
+    expect(snapshot.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "operational",
+      statusDetail: "verification_delayed",
+      lastVerifiedAt: "2026-08-05T01:00:00.000Z",
+    });
+    expect(snapshot.incidents).toHaveLength(0);
+  });
+
+  it("returns a coherent pre-failure or post-failure snapshot across an interleaved commit", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    await recordHeartbeatOutcome("coherent:verified", { schemaVersion: 1, outcome: "verified", reasonCode: "issue_verified", observedAt: new Date("2026-08-05T01:00:00.000Z") }, new Date("2026-08-05T01:00:01.000Z"), definition, []);
+    await recordHeartbeatOutcome("coherent:unknown", { schemaVersion: 1, outcome: "inconclusive", reasonCode: "github_network", observedAt: new Date("2026-08-05T02:00:00.000Z") }, new Date("2026-08-05T02:00:01.000Z"), definition, []);
+    testDatabase.afterNextBatch(async () => {
+      await recordHeartbeatOutcome("coherent:failed", { schemaVersion: 1, outcome: "delivery_failed", reasonCode: "issue_absent", observedAt: new Date("2026-08-05T03:00:00.000Z") }, new Date("2026-08-05T03:00:01.000Z"), definition, []);
+    });
+
+    const racing = await getPublicStatusSnapshot(new Date("2026-08-05T03:01:00.000Z"));
+    expect(racing.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "operational",
+      statusDetail: "verification_delayed",
+    });
+    const committed = await getPublicStatusSnapshot(new Date("2026-08-05T03:01:01.000Z"));
+    expect(committed.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "degraded",
+      statusDetail: null,
+    });
+    expect(committed.incidents.find((incident) => incident.state === "open")).toBeDefined();
+  });
+
+  it("returns a coherent pre-recovery or post-recovery snapshot across an interleaved commit", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    await recordHeartbeatOutcome("coherent:failure", { schemaVersion: 1, outcome: "delivery_failed", reasonCode: "issue_absent", observedAt: new Date("2026-08-05T01:00:00.000Z") }, new Date("2026-08-05T01:00:01.000Z"), definition, []);
+    testDatabase.afterNextBatch(async () => {
+      await recordHeartbeatOutcome("coherent:recovery", { schemaVersion: 1, outcome: "verified", reasonCode: "issue_verified", observedAt: new Date("2026-08-05T02:00:00.000Z") }, new Date("2026-08-05T02:00:01.000Z"), definition, []);
+    });
+
+    const racing = await getPublicStatusSnapshot(new Date("2026-08-05T02:01:00.000Z"));
+    expect(racing.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "degraded",
+      statusDetail: null,
+    });
+    expect(racing.incidents.find((incident) => incident.state === "open")).toBeDefined();
+    const committed = await getPublicStatusSnapshot(new Date("2026-08-05T02:01:01.000Z"));
+    expect(committed.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "operational",
+      statusDetail: null,
+    });
+    expect(committed.incidents.every((incident) => incident.state === "resolved")).toBe(true);
+  });
+
+  it("treats newer legacy success as verified for confirmed-failure precedence", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    await recordHeartbeatOutcome("run:failed", { schemaVersion: 1, outcome: "delivery_failed", reasonCode: "issue_absent", observedAt: new Date("2026-08-05T01:00:00.000Z") }, new Date("2026-08-05T01:00:01.000Z"), definition, []);
+    expect((await getHeartbeatBaseline()).confirmedFailureActive).toBe(true);
+    await recordHeartbeatSuccess("legacy:recovery", new Date("2026-08-05T02:00:00.000Z"), definition, []);
+    expect((await getHeartbeatBaseline()).confirmedFailureActive).toBe(false);
+    expect(await applyHeartbeatEvaluation(new Date("2026-08-05T02:30:00.000Z"), definition, [])).toMatchObject({
+      observation: { ok: true, errorCode: null, markVerifiedSuccess: false },
+    });
+    const snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T02:01:00.000Z"));
+    expect(snapshot.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "operational",
+      statusDetail: null,
+      lastVerifiedAt: "2026-08-05T02:00:00.000Z",
+    });
+  });
+
+  it("supersedes stale verification with a distinct confirmed-failure incident", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    const stale = await applyObservation(definition, {
+      ok: false,
+      checkedAt: new Date("2026-08-05T11:00:00.001Z"),
+      latencyMs: null,
+      errorCode: "heartbeat_stale",
+    }, []);
+    await recordHeartbeatOutcome("run:failed", {
+      schemaVersion: 1,
+      outcome: "delivery_failed",
+      reasonCode: "issue_absent",
+      observedAt: new Date("2026-08-05T12:00:00.000Z"),
+    }, new Date("2026-08-05T12:00:01.000Z"), definition, ["webhook"]);
+    const confirmed = await getPublicStatusSnapshot(new Date("2026-08-05T12:01:00.000Z"));
+    const staleIncident = confirmed.incidents.find((incident) => incident.id === stale?.incidentId)!;
+    const confirmedIncident = confirmed.incidents.find((incident) => incident.state === "open")!;
+    expect(staleIncident).toMatchObject({
+      state: "resolved",
+      impact: "degraded",
+      statusDetail: "verification_delayed",
+      message: definition.failureMessage,
+      resolvedAt: "2026-08-05T12:00:01.000Z",
+    });
+    expect(confirmedIncident).toMatchObject({
+      state: "open",
+      impact: "degraded",
+      statusDetail: null,
+      message: "BugDrop confirmed that end-to-end Issue delivery failed.",
+    });
+    expect(confirmedIncident.id).not.toBe(staleIncident.id);
+    const alerts = (await monitoringDatabase().query({
+      sql: "SELECT incident_id, event_kind FROM monitoring_alert_outbox ORDER BY event_kind",
+    })).results;
+    expect(alerts).toEqual(expect.arrayContaining([
+      expect.objectContaining({ incident_id: staleIncident.id, event_kind: "resolved" }),
+      expect.objectContaining({ incident_id: confirmedIncident.id, event_kind: "opened" }),
+    ]));
+    expect(confirmed.components.find((component) => component.id === definition.id)?.history30d.find((day) => day.date === "2026-08-05")).toMatchObject({
+      status: "degraded",
+      incidentIds: expect.arrayContaining([staleIncident.id, confirmedIncident.id]),
+    });
+
+    await recordHeartbeatOutcome("run:unknown-after-failure", {
+      schemaVersion: 1,
+      outcome: "inconclusive",
+      reasonCode: "cleanup_failed",
+      observedAt: new Date("2026-08-05T13:00:00.000Z"),
+    }, new Date("2026-08-05T13:00:01.000Z"), definition, []);
+    const afterInconclusive = await getPublicStatusSnapshot(new Date("2026-08-05T13:01:00.000Z"));
+    expect(afterInconclusive.incidents.find((incident) => incident.id === confirmedIncident.id)).toMatchObject({
+      state: "open",
+      statusDetail: null,
+      message: "BugDrop confirmed that end-to-end Issue delivery failed.",
+    });
+    expect(afterInconclusive.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "degraded",
+      statusDetail: null,
+    });
+  });
+
+  it("applies delayed authoritative failure at receipt time without backdating proof or history", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    await recordHeartbeatOutcome("proof:t1", { schemaVersion: 1, outcome: "verified", reasonCode: "issue_verified", observedAt: new Date("2026-08-05T01:00:00.000Z") }, new Date("2026-08-05T01:00:01.000Z"), definition, []);
+    await applyObservation(definition, { ok: true, checkedAt: new Date("2026-08-05T03:00:00.000Z"), latencyMs: null, errorCode: null, markVerifiedSuccess: false }, []);
+    const result = await recordHeartbeatOutcome("failure:t2", { schemaVersion: 1, outcome: "delivery_failed", reasonCode: "issue_absent", observedAt: new Date("2026-08-05T02:00:00.000Z") }, new Date("2026-08-05T04:00:00.000Z"), definition, []);
+    expect(result).toEqual({ status: "inserted", effect: "degraded" });
+    const snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T04:01:00.000Z"));
+    expect(snapshot.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "degraded",
+      lastCheckedAt: "2026-08-05T04:00:00.000Z",
+      lastVerifiedAt: "2026-08-05T01:00:00.000Z",
+    });
+    expect(snapshot.incidents.find((incident) => incident.state === "open")?.startedAt).toBe("2026-08-05T04:00:00.000Z");
+  });
+
+  it("uses deterministic equal-time precedence across v1 and legacy evidence in either order", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    const tiedAt = new Date("2026-08-05T01:00:00.000Z");
+    const verified = { schemaVersion: 1 as const, outcome: "verified" as const, reasonCode: "issue_verified", observedAt: tiedAt };
+    const failed = { schemaVersion: 1 as const, outcome: "delivery_failed" as const, reasonCode: "issue_absent", observedAt: tiedAt };
+
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    expect((await recordHeartbeatOutcome("v-first", verified, tiedAt, definition, [])).effect).toBe("verified");
+    expect((await recordHeartbeatOutcome("f-second", failed, new Date("2026-08-05T01:00:01.000Z"), definition, [])).effect).toBe("degraded");
+    expect((await recordHeartbeatOutcome("v-third", verified, new Date("2026-08-05T01:00:02.000Z"), definition, [])).effect).toBe("recorded_only");
+    expect((await getPublicStatusSnapshot(new Date("2026-08-05T01:01:00.000Z"))).components.find((item) => item.id === definition.id)?.status).toBe("degraded");
+
+    testDatabase.clear();
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    await recordHeartbeatSuccess("legacy-first", tiedAt, definition, []);
+    expect((await recordHeartbeatOutcome("failure-after-legacy", failed, new Date("2026-08-05T01:00:01.000Z"), definition, [])).effect).toBe("degraded");
+
+    testDatabase.clear();
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    await recordHeartbeatOutcome("failure-first", failed, tiedAt, definition, []);
+    await recordHeartbeatSuccess("legacy-after", tiedAt, definition, []);
+    expect(await applyHeartbeatEvaluation(new Date("2026-08-05T02:00:00.000Z"), definition, [])).toBeNull();
+    expect((await getPublicStatusSnapshot(new Date("2026-08-05T01:01:00.000Z"))).components.find((item) => item.id === definition.id)?.status).toBe("degraded");
+  });
+
+  it("serializes concurrent exact replays and conflicting reuse", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    const observedAt = new Date("2026-08-05T01:00:00.000Z");
+    const report = { schemaVersion: 1 as const, outcome: "inconclusive" as const, reasonCode: "setup_failed", observedAt };
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    const exact = await Promise.all([
+      recordHeartbeatOutcome("concurrent:exact", report, observedAt, definition, []),
+      recordHeartbeatOutcome("concurrent:exact", report, observedAt, definition, []),
+    ]);
+    expect(exact.map((item) => item.status).sort()).toEqual(["duplicate", "inserted"]);
+    const conflict = await Promise.all([
+      recordHeartbeatOutcome("concurrent:conflict", report, observedAt, definition, []),
+      recordHeartbeatOutcome("concurrent:conflict", { ...report, reasonCode: "venue_failed" }, observedAt, definition, []),
+    ]);
+    expect(conflict.map((item) => item.status).sort()).toEqual(["conflict", "inserted"]);
+  });
+
+  it("rolls back outcome, component, incident, event, alert, check, and rollup writes together", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    testDatabase.failNextBatchAt(3);
+    await expect(recordHeartbeatOutcome("rollback:1", { schemaVersion: 1, outcome: "delivery_failed", reasonCode: "issue_absent", observedAt: new Date("2026-08-05T01:00:00.000Z") }, new Date("2026-08-05T01:00:01.000Z"), definition, ["webhook"])).rejects.toThrow("injected monitoring batch failure");
+    for (const table of ["monitoring_heartbeat_outcomes", "monitoring_incidents", "monitoring_events", "monitoring_alert_outbox", "monitoring_check_results", "monitoring_daily_component_rollups"]) {
+      expect((await monitoringDatabase().query({ sql: `SELECT COUNT(*) AS count FROM ${table}` })).results[0].count).toBe(0);
+    }
+    expect((await getPublicStatusSnapshot(new Date("2026-08-05T01:01:00.000Z"))).components.find((item) => item.id === definition.id)?.status).toBe("unknown");
+  });
+
+  it("does not let inconclusive evidence mask genuine Issue delivery degradation", async () => {
+    const definition = { ...COMPONENTS.find((component) => component.id === "issue_delivery")!, failureMessage: "Issue delivery genuinely failed." };
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    await applyObservation(definition, failureAtDate("2026-08-05T01:00:00.000Z"), []);
+    await recordHeartbeatOutcome("genuine:unknown", { schemaVersion: 1, outcome: "inconclusive", reasonCode: "classification_failed", observedAt: new Date("2026-08-05T02:00:00.000Z") }, new Date("2026-08-05T02:00:01.000Z"), definition, []);
+    const snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T02:01:00.000Z"));
+    expect(snapshot.components.find((item) => item.id === definition.id)).toMatchObject({ status: "degraded", statusDetail: null });
+    expect(snapshot.incidents[0]).toMatchObject({ state: "open", statusDetail: null, message: "Issue delivery genuinely failed." });
+  });
+
+  it("suppresses a racing evaluator write after a confirmed failure wins the writer lock", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    await recordHeartbeatSuccess("linearized:proof", new Date("2026-08-05T01:00:00.000Z"), definition, []);
+    let releaseFailure!: () => void;
+    let failureEntered!: () => void;
+    const held = new Promise<void>((resolve) => { releaseFailure = resolve; });
+    const entered = new Promise<void>((resolve) => { failureEntered = resolve; });
+    testDatabase.beforeNextQueryMatching("SELECT schema_version", async () => {
+      failureEntered();
+      await held;
+    });
+    const failure = recordHeartbeatOutcome("linearized:failure", {
+      schemaVersion: 1,
+      outcome: "delivery_failed",
+      reasonCode: "issue_absent",
+      observedAt: new Date("2026-08-05T02:00:00.000Z"),
+    }, new Date("2026-08-05T02:00:01.000Z"), definition, []);
+    await entered;
+    const evaluation = applyHeartbeatEvaluation(new Date("2026-08-05T03:00:00.000Z"), definition, []);
+    releaseFailure();
+
+    expect((await failure).effect).toBe("degraded");
+    expect(await evaluation).toBeNull();
+    const snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T03:01:00.000Z"));
+    expect(snapshot.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "degraded",
+      lastCheckedAt: "2026-08-05T02:00:01.000Z",
+      lastVerifiedAt: "2026-08-05T01:00:00.000Z",
+    });
+    expect((await monitoringDatabase().query({ sql: "SELECT checked_at FROM monitoring_check_results WHERE component_id = ? ORDER BY checked_at", params: [definition.id] })).results).toHaveLength(2);
+  });
+
+  it("recomputes freshness after a racing verified recovery and never overwrites it as stale", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    await seedMonitoringComponents(new Date("2026-08-05T00:00:00.000Z"));
+    await recordHeartbeatSuccess("linearized:old-proof", new Date("2026-08-05T00:30:00.000Z"), definition, []);
+    let releaseRecovery!: () => void;
+    let recoveryEntered!: () => void;
+    const held = new Promise<void>((resolve) => { releaseRecovery = resolve; });
+    const entered = new Promise<void>((resolve) => { recoveryEntered = resolve; });
+    testDatabase.beforeNextQueryMatching("SELECT schema_version", async () => {
+      recoveryEntered();
+      await held;
+    });
+    const recovery = recordHeartbeatOutcome("linearized:recovery", {
+      schemaVersion: 1,
+      outcome: "verified",
+      reasonCode: "issue_verified",
+      observedAt: new Date("2026-08-05T12:00:00.000Z"),
+    }, new Date("2026-08-05T12:00:01.000Z"), definition, []);
+    await entered;
+    const evaluation = applyHeartbeatEvaluation(new Date("2026-08-05T13:00:00.000Z"), definition, []);
+    releaseRecovery();
+
+    expect((await recovery).effect).toBe("verified");
+    expect(await evaluation).toMatchObject({
+      componentId: definition.id,
+      observation: { ok: true, errorCode: null, markVerifiedSuccess: false },
+    });
+    const snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T13:01:00.000Z"));
+    expect(snapshot.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "operational",
+      lastCheckedAt: "2026-08-05T13:00:00.000Z",
+      lastVerifiedAt: "2026-08-05T12:00:00.000Z",
+    });
+    expect(snapshot.incidents).toHaveLength(0);
+  });
+
+  it("uses activation and verified proof at the exact eleven-hour evaluator boundary", async () => {
+    const definition = COMPONENTS.find((component) => component.id === "issue_delivery")!;
+    const startedAt = new Date("2026-08-05T00:00:00.000Z");
+    await seedMonitoringComponents(startedAt);
+    expect(await applyHeartbeatEvaluation(new Date("2026-08-05T11:00:00.000Z"), definition, [])).toBeNull();
+    const activated = await applyHeartbeatEvaluation(new Date("2026-08-05T11:00:00.001Z"), definition, []);
+    expect(activated?.observation).toMatchObject({ ok: false, errorCode: "heartbeat_stale", markVerifiedSuccess: false });
+    let snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T11:01:00.000Z"));
+    expect(snapshot.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "degraded",
+      lastVerifiedAt: null,
+    });
+
+    testDatabase.clear();
+    await seedMonitoringComponents(startedAt);
+    await recordHeartbeatSuccess("boundary:legacy", startedAt, definition, []);
+    expect((await applyHeartbeatEvaluation(new Date("2026-08-05T11:00:00.000Z"), definition, []))?.observation).toMatchObject({
+      ok: true,
+      errorCode: null,
+      markVerifiedSuccess: false,
+    });
+    expect((await applyHeartbeatEvaluation(new Date("2026-08-05T11:00:00.001Z"), definition, []))?.observation).toMatchObject({
+      ok: false,
+      errorCode: "heartbeat_stale",
+      markVerifiedSuccess: false,
+    });
+    snapshot = await getPublicStatusSnapshot(new Date("2026-08-05T11:01:00.000Z"));
+    expect(snapshot.components.find((component) => component.id === definition.id)).toMatchObject({
+      status: "degraded",
+      lastVerifiedAt: startedAt.toISOString(),
+    });
+    expect(snapshot.components.find((component) => component.id === definition.id)?.history30d.find((day) => day.date === "2026-08-05")).toMatchObject({
+      checks: 3,
+      successfulChecks: 2,
+      status: "degraded",
+    });
   });
 
   it("publishes verification_delayed only for heartbeat-stale degraded Issue delivery", async () => {

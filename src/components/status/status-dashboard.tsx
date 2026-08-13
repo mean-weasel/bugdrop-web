@@ -148,7 +148,7 @@ function overallMessage(status: PresentedStatus): string {
 
 function isVerificationDelayedOnly(snapshot: PublicStatusSnapshot): boolean {
   return (
-    snapshot.overall === "degraded" &&
+    snapshot.overall !== "outage" &&
     snapshot.evaluatorFresh &&
     snapshot.components.some((component) => component.statusDetail === "verification_delayed") &&
     snapshot.components.every((component) => component.status === "operational" || component.statusDetail === "verification_delayed")

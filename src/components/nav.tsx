@@ -4,20 +4,20 @@ import { GITHUB_REPO_URL } from "@/lib/links";
 export function Nav() {
   return (
     <nav className="flex justify-between items-center px-8 py-6 max-w-[1100px] mx-auto max-md:flex-col max-md:gap-4">
-      <Link href="/" className="text-xl font-semibold text-text-primary no-underline flex items-center gap-2">
+      <Link href="/" prefetch={false} className="text-xl font-semibold text-text-primary no-underline flex items-center gap-2">
         BugDrop
       </Link>
       <div className="flex gap-8 items-center max-sm:flex-wrap max-sm:justify-center max-sm:gap-4">
-        <Link href="/docs" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
+        <Link href="/docs" prefetch={false} className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Docs
         </Link>
-        <Link href="/use-cases" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
+        <Link href="/use-cases" prefetch={false} className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Use Cases
         </Link>
-        <Link href="/compare" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
+        <Link href="/compare" prefetch={false} className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Compare
         </Link>
-        <Link href="/status" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
+        <Link href="/status" prefetch={false} className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Status
         </Link>
         <a
@@ -30,6 +30,7 @@ export function Nav() {
         </a>
         <Link
           href="/#try-bugdrop"
+          prefetch={false}
           data-analytics-event="nav_try_widget_click"
           data-analytics-label="Try Widget"
           className="inline-flex items-center rounded-[10px] border border-accent-cyan/40 bg-accent-cyan/10 px-3 py-1.5 text-sm font-medium text-accent-cyan transition-all hover:-translate-y-0.5 hover:border-accent-cyan hover:bg-accent-cyan/15"

@@ -25,6 +25,21 @@ const context = await browser.newContext({
   hasTouch: true,
   reducedMotion: "reduce",
 });
+await context.addInitScript(() => {
+  globalThis.__bugdropLcpEntries = [];
+  new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) {
+      globalThis.__bugdropLcpEntries.push({
+        startTime: entry.startTime,
+        renderTime: entry.renderTime,
+        loadTime: entry.loadTime,
+        size: entry.size,
+        tag: entry.element?.tagName ?? null,
+        text: entry.element?.textContent?.trim().replace(/\s+/g, " ").slice(0, 160) ?? null,
+      });
+    }
+  }).observe({ type: "largest-contentful-paint", buffered: true });
+});
 await context.route(/https:\/\/www\.googletagmanager\.com\/.*/, async (route) => {
   await route.fulfill({ status: 200, contentType: "application/javascript", body: "" });
 });
@@ -86,15 +101,60 @@ for (const route of routes) {
 
 const page = await context.newPage();
 const initialRequests = [];
+const initialRscResponses = [];
+const initialResponseTasks = [];
 const videoResponses = [];
 page.on("request", (request) => initialRequests.push(request.url()));
 page.on("response", (response) => {
-  if (/youtube-nocookie\.com/.test(response.url())) {
-    videoResponses.push({ url: response.url(), status: response.status() });
-  }
+  initialResponseTasks.push((async () => {
+    const headers = await response.allHeaders();
+    if ((headers["content-type"] ?? "").includes("text/x-component")) {
+      const request = response.request();
+      const requestHeaders = await request.allHeaders();
+      initialRscResponses.push({
+        url: response.url(),
+        status: response.status(),
+        contentType: headers["content-type"],
+        nextRouterPrefetch: requestHeaders["next-router-prefetch"] ?? null,
+        startEpochMs: request.timing().startTime,
+      });
+    }
+    if (/youtube-nocookie\.com/.test(response.url())) {
+      videoResponses.push({ url: response.url(), status: response.status() });
+    }
+  })());
 });
 await page.goto(new URL("/", baseUrl).href, { waitUntil: "domcontentloaded" });
 await page.waitForTimeout(1200);
+await Promise.all(initialResponseTasks);
+
+const homepageRenderTimeline = await page.evaluate(() => ({
+  timeOrigin: performance.timeOrigin,
+  lcp: globalThis.__bugdropLcpEntries.at(-1) ?? null,
+  headerLinks: [...document.querySelectorAll("nav a[href]")].map((link) => ({
+    text: link.textContent?.trim() ?? "",
+    href: link.getAttribute("href"),
+  })),
+}));
+const initialRscSnapshot = initialRscResponses.slice();
+const headerDestinations = new Set(
+  homepageRenderTimeline.headerLinks
+    .map(({ href }) => href)
+    .filter((href) => href?.startsWith("/") && !href.includes("#")),
+);
+const headerRscRequests = initialRscSnapshot.map((request) => ({
+  ...request,
+  pathname: new URL(request.url).pathname,
+  startRelativeMs: request.startEpochMs - homepageRenderTimeline.timeOrigin,
+})).filter((request) => headerDestinations.has(request.pathname));
+const headerRscBeforeLcp = headerRscRequests.filter((request) =>
+  homepageRenderTimeline.lcp && request.startRelativeMs < homepageRenderTimeline.lcp.startTime,
+);
+const prohibitedHeaderPrefetches = headerRscRequests.filter(({ pathname }) =>
+  ["/", "/docs", "/status"].includes(pathname),
+);
+if (initialRscSnapshot.length) failures.push(`homepage prefetched RSC payloads before LCP proof: ${initialRscSnapshot.map(({ url }) => url).join(", ")}`);
+if (!homepageRenderTimeline.lcp || homepageRenderTimeline.lcp.tag !== "H1") failures.push("homepage H1 was not observed as LCP");
 
 const initialWidgetRequests = initialRequests.filter((url) => /\/widget(?:\.v[\d.]+)?\.js(?:\?|$)/.test(url));
 if (initialWidgetRequests.length) failures.push(`initial widget requests: ${initialWidgetRequests.join(", ")}`);
@@ -236,6 +296,42 @@ for (const [name, pass] of Object.entries(conversions)) {
   if (!pass) failures.push(`missing conversion/attribution contract: ${name}`);
 }
 
+const proveSpaHeaderNavigation = async ({ href, activation }) => {
+  const navigationPage = await context.newPage();
+  await navigationPage.goto(new URL("/", baseUrl).href, { waitUntil: "domcontentloaded" });
+  const timeOriginBefore = await navigationPage.evaluate(() => performance.timeOrigin);
+  const link = navigationPage.locator(`nav a[href="${href}"]`);
+  if (activation === "keyboard") {
+    await link.focus();
+    await navigationPage.keyboard.press("Enter");
+  } else {
+    await link.click();
+  }
+  await navigationPage.waitForURL(new URL(href, baseUrl).href);
+  const timeOriginAfter = await navigationPage.evaluate(() => performance.timeOrigin);
+  const proof = {
+    href,
+    activation,
+    destination: navigationPage.url(),
+    timeOriginBefore,
+    timeOriginAfter,
+    spaPreserved: timeOriginBefore === timeOriginAfter,
+  };
+  if (!proof.spaPreserved) failures.push(`${activation} header navigation to ${href} reloaded the document`);
+  await navigationPage.close();
+  return proof;
+};
+const headerNavigation = {
+  initialRscResponses: initialRscSnapshot,
+  allObservedRscResponses: initialRscResponses,
+  homepageRenderTimeline,
+  headerRscRequests,
+  headerRscBeforeLcp,
+  prohibitedHeaderPrefetches,
+  pointer: await proveSpaHeaderNavigation({ href: "/docs", activation: "pointer" }),
+  keyboard: await proveSpaHeaderNavigation({ href: "/use-cases", activation: "keyboard" }),
+};
+
 const result = {
   evidenceType: "local browser accessibility, keyboard, and 390x844 mobile interaction proof",
   fieldDataStatus: "Browser interaction evidence only; not field Core Web Vitals.",
@@ -271,6 +367,7 @@ const result = {
   },
   palette,
   conversions,
+  headerNavigation,
   failures,
   passed: failures.length === 0,
 };

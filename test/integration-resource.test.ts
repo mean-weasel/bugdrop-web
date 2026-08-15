@@ -56,6 +56,16 @@ describe("T012 integration and resource contracts", () => {
     expect(globals).not.toContain("--color-text-subtle: #787c99");
   });
 
+  it("keeps header links crawlable and disables automatic route prefetch", async () => {
+    const nav = await readFile("src/components/nav.tsx", "utf8");
+
+    expect(nav.match(/<Link\b/g)).toHaveLength(6);
+    expect(nav.match(/prefetch=\{false\}/g)).toHaveLength(6);
+    for (const href of ["/", "/docs", "/use-cases", "/compare", "/status", "/#try-bugdrop"]) {
+      expect(nav).toContain(`href="${href}"`);
+    }
+  });
+
   it("publishes exactly the two approved reusable resources", async () => {
     expect(resourceNav.map(({ slug }) => slug).sort()).toEqual([
       "client-website-qa-checklist",

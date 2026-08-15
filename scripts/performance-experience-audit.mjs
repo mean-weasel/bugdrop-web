@@ -25,6 +25,21 @@ const context = await browser.newContext({
   hasTouch: true,
   reducedMotion: "reduce",
 });
+await context.addInitScript(() => {
+  globalThis.__bugdropLcpEntries = [];
+  new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) {
+      globalThis.__bugdropLcpEntries.push({
+        startTime: entry.startTime,
+        renderTime: entry.renderTime,
+        loadTime: entry.loadTime,
+        size: entry.size,
+        tag: entry.element?.tagName ?? null,
+        text: entry.element?.textContent?.trim().replace(/\s+/g, " ").slice(0, 160) ?? null,
+      });
+    }
+  }).observe({ type: "largest-contentful-paint", buffered: true });
+});
 await context.route(/https:\/\/www\.googletagmanager\.com\/.*/, async (route) => {
   await route.fulfill({ status: 200, contentType: "application/javascript", body: "" });
 });
@@ -86,15 +101,63 @@ for (const route of routes) {
 
 const page = await context.newPage();
 const initialRequests = [];
+const initialRequestRecords = [];
+const initialRscResponses = [];
+const initialResponseTasks = [];
 const videoResponses = [];
-page.on("request", (request) => initialRequests.push(request.url()));
+page.on("request", (request) => {
+  initialRequests.push(request.url());
+  initialRequestRecords.push({ url: request.url(), resourceType: request.resourceType() });
+});
 page.on("response", (response) => {
-  if (/youtube-nocookie\.com/.test(response.url())) {
-    videoResponses.push({ url: response.url(), status: response.status() });
-  }
+  initialResponseTasks.push((async () => {
+    const headers = await response.allHeaders();
+    if ((headers["content-type"] ?? "").includes("text/x-component")) {
+      const request = response.request();
+      const requestHeaders = await request.allHeaders();
+      initialRscResponses.push({
+        url: response.url(),
+        status: response.status(),
+        contentType: headers["content-type"],
+        nextRouterPrefetch: requestHeaders["next-router-prefetch"] ?? null,
+        startEpochMs: request.timing().startTime,
+      });
+    }
+    if (/youtube-nocookie\.com/.test(response.url())) {
+      videoResponses.push({ url: response.url(), status: response.status() });
+    }
+  })());
 });
 await page.goto(new URL("/", baseUrl).href, { waitUntil: "domcontentloaded" });
 await page.waitForTimeout(1200);
+await Promise.all(initialResponseTasks);
+
+const homepageRenderTimeline = await page.evaluate(() => ({
+  timeOrigin: performance.timeOrigin,
+  lcp: globalThis.__bugdropLcpEntries.at(-1) ?? null,
+  headerLinks: [...document.querySelectorAll("nav a[href]")].map((link) => ({
+    text: link.textContent?.trim() ?? "",
+    href: link.getAttribute("href"),
+  })),
+}));
+const initialRscSnapshot = initialRscResponses.slice();
+const initialStylesheetRequests = initialRequestRecords.filter(({ resourceType }) => resourceType === "stylesheet");
+const headerDestinations = new Set(
+  homepageRenderTimeline.headerLinks
+    .map(({ href }) => href)
+    .filter((href) => href?.startsWith("/") && !href.includes("#")),
+);
+const headerRscRequests = initialRscSnapshot.map((request) => ({
+  ...request,
+  pathname: new URL(request.url).pathname,
+  startRelativeMs: request.startEpochMs - homepageRenderTimeline.timeOrigin,
+})).filter((request) => headerDestinations.has(request.pathname));
+const headerRscBeforeLcp = headerRscRequests.filter((request) =>
+  homepageRenderTimeline.lcp && request.startRelativeMs < homepageRenderTimeline.lcp.startTime,
+);
+if (initialRscSnapshot.length) failures.push(`homepage prefetched RSC payloads before LCP proof: ${initialRscSnapshot.map(({ url }) => url).join(", ")}`);
+if (initialStylesheetRequests.length) failures.push(`homepage requested external stylesheets: ${initialStylesheetRequests.map(({ url }) => url).join(", ")}`);
+if (!homepageRenderTimeline.lcp || homepageRenderTimeline.lcp.tag !== "H1") failures.push("homepage H1 was not observed as LCP");
 
 const initialWidgetRequests = initialRequests.filter((url) => /\/widget(?:\.v[\d.]+)?\.js(?:\?|$)/.test(url));
 if (initialWidgetRequests.length) failures.push(`initial widget requests: ${initialWidgetRequests.join(", ")}`);
@@ -110,16 +173,18 @@ const palette = await page.evaluate(async () => {
   const stylesheetUrls = [...document.querySelectorAll('link[rel="stylesheet"]')]
     .map((link) => link instanceof HTMLLinkElement ? link.href : "")
     .filter(Boolean);
-  const emittedCss = (await Promise.all(stylesheetUrls.map(async (url) => {
-    const response = await fetch(url);
-    return response.ok ? response.text() : "";
-  }))).join("\n").toLowerCase();
+  const inlineStyles = [...document.querySelectorAll("style")]
+    .map((style) => style.textContent ?? "")
+    .filter(Boolean);
+  const emittedCss = inlineStyles.join("\n").toLowerCase();
   const computedColor = (selector) => {
     const element = document.querySelector(selector);
     return element ? getComputedStyle(element).color : null;
   };
   return {
     stylesheetUrls,
+    inlineStyleCount: inlineStyles.length,
+    inlineCssBytes: new TextEncoder().encode(inlineStyles.join("\n")).byteLength,
     emitted: {
       correctedMuted: emittedCss.includes("#b8c2e8"),
       correctedSubtle: emittedCss.includes("#b4bde5"),
@@ -132,6 +197,8 @@ const palette = await page.evaluate(async () => {
     },
   };
 });
+if (palette.stylesheetUrls.length) failures.push(`homepage retained stylesheet links: ${palette.stylesheetUrls.join(", ")}`);
+if (!palette.inlineStyleCount || !palette.inlineCssBytes) failures.push("homepage is missing inlined CSS");
 if (!palette.emitted.correctedMuted || !palette.emitted.correctedSubtle) failures.push("emitted CSS is missing the corrected text palette");
 if (palette.emitted.staleMuted || palette.emitted.staleSubtle) failures.push("emitted CSS retains stale text palette tokens");
 if (palette.computed.muted !== "rgb(184, 194, 232)") failures.push(`computed muted text color was ${palette.computed.muted}`);
@@ -236,6 +303,53 @@ for (const [name, pass] of Object.entries(conversions)) {
   if (!pass) failures.push(`missing conversion/attribution contract: ${name}`);
 }
 
+const proveSpaHeaderNavigation = async ({ href, activation }) => {
+  const navigationPage = await context.newPage();
+  await navigationPage.goto(new URL("/", baseUrl).href, { waitUntil: "domcontentloaded" });
+  const timeOriginBefore = await navigationPage.evaluate(() => performance.timeOrigin);
+  const link = navigationPage.locator(`nav a[href="${href}"]`);
+  if (activation === "keyboard") {
+    await link.focus();
+    await navigationPage.keyboard.press("Enter");
+  } else {
+    await link.click();
+  }
+  await navigationPage.waitForURL(new URL(href, baseUrl).href);
+  await navigationPage.waitForTimeout(250);
+  const after = await navigationPage.evaluate(() => ({
+    timeOrigin: performance.timeOrigin,
+    background: getComputedStyle(document.body).backgroundColor,
+    textColor: getComputedStyle(document.body).color,
+    stylesheetUrls: [...document.querySelectorAll('link[rel="stylesheet"]')].map((link) => link.href),
+    inlineStyleCount: document.querySelectorAll("style").length,
+    overflowPx: Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
+  }));
+  const proof = {
+    href,
+    activation,
+    destination: navigationPage.url(),
+    timeOriginBefore,
+    timeOriginAfter: after.timeOrigin,
+    spaPreserved: timeOriginBefore === after.timeOrigin,
+    styling: after,
+  };
+  if (!proof.spaPreserved) failures.push(`${activation} header navigation to ${href} reloaded the document`);
+  if (!after.inlineStyleCount && !after.stylesheetUrls.length) failures.push(`${activation} header navigation to ${href} lost route styling`);
+  if (after.overflowPx > 1) failures.push(`${activation} header navigation to ${href} introduced overflow`);
+  await navigationPage.close();
+  return proof;
+};
+const headerNavigation = {
+  initialRscResponses: initialRscSnapshot,
+  allObservedRscResponses: initialRscResponses,
+  initialStylesheetRequests,
+  homepageRenderTimeline,
+  headerRscRequests,
+  headerRscBeforeLcp,
+  pointer: await proveSpaHeaderNavigation({ href: "/docs", activation: "pointer" }),
+  keyboard: await proveSpaHeaderNavigation({ href: "/use-cases", activation: "keyboard" }),
+};
+
 const result = {
   evidenceType: "local browser accessibility, keyboard, and 390x844 mobile interaction proof",
   fieldDataStatus: "Browser interaction evidence only; not field Core Web Vitals.",
@@ -271,6 +385,7 @@ const result = {
   },
   palette,
   conversions,
+  headerNavigation,
   failures,
   passed: failures.length === 0,
 };

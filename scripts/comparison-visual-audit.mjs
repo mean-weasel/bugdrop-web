@@ -113,28 +113,55 @@ try {
         const touchScrollLeft = await scroller.evaluate((element) => element.scrollLeft);
         assert(touchScrollLeft > 0, `${slug}/mobile: touch gesture did not move the table scroller`);
 
-        await scroller.evaluate((element) => { element.scrollLeft = 0; });
-        await scroller.focus();
-        for (let press = 0; press < 24; press += 1) await page.keyboard.press("ArrowRight");
-        const keyboardScrollLeft = await scroller.evaluate((element) => element.scrollLeft);
-        assert(keyboardScrollLeft > 0, `${slug}/mobile: keyboard arrows did not move the table scroller`);
+        const pollScroller = async (predicate, message) => {
+          const deadline = Date.now() + 1500;
+          let state;
+          do {
+            state = await scroller.evaluate((element) => ({
+              scrollLeft: element.scrollLeft,
+              maxScrollLeft: element.scrollWidth - element.clientWidth,
+            }));
+            if (predicate(state)) return state;
+            await page.waitForTimeout(16);
+          } while (Date.now() < deadline);
+          throw new Error(`${slug}/mobile: ${message}: ${JSON.stringify(state)}`);
+        };
 
-        const finalState = await scroller.evaluate((container) => {
-          container.scrollLeft = container.scrollWidth;
+        await scroller.evaluate((element) => { element.scrollLeft = 0; });
+        const resetState = await pollScroller(({ scrollLeft }) => scrollLeft === 0, "table scroller did not settle at reset zero");
+        await scroller.focus();
+        const focusOwned = await scroller.evaluate((element) => document.activeElement === element);
+        assert(focusOwned, `${slug}/mobile: table scroller did not own focus`);
+        await page.keyboard.press("ArrowRight");
+        const keyboardState = await pollScroller(({ scrollLeft }) => scrollLeft > 0, "real ArrowRight input did not move the table scroller");
+
+        for (let press = 0; press < 48; press += 1) await page.keyboard.press("ArrowRight");
+        const finalState = await pollScroller(
+          ({ scrollLeft, maxScrollLeft }) => scrollLeft === maxScrollLeft,
+          "real ArrowRight input did not reach the end of the table",
+        );
+
+        const finalVisibility = await scroller.evaluate((container) => {
           const table = container.querySelector("table");
           const containerRect = container.getBoundingClientRect();
           const finalCells = [...(table?.querySelectorAll("tr") ?? [])].map((row) => row.lastElementChild?.getBoundingClientRect());
           return {
-            scrollLeft: container.scrollLeft,
-            maxScrollLeft: container.scrollWidth - container.clientWidth,
             finalCellsVisible: finalCells.every((rect) => rect && rect.left >= containerRect.left - 1 && rect.right <= containerRect.right + 1),
           };
         });
         assert(finalState.scrollLeft === finalState.maxScrollLeft, `${slug}/mobile: could not reach the end of the table`);
-        assert(finalState.finalCellsVisible, `${slug}/mobile: final header/cells are not fully visible at maximum scroll`);
+        assert(finalVisibility.finalCellsVisible, `${slug}/mobile: final header/cells are not fully visible at maximum scroll`);
         const scrolledScreenshot = `${output}/mobile-scrolled-${slug}.png`;
         await page.screenshot({ path: scrolledScreenshot, fullPage: true });
-        interactionAudit = { touchScrollLeft, keyboardScrollLeft, scrolledScreenshot, ...finalState };
+        interactionAudit = {
+          touchScrollLeft,
+          resetScrollLeft: resetState.scrollLeft,
+          focusOwned,
+          keyboardScrollLeft: keyboardState.scrollLeft,
+          scrolledScreenshot,
+          ...finalState,
+          ...finalVisibility,
+        };
       }
       results.push({ slug, viewport: viewport.name, screenshot, ...audit, interactionAudit });
       await page.close();

@@ -43,6 +43,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   experimental: {
+    inlineCss: true,
     mdxRs: {
       mdxType: "gfm",
     },

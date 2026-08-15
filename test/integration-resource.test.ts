@@ -56,6 +56,27 @@ describe("T012 integration and resource contracts", () => {
     expect(globals).not.toContain("--color-text-subtle: #787c99");
   });
 
+  it("enables only documented inline CSS while preserving branded fonts", async () => {
+    const config = await readFile("next.config.ts", "utf8");
+    const layout = await readFile("src/app/layout.tsx", "utf8");
+
+    expect(config).toContain("inlineCss: true");
+    expect(layout).toContain('import { Space_Grotesk, JetBrains_Mono } from "next/font/google"');
+    expect(layout).toContain('variable: "--font-space-grotesk"');
+    expect(layout).toContain('variable: "--font-jetbrains-mono"');
+    expect(layout).toContain('display: "swap"');
+  });
+
+  it("keeps all header links crawlable while disabling automatic prefetch", async () => {
+    const nav = await readFile("src/components/nav.tsx", "utf8");
+
+    expect(nav.match(/<Link\b/g)).toHaveLength(6);
+    expect(nav.match(/prefetch=\{false\}/g)).toHaveLength(6);
+    for (const href of ["/", "/docs", "/use-cases", "/compare", "/status", "/#try-bugdrop"]) {
+      expect(nav).toContain(`href="${href}"`);
+    }
+  });
+
   it("publishes exactly the two approved reusable resources", async () => {
     expect(resourceNav.map(({ slug }) => slug).sort()).toEqual([
       "client-website-qa-checklist",

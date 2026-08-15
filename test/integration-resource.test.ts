@@ -56,17 +56,14 @@ describe("T012 integration and resource contracts", () => {
     expect(globals).not.toContain("--color-text-subtle: #787c99");
   });
 
-  it("keeps the heading font non-blocking without preloading the secondary mono font", async () => {
+  it("keeps text rendering independent of downloadable fonts", async () => {
     const layout = await readFile("src/app/layout.tsx", "utf8");
+    const globals = await readFile("src/app/globals.css", "utf8");
 
-    const spaceGrotesk = layout.match(/const spaceGrotesk = Space_Grotesk\(\{[\s\S]*?\n\}\);/)?.[0];
-    const jetbrainsMono = layout.match(/const jetbrainsMono = JetBrains_Mono\(\{[\s\S]*?\n\}\);/)?.[0];
-
-    expect(spaceGrotesk).toContain('display: "optional"');
-    expect(spaceGrotesk).not.toContain("preload: false");
-    expect(jetbrainsMono).toContain('display: "optional"');
-    expect(jetbrainsMono).toContain("preload: false");
-    expect(layout).toContain("`${spaceGrotesk.variable} ${jetbrainsMono.variable}`");
+    expect(layout).not.toContain("next/font");
+    expect(layout).toContain('<html lang="en">');
+    expect(globals).toContain('--font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif');
+    expect(globals).toContain('--font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace');
   });
 
   it("publishes exactly the two approved reusable resources", async () => {

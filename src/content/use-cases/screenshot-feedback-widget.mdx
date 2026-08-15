@@ -1,52 +1,52 @@
-# Screenshot Feedback Widget for Visual Bug Reports
+# Screenshot Feedback Widget
 
-BugDrop is a screenshot feedback widget for teams that need users to show the problem, not just describe it. A report can include the current page screenshot, annotations, redacted regions, the page URL, and browser metadata.
+A screenshot feedback widget helps a reporter capture a visible UI state, point to the relevant region, and send that artifact with environment context. BugDrop supports full-page, selected-element, and selected-area captures in its manual flow, followed by annotation and redaction review.
 
-**Best for:** visual QA, docs issues, responsive layout bugs, client review, preview deployments, and product screens where a screenshot is faster than a reproduction essay.
+**Use this guide when:** the capture and privacy mechanics are the decision. For the repeatable QA process around the artifact, read [Visual Bug Reporting](/use-cases/visual-bug-reporting).
 
-[Try the screenshot widget](/demo) or [read the screenshot configuration docs](/docs/configuration).
+[Try screenshot capture](/demo) or [open the isolated widget sandbox](/sandbox).
 
-## Why Screenshots Matter
+## Choose the right screenshot mode
 
-Website bugs are often visual: clipped text, broken spacing, missing images, wrong colors, hidden buttons, mobile overflow, dark-mode issues, or browser-specific rendering problems. A written report like "the page looks broken" rarely gives developers enough context.
+BugDrop provides three configuration modes:
 
-A screenshot turns the report into a concrete artifact. An annotation points to the exact area, and metadata explains the environment where it happened.
+- **Optional:** the reporter may use full page, element, or area capture, annotate or redact it, or skip the screenshot.
+- **Required:** the reporter must add a screenshot through the manual capture and review flow.
+- **Automatic:** BugDrop attempts a full-page screenshot after form submission without showing the manual picker or redaction review.
 
-## Screenshot Feedback Flow
+Optional is the safest default for a pilot because it lets the reporter inspect the image and continue without one. Required is useful when visual evidence is essential and the page is suitable for capture. Automatic reduces interaction but should be limited to pages where sensitive regions are stable, marked, and supported by the DOM capture path.
 
-1. Add the BugDrop script tag to the page where visual reports should be available.
-2. Users click the feedback button when they see a broken UI state.
-3. BugDrop captures the page, lets the user annotate the relevant area, and supports manual redaction before submit.
-4. The widget sends the screenshot, description, page URL, viewport, browser, OS, and labels to GitHub Issues.
-5. Developers triage the issue beside the code, pull requests, and release workflow.
+## What capture does and does not prove
 
-## BugDrop Screenshot Reports Include
+A screenshot is strong evidence for clipped text, overlap, missing content, spacing, colors, or an unexpected responsive state. It is weak evidence for timing, intermittent interaction, network failures, and multi-step behavior. Ask reporters to include expected behavior and reproduction steps when a still image cannot tell the whole story.
 
-- Page screenshot
-- User annotation
-- Manual redaction before submit
-- Developer-controlled masking with `data-bugdrop-mask`
-- Page URL
-- Viewport size
-- Browser and operating system
-- Feedback category and labels
+BugDrop adds URL, browser, OS, language, and viewport fields to the issue. These fields help reproduce the environment, but they do not identify the root cause automatically.
 
-## Feature Summary
+## Full page, area, or element
 
-| Capability | BugDrop screenshot widget |
-|---|---|
-| Screenshot capture | Current page state with reporter context |
-| Annotation | User can point to the broken area |
-| Redaction | Reporter can hide sensitive regions before submit |
-| Developer masking | `data-bugdrop-mask` covers marked private UI |
-| Output | GitHub Issue with screenshot, URL, metadata, and labels |
+Use **full page** when the relationship between distant sections matters. Use **selected area** when the reporter wants to crop around a compact region. Use **selected element** when one control or component is the clearest target; BugDrop can include selector metadata and a visible border for that selection.
 
-## Privacy Controls
+Selected-element context is configurable. Increasing surrounding context can help a developer understand nearby layout, but it also creates a larger artifact and may expose more content. Keep the captured region as small as the report allows.
 
-Screenshots can expose private information. BugDrop supports user redaction and developer-defined masking for sensitive elements. Password and payment fields should be treated carefully, and teams should review [screenshot masking](/docs/security) before deploying the widget to authenticated product pages.
+## Annotation, redaction, and masking
 
-## GitHub-Native Output
+Manual capture lets the reporter draw, add an arrow, and redact visible regions before submitting. Redactions are embedded in the uploaded image. Site owners can also mark DOM elements with `data-bugdrop-mask`, `data-bugdrop-redact`, or another supported attribute so BugDrop covers measured boxes in supported DOM-rendered captures.
 
-Instead of sending screenshots to a separate dashboard, BugDrop creates a GitHub Issue. That keeps visual bug reports close to the code, release process, assignees, labels, and comments developers already use.
+Masking has important limits:
 
-Start with [installation](/docs/installation), then configure screenshot behavior in [configuration](/docs/configuration). Use the [demo](/demo) to try the capture and submission flow first.
+- It does not discover unmarked secrets or inspect pixels inside media and embedded content.
+- Native viewport fallback cannot apply element masks.
+- A layout change during capture can make a measured mask stale.
+- Automatic mode does not show the reporter a review step.
+
+Password inputs and supported credit-card autocomplete fields are masked automatically on supported DOM-rendered paths, but teams should still test their exact page. If sensitive pixels cannot be enclosed reliably, disable screenshots there.
+
+## A useful visual-report example
+
+A reviewer notices that a modal footer is cut off at a particular viewport. They choose the modal element, add an arrow to the hidden action, and describe the expected footer behavior. The issue contains the selected visual context and environment details. A developer can reproduce the viewport and inspect the component, while the screenshot remains evidence of the report rather than a substitute for verification.
+
+## Test before collecting real reports
+
+On a staging page, exercise every enabled capture path. Confirm the final PNG includes the intended area, annotations remain visible, marked private content is fully covered, unmarked sensitive content is absent, and the screenshot branch is excluded from CI. Also test failure and skip paths so feedback can still be submitted when capture is unavailable.
+
+Read [screenshot configuration](/docs/configuration#screenshot-behavior), [masking limits](/docs/security#screenshot-masking), and [installation](/docs/installation) before launch.

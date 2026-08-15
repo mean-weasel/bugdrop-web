@@ -1,0 +1,365 @@
+{
+  "pages": [
+    {
+      "path": "/",
+      "kind": "home",
+      "primaryQuery": "BugDrop",
+      "title": "BugDrop — Website Feedback to GitHub Issues",
+      "description": "BugDrop turns website feedback, screenshots, annotations, and browser context into GitHub Issues from one lightweight widget.",
+      "related": [
+        { "path": "/use-cases", "anchor": "Explore website feedback use cases", "rationale": "Find the BugDrop workflow that matches your team." },
+        { "path": "/compare", "anchor": "Compare website feedback tools", "rationale": "Evaluate BugDrop alongside other feedback workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Understand the website feedback widget", "rationale": "See how the broad feedback-to-GitHub workflow works." },
+        { "path": "/use-cases/github-issues-feedback", "anchor": "Send website feedback to GitHub Issues", "rationale": "Keep reports in the developer triage workflow." },
+        { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Capture screenshot feedback", "rationale": "Explore annotations, redaction, and visual context." },
+        { "path": "/use-cases/free-website-feedback-widget", "anchor": "Choose a free website feedback widget", "rationale": "Learn when a focused free tool is sufficient." },
+        { "path": "/resources/visual-bug-report-template", "anchor": "Use the visual bug report template", "rationale": "Give reporters a portable structure before installing a tool." },
+        { "path": "/resources/client-website-qa-checklist", "anchor": "Run the client website QA checklist", "rationale": "Use a printable review asset for launch and handoff." }
+      ]
+    },
+    {
+      "path": "/use-cases",
+      "kind": "use-case-hub",
+      "primaryQuery": "website feedback use cases",
+      "title": "Website Feedback Use Cases",
+      "description": "Explore website feedback use cases for GitHub Issues, visual bug reporting, open-source projects, internal tools, Next.js sites, and client review.",
+      "related": []
+    },
+    {
+      "path": "/use-cases/website-feedback-widget",
+      "kind": "use-case",
+      "group": "Core feedback workflows",
+      "primaryQuery": "website feedback widget",
+      "title": "Website Feedback Widget",
+      "description": "Use a website feedback widget to capture screenshots, page context, and user notes as structured GitHub Issues.",
+      "icon": "💬",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare workflows for different teams and reporting jobs." },
+        { "path": "/use-cases/github-issues-feedback", "anchor": "Send website feedback to GitHub Issues", "rationale": "Follow the destination and developer-triage workflow." },
+        { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Add screenshot context to feedback", "rationale": "See the capture, annotation, and redaction workflow." },
+        { "path": "/use-cases/free-website-feedback-widget", "anchor": "When a free feedback widget is enough", "rationale": "Evaluate cost, scope, and the limits of a focused tool." },
+        { "path": "/compare", "anchor": "Compare website feedback tools", "rationale": "Choose between GitHub-native and hosted feedback workflows." }
+      ]
+    },
+    {
+      "path": "/use-cases/free-website-feedback-widget",
+      "kind": "use-case",
+      "group": "Core feedback workflows",
+      "primaryQuery": "free website feedback widget",
+      "title": "Free Website Feedback Widget",
+      "description": "Learn when a free website feedback widget is sufficient, what BugDrop includes, and when a broader paid feedback suite may fit better.",
+      "icon": "Free",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare free feedback with other reporting jobs." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Review the complete website feedback workflow", "rationale": "Understand the broader category and product workflow." },
+        { "path": "/compare/open-source-feedback-tools", "anchor": "Compare open-source feedback tools", "rationale": "Evaluate free and inspectable options beyond one widget." }
+      ]
+    },
+    {
+      "path": "/use-cases/github-issues-feedback",
+      "kind": "use-case",
+      "group": "Core feedback workflows",
+      "primaryQuery": "send website feedback to GitHub Issues",
+      "title": "Send Website Feedback to GitHub Issues",
+      "description": "Send website feedback to GitHub Issues with screenshots, page URLs, labels, browser context, and developer-ready fields.",
+      "icon": "📋",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "See where GitHub-native reporting fits among other workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "See the website feedback widget workflow", "rationale": "Understand the reporter experience before GitHub triage." },
+        { "path": "/use-cases/nextjs-feedback-widget", "anchor": "Add feedback to a Next.js site", "rationale": "Connect the GitHub Issues destination to a framework entry point." }
+      ]
+    },
+    {
+      "path": "/use-cases/screenshot-feedback-widget",
+      "kind": "use-case",
+      "group": "Core feedback workflows",
+      "primaryQuery": "screenshot feedback widget",
+      "title": "Screenshot Feedback Widget",
+      "description": "Use a screenshot feedback widget for annotated visual reports with redaction, page URLs, viewport details, and browser metadata.",
+      "icon": "📸",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare screenshot capture with other reporting workflows." },
+        { "path": "/use-cases/visual-bug-reporting", "anchor": "Build a visual bug reporting process", "rationale": "Move from the capture tool to a repeatable QA practice." },
+        { "path": "/demo", "anchor": "Try screenshot feedback in the live demo", "rationale": "Experience the visual reporting flow directly." }
+      ]
+    },
+    {
+      "path": "/use-cases/visual-bug-reporting",
+      "kind": "use-case",
+      "group": "Core feedback workflows",
+      "primaryQuery": "visual bug reporting",
+      "title": "Visual Bug Reporting",
+      "description": "Build a visual bug reporting process that gives developers screenshots, annotations, system context, and clearer reproduction evidence.",
+      "icon": "🖼️",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Place visual bug reporting within the wider feedback workflow." },
+        { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Choose a screenshot feedback widget", "rationale": "See the capture tool behind visual reporting." },
+        { "path": "/use-cases/client-projects", "anchor": "Apply visual reporting to client review", "rationale": "Use visual evidence during staging feedback rounds." },
+        { "path": "/use-cases/internal-tools", "anchor": "Apply visual reporting to internal tools", "rationale": "Reduce reporting friction in authenticated dashboards." },
+        { "path": "/resources/visual-bug-report-template", "anchor": "Copy a visual bug report template", "rationale": "Standardize expected behavior, steps, evidence, privacy, and triage." }
+      ]
+    },
+    {
+      "path": "/use-cases/nextjs-feedback-widget",
+      "kind": "use-case",
+      "group": "Audience and integration workflows",
+      "primaryQuery": "Next.js feedback widget",
+      "title": "Next.js Feedback Widget",
+      "description": "Add a feedback widget to a Next.js site and route screenshot reports to GitHub Issues without a framework-specific package.",
+      "icon": "▲",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare the Next.js entry point with other workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Understand the website feedback widget", "rationale": "Review the framework-independent product workflow." },
+        { "path": "/use-cases/github-issues-feedback", "anchor": "Route Next.js feedback to GitHub Issues", "rationale": "See the developer destination and triage fields." },
+        { "path": "/docs/installation", "anchor": "Install the widget", "rationale": "Follow the maintained script-loading contract." },
+        { "path": "/docs/ci-testing", "anchor": "Test the widget in CI", "rationale": "Verify feedback integration during delivery." },
+        { "path": "/use-cases/vercel-preview-feedback", "anchor": "Limit feedback to Vercel previews", "rationale": "Apply the Next.js integration to preview review without loading it in production." }
+      ]
+    },
+    {
+      "path": "/use-cases/vercel-preview-feedback",
+      "kind": "use-case",
+      "group": "Audience and integration workflows",
+      "primaryQuery": "Vercel preview feedback",
+      "title": "Vercel Preview Feedback",
+      "description": "Collect feedback on Vercel Preview Deployments while proving the preview-only BugDrop integration is absent from production.",
+      "icon": "Preview",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare preview review with other reporting workflows." },
+        { "path": "/use-cases/nextjs-feedback-widget", "anchor": "Add BugDrop to a Next.js layout", "rationale": "Start with the tested framework loading contract." },
+        { "path": "/use-cases/client-projects", "anchor": "Design the client review round", "rationale": "Connect the preview surface to review ownership and closure." },
+        { "path": "/docs/ci-testing", "anchor": "Prove preview loading and production exclusion", "rationale": "Run current event and Shadow DOM assertions." },
+        { "path": "/resources/client-website-qa-checklist", "anchor": "Use a client website QA checklist", "rationale": "Give reviewers a portable asset even without an installed widget." }
+      ]
+    },
+    {
+      "path": "/use-cases/open-source",
+      "kind": "use-case",
+      "group": "Audience and integration workflows",
+      "primaryQuery": "bug reporting for open-source projects",
+      "title": "Bug Reporting for Open-Source Projects",
+      "description": "Collect structured bug reports from an open-source community with screenshots and context routed to the project's GitHub Issues.",
+      "icon": "🌐",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare maintainer workflows with other audiences." },
+        { "path": "/use-cases/open-source-feedback-widget", "anchor": "Choose an open-source feedback widget", "rationale": "Evaluate inspectability, adaptation, and self-hosting." },
+        { "path": "/use-cases/github-issues-feedback", "anchor": "Structure community reports in GitHub Issues", "rationale": "See the fields and triage workflow maintainers receive." }
+      ]
+    },
+    {
+      "path": "/use-cases/open-source-feedback-widget",
+      "kind": "use-case",
+      "group": "Audience and integration workflows",
+      "primaryQuery": "open-source feedback widget",
+      "title": "Open-Source Feedback Widget",
+      "description": "Choose an open-source feedback widget based on license, inspectability, self-hosting requirements, and fit with your issue workflow.",
+      "icon": "OSS",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare open-source tooling with other reporting jobs." },
+        { "path": "/use-cases/open-source", "anchor": "Plan bug reporting for an open-source project", "rationale": "Move from tool selection to the maintainer workflow." },
+        { "path": "/compare/open-source-feedback-tools", "anchor": "Compare open-source website feedback tools", "rationale": "Evaluate multiple approaches and tradeoffs." },
+        { "path": "/docs/self-hosting", "anchor": "Review the self-hosting guide", "rationale": "Understand the infrastructure path before adopting it." }
+      ]
+    },
+    {
+      "path": "/use-cases/internal-tools",
+      "kind": "use-case",
+      "group": "Audience and integration workflows",
+      "primaryQuery": "feedback widget for internal tools",
+      "title": "Feedback Widget for Internal Tools",
+      "description": "Add a feedback widget to internal tools and authenticated dashboards so coworkers can report visual issues into engineering triage.",
+      "icon": "🔧",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare internal reporting with public and client workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Review the website feedback widget", "rationale": "Understand the shared reporting interaction." },
+        { "path": "/use-cases/visual-bug-reporting", "anchor": "Improve visual bug reports from dashboards", "rationale": "Give engineering clearer evidence from complex internal UI." },
+        { "path": "/use-cases/github-issues-feedback", "anchor": "Send internal feedback to GitHub Issues", "rationale": "Keep coworker reports in developer triage." }
+      ]
+    },
+    {
+      "path": "/use-cases/client-projects",
+      "kind": "use-case",
+      "group": "Client review workflows",
+      "primaryQuery": "client feedback workflow for web projects",
+      "title": "Client Feedback Workflow for Web Projects",
+      "description": "Run a client feedback workflow for staging review that turns stakeholder notes, screenshots, and page context into trackable GitHub Issues.",
+      "icon": "🤝",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare agency review with other reporting workflows." },
+        { "path": "/use-cases/client-website-feedback-tool", "anchor": "Choose a client website feedback tool", "rationale": "Evaluate the tool requirements behind the review process." },
+        { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Collect screenshot feedback from clients", "rationale": "Give stakeholders a precise visual reporting method." },
+        { "path": "/compare/bugherd", "anchor": "Compare BugDrop with BugHerd for client review", "rationale": "Contrast GitHub-native and hosted task-board workflows." },
+        { "path": "/resources/client-website-qa-checklist", "anchor": "Run the client website QA checklist", "rationale": "Give the review round a portable scope and exit contract." }
+      ]
+    },
+    {
+      "path": "/use-cases/client-website-feedback-tool",
+      "kind": "use-case",
+      "group": "Client review workflows",
+      "primaryQuery": "client website feedback tool",
+      "title": "Client Website Feedback Tool",
+      "description": "Choose a client website feedback tool for design QA, staging review, launch prep, and developer-ready visual issue reports.",
+      "icon": "QA",
+      "related": [
+        { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare client review tooling with other reporting jobs." },
+        { "path": "/use-cases/client-projects", "anchor": "Design a client feedback workflow", "rationale": "See how the tool fits agency review operations." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Review the website feedback widget", "rationale": "Understand the broad product workflow behind the tool." },
+        { "path": "/compare/userback", "anchor": "Compare BugDrop with Userback for client feedback", "rationale": "Evaluate a broader hosted feedback platform." },
+        { "path": "/compare/marker-io", "anchor": "Compare BugDrop with Marker.io for website review", "rationale": "Contrast managed review workflows with GitHub-native triage." }
+      ]
+    },
+    {
+      "path": "/compare",
+      "kind": "compare-hub",
+      "primaryQuery": "website feedback tool comparisons",
+      "title": "Website Feedback Tool Comparisons",
+      "description": "Compare website feedback tools by reporting workflow, issue destination, visual context, hosting model, and team fit.",
+      "related": []
+    },
+    {
+      "path": "/compare/userback",
+      "kind": "compare",
+      "group": "Visual feedback platforms",
+      "primaryQuery": "Userback alternative",
+      "title": "Userback Alternative",
+      "description": "Compare BugDrop with Userback when choosing between GitHub-native screenshot reports and a broader hosted feedback platform.",
+      "related": [
+        { "path": "/compare", "anchor": "Browse all website feedback tool comparisons", "rationale": "Compare other reporting and feedback workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Review BugDrop's website feedback workflow", "rationale": "Understand the product category before comparing tools." },
+        { "path": "/use-cases/client-website-feedback-tool", "anchor": "Choose a tool for client website feedback", "rationale": "Apply the comparison to design QA and staging review." }
+      ]
+    },
+    {
+      "path": "/compare/marker-io",
+      "kind": "compare",
+      "group": "Visual feedback platforms",
+      "primaryQuery": "Marker.io alternative",
+      "title": "Marker.io Alternative",
+      "description": "Compare BugDrop with Marker.io for screenshot bug reports, GitHub Issues routing, stakeholder review, and hosted workflow needs.",
+      "related": [
+        { "path": "/compare", "anchor": "Browse all website feedback tool comparisons", "rationale": "Compare other reporting and feedback workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Review BugDrop's website feedback workflow", "rationale": "Understand the product category before comparing tools." },
+        { "path": "/use-cases/client-website-feedback-tool", "anchor": "Choose a client website feedback tool", "rationale": "Apply the comparison to stakeholder review and design QA." }
+      ]
+    },
+    {
+      "path": "/compare/bugherd",
+      "kind": "compare",
+      "group": "Visual feedback platforms",
+      "primaryQuery": "BugHerd alternative",
+      "title": "BugHerd Alternative",
+      "description": "Compare BugDrop with BugHerd when choosing between GitHub-native visual reports and a hosted website annotation task board.",
+      "related": [
+        { "path": "/compare", "anchor": "Browse all website feedback tool comparisons", "rationale": "Compare other reporting and feedback workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Review BugDrop's website feedback workflow", "rationale": "Understand the product category before comparing tools." },
+        { "path": "/use-cases/client-projects", "anchor": "Build a client feedback workflow", "rationale": "Apply the comparison to staging and agency review." }
+      ]
+    },
+    {
+      "path": "/compare/usersnap",
+      "kind": "compare",
+      "group": "Visual feedback platforms",
+      "primaryQuery": "Usersnap alternative",
+      "title": "Usersnap Alternative",
+      "description": "Compare BugDrop with Usersnap when choosing between GitHub-native bug reports and a broader customer feedback suite.",
+      "related": [
+        { "path": "/compare", "anchor": "Browse all website feedback tool comparisons", "rationale": "Compare other reporting and feedback workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Review BugDrop's website feedback workflow", "rationale": "Understand the product category before comparing tools." },
+        { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Explore screenshot feedback", "rationale": "See the visual reporting job at the center of this comparison." }
+      ]
+    },
+    {
+      "path": "/compare/canny",
+      "kind": "compare",
+      "group": "Product feedback and observability",
+      "primaryQuery": "Canny alternative for bug reporting",
+      "title": "Canny Alternative for Bug Reporting",
+      "description": "Compare BugDrop's visual bug reporting workflow with Canny's feature-request voting, roadmap, and product feedback workflow.",
+      "related": [
+        { "path": "/compare", "anchor": "Browse all website feedback tool comparisons", "rationale": "Compare other reporting and feedback workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Review BugDrop's website feedback workflow", "rationale": "Understand the bug-reporting job before comparing tools." },
+        { "path": "/use-cases/github-issues-feedback", "anchor": "See how bug reports reach GitHub Issues", "rationale": "Follow the engineering-triage workflow that distinguishes BugDrop." }
+      ]
+    },
+    {
+      "path": "/compare/sentry-user-feedback",
+      "kind": "compare",
+      "group": "Product feedback and observability",
+      "primaryQuery": "Sentry User Feedback alternative",
+      "title": "Sentry User Feedback Alternative",
+      "description": "Compare BugDrop's annotated visual reports to GitHub Issues with Sentry's feedback, observability, and replay context.",
+      "related": [
+        { "path": "/compare", "anchor": "Browse all website feedback tool comparisons", "rationale": "Compare other reporting and feedback workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Review BugDrop's website feedback workflow", "rationale": "Understand the product category before comparing tools." },
+        { "path": "/use-cases/visual-bug-reporting", "anchor": "Plan a visual bug reporting process", "rationale": "Contrast annotated visual evidence with observability context." },
+        { "path": "/use-cases/github-issues-feedback", "anchor": "Route feedback to GitHub Issues", "rationale": "See BugDrop's developer-triage destination." }
+      ]
+    },
+    {
+      "path": "/compare/open-source-feedback-tools",
+      "kind": "compare",
+      "group": "Open-source evaluation",
+      "primaryQuery": "open-source website feedback tools",
+      "title": "Open-Source Website Feedback Tools",
+      "description": "Compare open-source website feedback tools by issue destination, visual context, privacy controls, setup, self-hosting, and maintenance fit.",
+      "related": [
+        { "path": "/compare", "anchor": "Browse all website feedback tool comparisons", "rationale": "Compare open-source options with hosted feedback workflows." },
+        { "path": "/use-cases/website-feedback-widget", "anchor": "Review BugDrop's website feedback workflow", "rationale": "Understand the single-widget implementation path." },
+        { "path": "/use-cases/open-source-feedback-widget", "anchor": "Choose an open-source feedback widget", "rationale": "Move from multi-option evaluation to widget requirements." },
+        { "path": "/use-cases/open-source", "anchor": "Plan feedback for an open-source project", "rationale": "Apply tool selection to a maintainer and community workflow." }
+      ]
+    },
+    {
+      "path": "/compare/markup-io",
+      "kind": "compare",
+      "group": "Visual feedback platforms",
+      "primaryQuery": "MarkUp.io alternative",
+      "title": "MarkUp.io Alternative",
+      "description": "Compare BugDrop with MarkUp.io when choosing between direct GitHub Issue intake and a multi-format visual review workspace.",
+      "related": [
+        { "path": "/compare", "anchor": "Browse all website feedback tool comparisons", "rationale": "Compare other reporting and feedback workflows." },
+        { "path": "/use-cases/client-website-feedback-tool", "anchor": "Choose a client website feedback tool", "rationale": "Apply the review-workspace tradeoff to client and agency feedback." },
+        { "path": "/compare/marker-io", "anchor": "Compare another managed visual feedback workflow", "rationale": "Contrast MarkUp.io's multi-format review with a tracker-integrated reporting platform." },
+        { "path": "/use-cases/github-issues-feedback", "anchor": "Review direct GitHub Issues feedback", "rationale": "See the developer-triage workflow that distinguishes BugDrop." }
+      ]
+    },
+    {
+      "path": "/compare/jam-dev",
+      "kind": "compare",
+      "group": "Developer bug capture",
+      "primaryQuery": "Jam.dev alternative",
+      "title": "Jam.dev Alternative",
+      "description": "Compare BugDrop with Jam for GitHub-native screenshot reports versus recordings, replay, developer logs, and coding-agent context.",
+      "related": [
+        { "path": "/compare", "anchor": "Browse all website feedback tool comparisons", "rationale": "Compare other reporting and feedback workflows." },
+        { "path": "/use-cases/github-issues-feedback", "anchor": "Route website reports to GitHub Issues", "rationale": "See BugDrop's direct issue-creation workflow." },
+        { "path": "/use-cases/visual-bug-reporting", "anchor": "Plan a visual bug reporting process", "rationale": "Choose the evidence depth reporters and developers need." },
+        { "path": "/compare/sentry-user-feedback", "anchor": "Compare feedback with observability context", "rationale": "Evaluate a different workflow for richer debugging evidence." }
+      ]
+    },
+    {
+      "path": "/resources/visual-bug-report-template",
+      "kind": "resource",
+      "primaryQuery": "visual bug report template",
+      "title": "Visual Bug Report Template",
+      "description": "Copy, download, or print a visual bug report template for reproduction, environment, evidence, privacy review, and triage.",
+      "related": [
+        { "path": "/use-cases/visual-bug-reporting", "anchor": "Plan a visual bug reporting process", "rationale": "Use the template inside a repeatable reporting workflow." },
+        { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Capture screenshot feedback", "rationale": "Evaluate an in-page capture path for the visual evidence." },
+        { "path": "/resources/client-website-qa-checklist", "anchor": "Use the client website QA checklist", "rationale": "Pair individual reports with a bounded review round." }
+      ]
+    },
+    {
+      "path": "/resources/client-website-qa-checklist",
+      "kind": "resource",
+      "primaryQuery": "client website QA checklist",
+      "title": "Client Website QA Checklist",
+      "description": "Print or download a client website QA checklist for scope, responsive review, content, accessibility, privacy, and launch handoff.",
+      "related": [
+        { "path": "/use-cases/client-projects", "anchor": "Design a client feedback workflow", "rationale": "Place the checklist inside a review round with owners and closure." },
+        { "path": "/use-cases/vercel-preview-feedback", "anchor": "Collect feedback on Vercel previews", "rationale": "Use the checklist on a tested preview surface." },
+        { "path": "/resources/visual-bug-report-template", "anchor": "Write a visual bug report", "rationale": "Turn failed checks into reproducible individual issues." }
+      ]
+    }
+  ]
+}

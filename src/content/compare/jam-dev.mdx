@@ -1,0 +1,29 @@
+# Jam.dev Alternative for GitHub-Native Bug Reports
+
+Jam and BugDrop both reduce the effort of reporting a visual problem, but their evidence models differ. Jam packages screenshots or recordings with deep developer context into a shareable Jam. BugDrop uses an embedded screenshot-and-annotation flow that creates a GitHub Issue directly. [JM-01](#source-jam-creating "Claim JM-01") [JM-03](#source-bugdrop-repo-jam "Claim JM-03")
+
+## Quick comparison
+
+| Decision factor | BugDrop | Jam |
+|---|---|---|
+| Capture entry point | Embedded website widget or JavaScript API | Chrome extension or iOS app [JM-01](#source-jam-creating "Claim JM-01") |
+| Visual evidence | Reporter-selected screenshot with annotation and redaction | Screenshot, video recording, or instant replay [JM-01](#source-jam-creating "Claim JM-01") |
+| Developer context | Page, browser, viewport, and reporter details | Console logs, network requests, user events, and device metadata [JM-01](#source-jam-creating "Claim JM-01") |
+| Triage handoff | Creates a GitHub Issue directly | Share a Jam link to GitHub Issues or other connected workflows [JM-01](#source-jam-creating "Claim JM-01") |
+| AI workflow | No MCP interface | MCP exposes available recording and developer context to coding tools [JM-02](#source-jam-mcp "Claim JM-02") |
+
+## Screenshot-first versus reproduction context
+
+Jam's current capture documentation describes screenshot, video, and instant-replay modes. Each capture can include console logs, network requests, user events, and device information. That makes Jam the stronger documented choice when an engineer needs to reconstruct behavior that a still image cannot explain. [JM-01](#source-jam-creating "Claim JM-01")
+
+BugDrop is intentionally smaller. It collects a deliberate annotated screenshot, the page and browser context, and reporter text, then creates the GitHub Issue. It does not record the session, console, or network traffic. [JM-03](#source-bugdrop-repo-jam "Claim JM-03")
+
+## GitHub and coding-agent handoff
+
+Jam documents pasting or sending a Jam link into a GitHub Issue and other trackers. Its MCP documentation also describes exposing recordings, user events, console logs, network requests, transcripts, and metadata to supported coding tools. The Jam remains a separate artifact that the ticket or agent opens. [JM-01](#source-jam-creating "Claim JM-01") [JM-02](#source-jam-mcp "Claim JM-02")
+
+BugDrop creates the GitHub Issue as the primary record, with its screenshot stored in the selected repository. That direct destination is simpler when GitHub is the only required system, but it cannot match Jam's replay, telemetry, mobile recorder, or MCP context. [JM-01](#source-jam-creating "Claim JM-01") [JM-02](#source-jam-mcp "Claim JM-02") [JM-03](#source-bugdrop-repo-jam "Claim JM-03")
+
+## A practical decision
+
+Choose BugDrop when a site-embedded, annotated screenshot should become a GitHub Issue without a separate debugging artifact. Choose Jam when QA, support, or engineering needs recordings and technical context that can travel into multiple trackers or coding agents. These conclusions come from current documentation, not hands-on competitor testing.

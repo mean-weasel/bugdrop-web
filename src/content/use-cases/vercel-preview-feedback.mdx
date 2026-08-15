@@ -1,0 +1,55 @@
+# Vercel Preview Feedback
+
+Vercel preview feedback turns an ephemeral deployment into a focused review surface: a reviewer reports the page and visible state while engineering receives a GitHub Issue. The key implementation job is loading that review channel in Preview Deployments while proving the same preview-only script is absent from Production.
+
+**Use this guide when:** Vercel deployment scope and preview review are the decision. For framework placement, read [Next.js Feedback Widget](/use-cases/nextjs-feedback-widget); for agency review operations, read [Client Feedback Workflow](/use-cases/client-projects).
+
+[Try a report in the demo](/demo) before adding the preview gate.
+
+## Gate the widget with Vercel's environment
+
+Vercel documents `VERCEL_ENV` as a build-and-runtime system value whose supported values are `production`, `preview`, and `development`. Read it in a Server Component so it does not need a public environment-variable prefix. Render the normal synchronous BugDrop script only for `preview`:
+
+```tsx
+// components/vercel-preview-bugdrop.tsx
+export function VercelPreviewBugDrop({ repo }: { repo: string }) {
+  if (process.env.VERCEL_ENV !== "preview") return null;
+
+  return (
+    <script
+      src="https://bugdrop.neonwatty.workers.dev/widget.js"
+      data-repo={repo}
+      data-label="Preview feedback"
+      data-screenshot="optional"
+    />
+  );
+}
+```
+
+Mount that component once in the shared layout for the routes under review. Do not add `async`, `defer`, or a `next/script` strategy: BugDrop's official loading contract keeps repository configuration on the script element available at execution time.
+
+## Define what a preview report means
+
+Vercel creates Preview Deployments for non-production Git branches in the standard Git workflow and gives deployments generated URLs. BugDrop records the current page URL and environment context, but it does not automatically attach the resulting issue to a pull request or infer an owner from a Vercel branch.
+
+Define a triage convention before inviting reviewers. Ask for expected behavior, affected area, and whether the problem blocks approval. Use repository labels to separate preview reports from live incidents. If branch or pull-request association is mandatory, add it during triage or build a separately reviewed integration rather than implying BugDrop performs that join.
+
+## Protect preview data
+
+Preview access controls and BugDrop submission controls are separate. A protected Preview Deployment does not turn the hosted BugDrop endpoint into authenticated employee intake. Review whether the page exposes unreleased product details, customer data, credentials, or third-party embeds. Mark stable private DOM regions, keep screenshots optional when manual review and redaction are important, and disable capture when sensitive pixels cannot be bounded reliably.
+
+Treat the `bugdrop-screenshots` branch as user-generated content. Exclude it from privileged CI and deployment triggers. Limit the GitHub App to the intended repository and decide who closes reports after a preview is deleted or promoted.
+
+## Prove preview loads and production does not
+
+Build and visit a Preview Deployment with a `bugdrop:ready` listener registered before navigation. Assert exactly one configured script, one `#bugdrop-host`, and a visible `.bd-trigger`. Open it and assert `.bd-modal` and `.bd-close`. Navigate between reviewed routes and confirm the host count stays one.
+
+Then visit the Production URL and assert the script carrying `data-label="Preview feedback"` is absent. This negative assertion matters: a passing preview smoke test cannot prove production exclusion. If production intentionally has a different BugDrop channel, distinguish its label and configuration so the test targets only the preview integration.
+
+The executable selectors and examples live in [CI Testing with Playwright](/docs/ci-testing). The repository also retains a noindex integration lab that exercises both branches with the checksum-pinned widget.
+
+## Run a bounded review pilot
+
+Choose one pull request and one non-sensitive preview. Have a developer submit a layout defect, a reviewer submit an expected-copy correction, and a third participant try an out-of-scope request. Confirm the preview URL, viewport, description, and optional screenshot provide enough evidence, then validate labels, assignment, duplicate handling, and closure.
+
+Continue with [installation](/docs/installation), [security](/docs/security), and the [visual bug-report template](/resources/visual-bug-report-template). If the review requires a reusable launch sweep instead of an installed widget, use the [client website QA checklist](/resources/client-website-qa-checklist), which remains useful with JavaScript disabled and without a BugDrop install.

@@ -1,27 +1,63 @@
 # Client Website Feedback Tool
 
-BugDrop is a client website feedback tool for agencies, freelancers, and product teams that need structured review notes during design QA, staging review, and launch prep. Clients can report issues from the page they are reviewing without needing a GitHub account.
+A client website feedback tool should be selected by the evidence clients can provide, the review experience they can understand, and the destination the delivery team will actually triage. BugDrop is the focused GitHub-native option; it is not a complete client approval or project-management platform.
 
-## The Client Review Problem
+**Use this guide when:** you are evaluating tool requirements for design QA, staging review, or launch preparation. For running the review round, read [Client Feedback Workflow for Web Projects](/use-cases/client-projects).
 
-Client feedback often arrives as screenshots in email threads, comments in documents, chat messages, or vague notes like "the homepage looks odd on my phone." Those reports are hard to track and harder to convert into developer-ready tasks.
+[Try BugDrop as a reviewer](/demo) or [browse visual feedback comparisons](/compare).
 
-BugDrop turns client feedback into GitHub Issues with screenshots, annotations, page URLs, browser metadata, and labels. Developers get a task they can reproduce and close.
+## Start with the reporter
 
-## Useful During
+Clients should be able to identify a problem without learning the repository or engineering vocabulary. Evaluate whether the tool supports:
 
-- Staging site review
-- Pre-launch QA
-- Design implementation review
-- Content and copy review
-- Post-launch bug collection
+- a visible control on the page under review;
+- a short description and expected outcome;
+- optional screenshot capture for visual defects;
+- annotation and manual redaction;
+- page and browser context captured at submission;
+- a clear success state that does not expose private project information.
 
-## No GitHub Account Required
+BugDrop supplies this focused reporter path and does not require the reporter to have a GitHub or BugDrop account. For private repositories, only collaborators can open the GitHub Issue; configure whether its link appears after submission.
 
-Clients should not need to understand your repository, issue templates, or triage workflow. They use the feedback widget on the website, and BugDrop creates the GitHub Issue behind the scenes.
+## Evaluate the delivery handoff
 
-## Keep Feedback Close to Delivery
+A report is useful only if it reaches the system the team maintains. BugDrop creates a GitHub Issue with category and system information, plus an optional screenshot stored in the repository. This avoids copying client notes from another dashboard when GitHub is already the delivery record.
 
-Once the issue is in GitHub, your team can assign it, label it, link it to a pull request, discuss the fix, and close it when shipped. The client gets a simple reporting experience; the team gets a normal engineering workflow.
+Choose a broader product when the agency needs two-way tracker synchronization, a hosted client portal, formal approvals, deadlines, asset review across PDFs or videos, or status notifications managed outside GitHub. [Marker.io](/compare/marker-io), [Userback](/compare/userback), [BugHerd](/compare/bugherd), and [MarkUp.io](/compare/markup-io) document different strengths.
 
-Start with the [installation guide](/docs/installation) and review [configuration](/docs/configuration) for labels, widget placement, screenshots, and submitter fields.
+## Review evidence quality
+
+For website QA, test whether the tool makes these reports actionable:
+
+1. A responsive overlap with viewport context.
+2. A copy or asset correction tied to the exact route.
+3. A browser-specific visual state.
+4. A request that is actually a new feature rather than a bug.
+5. A sensitive page where screenshot capture should be skipped or redacted.
+
+BugDrop can capture full-page, area, or element screenshots in the manual flow. It records browser, OS, language, viewport, and URL, but it does not capture replay or prove the cause. The client still needs to state what they expected.
+
+## Check privacy and access
+
+Client and staging environments often contain unreleased or private information. Confirm:
+
+- who can load the review site and who can submit feedback;
+- whether hosted unauthenticated submission is acceptable;
+- which DOM regions are marked for supported masking;
+- whether reporters review screenshots before sending;
+- who can access the target repository and screenshot branch;
+- how artifacts are retained after the project.
+
+If verified reporter identity is required, self-host with host-app authentication. Optional name and email fields are reporter-provided, not identity proof.
+
+## Check implementation fit
+
+BugDrop loads from a normal synchronous script tag without `async` or `defer` and is configured through data attributes on that element. It can be limited to the staging layout and removed when review ends. Appearance controls include theme, accent color, position, label, font, radius, background, text, border, and shadow.
+
+The GitHub App requires Issues and Contents access for issue creation and screenshot storage. Treat the screenshot branch as user-generated content and keep it out of privileged automation.
+
+## Make the selection with a trial
+
+Have one client-like reviewer and one developer complete the same three tasks in each shortlisted tool. Measure reporting friction, missing context, triage steps, privacy handling, and cleanup—not the length of the feature list.
+
+If direct GitHub intake wins, follow [installation](/docs/installation) and [security](/docs/security). If the workflow needs managed client collaboration, choose the product whose official documentation covers that job and test it directly before purchase.

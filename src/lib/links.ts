@@ -3,9 +3,6 @@ export const MARKETPLACE_URL =
 
 export const PRODUCT_HUNT_URL = "https://www.producthunt.com/products/bugdrop-2";
 
-export const PRODUCT_HUNT_BADGE_URL =
-  "https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1141615&theme=light&t=1778415221018";
-
 export const GITHUB_ORG_URL = "https://github.com/mean-weasel";
 
 export const MEAN_WEASEL_PROJECT_URL = "https://mean-weasel.com/projects/bugdrop";
@@ -27,7 +24,20 @@ export const DEMO_PATH = "/demo";
 
 export const DEMO_URL = "https://bugdrop-widget-test.vercel.app";
 
+export const WIDGET_ORIGIN = "https://bugdrop.neonwatty.workers.dev";
+
 export const WIDGET_URL =
-  process.env.NEXT_PUBLIC_BUGDROP_WIDGET_URL ?? "https://bugdrop.neonwatty.workers.dev/widget.js";
+  process.env.NEXT_PUBLIC_BUGDROP_WIDGET_URL ?? `${WIDGET_ORIGIN}/widget.js`;
+
+export function widgetScriptTag(repo = "owner/repo", attributes: Record<string, string> = {}) {
+  const lines = ["<script", `  src="${WIDGET_URL}"`, `  data-repo="${repo}"`];
+
+  for (const [name, value] of Object.entries(attributes)) {
+    lines.push(`  ${name}="${value}"`);
+  }
+
+  lines.push("></script>");
+  return lines.join("\n");
+}
 
 export const SAMPLE_DEMO_REPO = "mean-weasel/bugdrop-widget-test";

@@ -1,26 +1,50 @@
-# GitHub Issues Feedback
+# Send Website Feedback to GitHub Issues
 
-BugDrop is a website feedback widget for teams that want user reports to become GitHub Issues without a separate dashboard. A reporter clicks the feedback button, describes the problem, attaches or annotates a screenshot, and BugDrop creates a formatted issue in the repository you choose.
+Sending website feedback to GitHub Issues removes the handoff between a reporter-facing form and engineering triage. BugDrop creates the issue directly, adds structured environment context, and stores an optional screenshot in the selected repository.
 
-## Why Use GitHub Issues for Feedback?
+**Use this guide when:** GitHub is the required destination and you need to design the issue body, labels, permissions, and triage flow. This is not the broad [website feedback widget](/use-cases/website-feedback-widget) category guide.
 
-Many teams already triage bugs, assign work, discuss fixes, and close tasks in GitHub. Moving user feedback into a separate SaaS dashboard creates another inbox to monitor and another workflow to maintain. BugDrop keeps feedback where engineering work already happens.
+[Try a report in the demo](/demo) or [review the installation contract](/docs/installation).
 
-Each report includes the user's description, feedback category, page URL, browser details, viewport size, operating system, and optional screenshot. That context makes the issue actionable without a long follow-up thread.
+## What reaches GitHub
 
-## What BugDrop Adds
+Every submission includes the reporter's title, description, and one built-in category: Bug, Feature, or Question. BugDrop also records browser, operating system, viewport, language, and current URL in a System Info section. When configured and provided, submitter name and email are included in the issue body.
 
-- **One script tag** -- add the widget to a production site, docs site, internal tool, or staging environment
-- **No reporter account** -- users do not need GitHub accounts to submit feedback
-- **Issue labels** -- bug, feature, and question reports can map to GitHub labels
-- **Visual context** -- screenshots and annotations show the exact UI state
-- **Privacy controls** -- reporters can redact screenshot regions and developers can mark private UI with `data-bugdrop-mask`
-- **GitHub-native triage** -- assign, label, comment, prioritize, and close issues in your existing workflow
+Screenshots are optional by default. When a screenshot is attached, BugDrop stores the PNG under `.bugdrop/screenshots/` on the dedicated `bugdrop-screenshots` branch and links it from the issue. The app needs Issues read/write permission to create the report and Contents read/write permission for screenshot storage.
 
-## Example Workflow
+## Design the issue for triage
 
-A user sees a pricing table that wraps incorrectly on mobile. They tap the BugDrop button, write "The Pro plan card overlaps the CTA on my phone," circle the overlapping area, and submit. GitHub receives an issue with the screenshot, URL, viewport, browser, and OS. The developer can reproduce the layout immediately.
+The widget can reduce missing context, but teams still need a small operating contract:
 
-## Set It Up
+1. **Category ownership:** decide who reviews Bug, Feature, and Question submissions.
+2. **Label mapping:** use the hosted defaults or configure self-hosted category labels. Do not trust page-provided raw labels as an authorization boundary.
+3. **Repository choice:** send reports to the repository where someone is accountable for triage.
+4. **Response expectation:** define whether reporters receive follow-up outside GitHub, especially when they do not have repository access.
+5. **Screenshot handling:** keep the screenshot branch out of privileged workflows and define cleanup expectations.
 
-Start with the [installation guide](/docs/installation), then review [configuration](/docs/configuration) for labels, screenshot behavior, submitter fields, and button placement. If screenshots may include sensitive data, read the [security guide](/docs/security) before adding BugDrop to production pages.
+GitHub then supplies the normal engineering tools: assignees, comments, projects, milestones, links to pull requests, and closure. BugDrop does not mirror status to a separate reporter portal.
+
+## Example: mobile layout report
+
+A visitor sees a plan card overlap the purchase button on a narrow screen. They submit the expected result and the visible problem, then select the affected area for a screenshot. The issue records the route and viewport automatically, while the screenshot shows the layout state.
+
+The developer now has evidence to reproduce the bug at the reported viewport. They should still confirm the behavior locally and avoid treating browser metadata as a diagnosis. After the fix, the pull request and issue remain connected in GitHub without copying the report out of another dashboard.
+
+## Public and private repository considerations
+
+Reporters do not need GitHub accounts to submit through the widget. Issue visibility is still controlled by the repository. For private repositories, only authorized collaborators can open the resulting GitHub URL; configure whether the success screen should expose that link to the reporter.
+
+The hosted endpoint accepts unauthenticated submissions and uses rate limits. For a private internal workflow that requires host-app identity or stronger abuse controls, review the self-hosted authentication and edge-protection options rather than assuming repository privacy authenticates the form.
+
+## Validate the destination workflow
+
+Use a test repository or staging label and submit one report of each category. Confirm:
+
+- the issue is created in the intended repository;
+- system fields reflect the reporting browser and URL;
+- configured labels exist and apply as expected;
+- screenshot links work and the storage branch does not trigger CI;
+- private issue-link behavior matches the audience;
+- the security and retention model is acceptable.
+
+Continue with [configuration](/docs/configuration) and [security](/docs/security). For a developer-oriented alternative with recordings and logs rather than direct issue creation, review the [Jam comparison](/compare/jam-dev).

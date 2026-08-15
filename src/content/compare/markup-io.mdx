@@ -1,0 +1,29 @@
+# MarkUp.io Alternative for GitHub-Native Website Feedback
+
+MarkUp.io and BugDrop both make visual website feedback more specific, but they organize the work differently. MarkUp.io places websites and other creative assets in a shared review workspace. BugDrop captures an annotated website screenshot and creates a GitHub Issue. [MU-01](#source-markup-product "Claim MU-01") [MU-02](#source-markup-website-guide "Claim MU-02") [MU-03](#source-bugdrop-repo-markup "Claim MU-03")
+
+## Quick comparison
+
+| Decision factor | BugDrop | MarkUp.io |
+|---|---|---|
+| Primary workflow | Embedded website report to GitHub Issues | Shared visual commenting across digital content [MU-01](#source-markup-product "Claim MU-01") |
+| Content types | Current webpage screenshot | Websites plus images, PDFs, videos, and other file types [MU-01](#source-markup-product "Claim MU-01") |
+| Website review | Reporter selects and annotates a screenshot | Create a Website MarkUp from a URL and pin comments on the page [MU-02](#source-markup-website-guide "Claim MU-02") |
+| Collaboration record | GitHub Issue and repository-hosted screenshot | Comment threads, real-time responses, and resolved comments in MarkUp.io [MU-02](#source-markup-website-guide "Claim MU-02") |
+| Operations | Hosted widget or self-hosted Worker | Managed review workspace [MU-01](#source-markup-product "Claim MU-01") |
+
+## Where the workflows separate
+
+MarkUp.io's current product page describes a visual-commenting workspace for more than 30 file types. Its website guide documents creating a Website MarkUp from a URL, dropping pinned comments, sharing the review, and resolving comment threads. That broader creative-review job is useful when a client or team needs one place to discuss a website, PDF, image, and video. [MU-01](#source-markup-product "Claim MU-01") [MU-02](#source-markup-website-guide "Claim MU-02")
+
+BugDrop has a narrower handoff. A reporter selects and annotates part of the current page, adds context, and submits the report to GitHub Issues. It does not create a parallel review workspace or accept general creative files for approval. [MU-03](#source-bugdrop-repo-markup "Claim MU-03")
+
+## Context and handoff
+
+MarkUp.io documents attachments, links, live comment visibility, resolved-comment history, and browser, screen-size, and operating-system details for website comments. Its review remains centered in MarkUp.io, so teams should confirm how the rest of their delivery workflow receives and tracks the resulting work. [MU-02](#source-markup-website-guide "Claim MU-02")
+
+BugDrop records page and browser context alongside the annotated screenshot and makes GitHub the working record. It does not provide MarkUp.io's multi-asset discussion history, so it is a poor replacement when creative approval is the actual job. [MU-01](#source-markup-product "Claim MU-01") [MU-03](#source-bugdrop-repo-markup "Claim MU-03")
+
+## A practical decision
+
+Choose BugDrop when website feedback should enter engineering triage directly and GitHub is already the source of truth. Choose MarkUp.io when stakeholders need an approachable review workspace spanning websites and creative files. The official documentation establishes these workflow differences; it does not establish hands-on parity between the annotation interfaces.

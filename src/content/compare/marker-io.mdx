@@ -1,54 +1,29 @@
-# Free Marker.io Alternative: BugDrop vs Marker.io
+# Marker.io Alternative for Visual Reports to GitHub
 
-BugDrop is a free Marker.io alternative for teams that want visual website feedback to become GitHub Issues. Both tools collect screenshot bug reports, annotations, and browser context, but the workflow is different: BugDrop is open source and GitHub-native, while Marker.io is a paid hosted visual bug reporting platform with team workflows and integrations across project management tools.
+BugDrop and Marker.io overlap more closely than many feedback products: both can turn an annotated website screenshot and technical context into a GitHub issue. The choice is between a focused GitHub-native widget and a managed visual-feedback workflow with synchronization and multiple destinations. [MK-01](#source-marker-features "Claim MK-01") [MK-02](#source-marker-github "Claim MK-02") [MK-03](#source-bugdrop-repo-marker "Claim MK-03")
 
-If you are searching for "Marker.io alternative", "Marker.io free alternative", or "Marker.io vs BugDrop", the main question is whether you need a managed feedback workspace or a lightweight widget that sends reports where developers already triage work.
+## Quick comparison
 
-**Best for:** BugDrop fits GitHub-native teams, open-source projects, staging sites, docs, and small product teams that want screenshot feedback without adding another paid dashboard.
-
-[Try the widget](/demo) or [read the installation guide](/docs/installation).
-
-## What is Marker.io?
-
-Marker.io is a paid visual feedback and bug reporting product. It focuses on collecting screenshots, annotations, technical metadata, and reporter comments, then routing those reports into tools such as Jira, Trello, Asana, GitHub, and others.
-
-Its value is strongest for teams that need a managed feedback platform, stakeholder workflows, and integrations beyond GitHub.
-
-## What is BugDrop?
-
-BugDrop is a free, MIT-licensed website feedback widget for teams that want reports to become GitHub Issues. It captures screenshots, annotations, page context, browser details, and privacy controls without requiring a separate feedback dashboard.
-
-## How BugDrop Works
-
-1. Install the GitHub App for the repository that should receive reports.
-2. Add one script tag to the site, docs, product screen, or preview deployment.
-3. Users click the feedback widget, describe the issue, and annotate or redact a screenshot.
-4. BugDrop creates a GitHub Issue with the screenshot, page URL, browser metadata, labels, and reporter notes.
-
-## Feature Comparison
-
-| Feature | BugDrop | Marker.io |
+| Decision factor | BugDrop | Marker.io |
 |---|---|---|
-| Price | Free / MIT | Paid SaaS |
-| Primary workflow | GitHub Issues | Hosted platform + integrations |
-| Setup | One script tag | Account + project setup |
-| Screenshots | Yes | Yes |
-| Annotations | Yes | Yes |
-| Browser and page metadata | Yes | Yes |
-| Screenshot redaction and masking | Yes | Product-dependent |
-| GitHub Issues destination | Native | Integration |
-| Hosted feedback dashboard | No | Yes |
-| Self-hostable | Yes | No |
-| Best fit | GitHub-native developer teams | Teams needing managed feedback workflows |
+| GitHub destination | Creates GitHub Issues directly | GitHub integration with documented two-way synchronization [MK-02](#source-marker-github "Claim MK-02") |
+| Other destinations | No | Jira, Linear, Trello, ClickUp, Asana, and others are documented [MK-01](#source-marker-features "Claim MK-01") |
+| Reporter workflow | Widget submission to GitHub | Managed projects, member/guest forms, and reporter updates [MK-02](#source-marker-github "Claim MK-02") |
+| Visual context | Screenshot, annotation, redaction, and browser/page details | Screenshot annotation and technical metadata [MK-01](#source-marker-features "Claim MK-01") |
+| Operations | Hosted widget or self-hosted Worker | Managed service with a trial [MK-01](#source-marker-features "Claim MK-01") |
 
-## When to Choose BugDrop
+## The GitHub difference
 
-Choose BugDrop when your team already works in GitHub Issues, wants an open-source tool, needs a lightweight script tag, or prefers feedback data to stay in your own GitHub repository. BugDrop is also a strong fit for open-source projects, internal tools, docs, and staging sites where a paid feedback platform is unnecessary.
+Marker.io's official GitHub guide documents native-field mapping plus synchronization of issue status, fields, and comments. That is valuable when reporters need updates in Marker.io while developers work in GitHub. [MK-02](#source-marker-github "Claim MK-02")
 
-## When to Choose Marker.io
+BugDrop has no mirrored feedback state. Submission creates the GitHub Issue, and GitHub becomes the only working record. It does not offer Marker.io's separate guest experience or status synchronization. [MK-02](#source-marker-github "Claim MK-02") [MK-03](#source-bugdrop-repo-marker "Claim MK-03")
 
-Marker.io can be a better fit when you need a polished hosted platform, richer stakeholder management, and integrations across several non-GitHub tools. Larger QA or product teams may value those workflows more than open-source control.
+## Setup and governance
 
-## Start with BugDrop
+BugDrop uses a GitHub App plus a script tag. Teams can use the hosted endpoint or self-host the Worker. Screenshots are stored on a dedicated branch in the selected repository, so repository access and branch policy are part of the privacy model. [MK-03](#source-bugdrop-repo-marker "Claim MK-03")
 
-Use the [live demo](/demo) to try the reporting flow, then follow [getting started](/docs/getting-started) to install the widget. Developers can also inspect the [GitHub repository](https://github.com/mean-weasel/bugdrop) before adopting it.
+Marker.io documents widget, browser-extension, CMS/plugin, and package installation options. Its project and integration model is designed for multiple client and project-management workflows. [MK-01](#source-marker-features "Claim MK-01")
+
+## A practical decision
+
+Choose BugDrop when GitHub is the only destination, open-source inspection matters, and a separate reporter workspace would be overhead. Choose Marker.io when two-way synchronization, guest communication, flexible forms, or multiple project-management destinations are requirements rather than extras.

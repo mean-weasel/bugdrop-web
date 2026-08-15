@@ -188,9 +188,10 @@ function buildAgentPrompt(config: SandboxConfig) {
   return `Install BugDrop in this web app using the script tag below.
 
 Requirements:
-- Add the script globally so it loads on every product page after the app is interactive.
-- If this is Next.js App Router, use next/script in the root layout with strategy="afterInteractive".
-- If this is Vite, React, Rails, Laravel, or plain HTML, place it near the end of the body or equivalent app shell.
+- Add the script globally as a normal synchronous <script> element in the document or framework HTML shell.
+- Do not add async or defer. BugDrop reads its configuration from the currently executing script element.
+- In Next.js App Router, render the literal <script> element in the root layout; do not use next/script for the BugDrop widget.
+- In Vite, React, Rails, Laravel, or plain HTML, use the equivalent normal synchronous script element.
 - Preserve all data-* attributes exactly.
 - Do not include data-preview="true" in production.
 - Mark private fields with data-bugdrop-mask when they should never appear in screenshots.
@@ -509,7 +510,17 @@ function Checkbox({
   );
 }
 
-function CopyButton({ value, label = "Copy" }: { value: string; label?: string }) {
+function CopyButton({
+  value,
+  label = "Copy",
+  analyticsEvent,
+  analyticsLabel,
+}: {
+  value: string;
+  label?: string;
+  analyticsEvent: string;
+  analyticsLabel: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   return (
@@ -517,9 +528,14 @@ function CopyButton({ value, label = "Copy" }: { value: string; label?: string }
       type="button"
       onClick={async () => {
         await navigator.clipboard.writeText(value);
+        window.dispatchEvent(new CustomEvent("bugdrop:analytics-success", {
+          detail: { eventName: analyticsEvent, label: analyticsLabel },
+        }));
         setCopied(true);
         window.setTimeout(() => setCopied(false), 1400);
       }}
+      data-analytics-success-event={analyticsEvent}
+      data-analytics-label={analyticsLabel}
       className="inline-flex min-h-9 items-center gap-2 rounded-[8px] border border-cyan-400/35 bg-cyan-400/10 px-3 text-sm font-semibold text-cyan-200 transition hover:border-cyan-300 hover:bg-cyan-400/15"
     >
       {copied ? <Check className="size-4" /> : <Clipboard className="size-4" />}
@@ -695,6 +711,8 @@ export function WidgetSandbox() {
                 <button
                   type="button"
                   onClick={() => postPreviewAction("open")}
+                  data-analytics-event="sandbox_preview_open_click"
+                  data-analytics-label="Sandbox welcome preview"
                   className="inline-flex min-h-9 items-center gap-2 rounded-[8px] bg-cyan-300 px-3 text-sm font-semibold text-slate-950"
                 >
                   <Play className="size-4" />
@@ -737,7 +755,19 @@ export function WidgetSandbox() {
                   Switch between the production artifact, temporary preview, and agent handoff.
                 </p>
               </div>
-              <CopyButton value={activeOutput} />
+              <CopyButton
+                value={activeOutput}
+                analyticsEvent={
+                  outputTab === "script"
+                    ? "installation_proxy_script_copy"
+                    : `sandbox_${outputTab}_copy`
+                }
+                analyticsLabel={
+                  outputTab === "script"
+                    ? "Sandbox production script"
+                    : `Sandbox ${outputTab} output`
+                }
+              />
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
@@ -774,7 +804,12 @@ export function WidgetSandbox() {
                   <p className="text-sm text-slate-400">
                     Bookmarklet version for repeated own-site previews.
                   </p>
-                  <CopyButton value={bookmarklet} label="Copy bookmarklet" />
+                  <CopyButton
+                    value={bookmarklet}
+                    label="Copy bookmarklet"
+                    analyticsEvent="sandbox_bookmarklet_copy"
+                    analyticsLabel="Sandbox preview bookmarklet"
+                  />
                 </div>
               </div>
             ) : null}

@@ -1,49 +1,51 @@
-# Website Feedback Widget for GitHub Issues
+# Website Feedback Widget
 
-BugDrop is a website feedback widget for teams that want actionable reports without asking users to leave the page. Visitors click the widget, describe what they saw, attach or annotate a screenshot, and BugDrop sends the report to GitHub Issues with the page URL and browser context.
+BugDrop is a website feedback widget for teams that want a clear in-page reporting path and developer-ready output in GitHub Issues. This guide owns the broad category question: what the widget does, where it fits, and what a team must decide before installing it.
 
-**Best for:** product pages, docs, SaaS apps, internal tools, and client review environments where developers already triage work in GitHub.
+**Use this guide when:** you are choosing the general feedback experience for a website or web app. For capture mechanics, use the [screenshot feedback guide](/use-cases/screenshot-feedback-widget); for the destination workflow, use the [GitHub Issues guide](/use-cases/github-issues-feedback).
 
-[Try the widget](/demo) or [follow the installation guide](/docs/installation).
+[Try the reporting flow](/demo) or [inspect it safely in the sandbox](/sandbox).
 
-## What Makes a Feedback Widget Useful?
+## The job of a website feedback widget
 
-A feedback widget should reduce friction for the reporter and reduce ambiguity for the developer. Text-only reports often miss the page state, viewport, browser, and reproduction context. BugDrop captures those details at submit time so the issue starts with enough information to triage.
+A useful widget reduces work on both sides of a report. The reporter should not have to leave the page, create a GitHub account, or reconstruct basic environment details. The developer should receive more than an unstructured message.
 
-## Best-Fit Workflows
+BugDrop places a feedback control on the page. A submission can include the reporter's title and description, a Bug, Feature, or Question category, the current URL, browser, operating system, language, viewport, and an optional screenshot. Name and email fields are off by default and can be enabled when follow-up is appropriate.
 
-- Marketing pages where layout or copy issues affect conversion
-- Documentation sites where examples, tabs, and navigation need quick feedback
-- SaaS apps where users can report broken UI states from inside the product
-- Internal tools where teammates need a low-friction way to report bugs
-- Client review sites where non-technical stakeholders should not need GitHub accounts
+The output is a GitHub Issue rather than a separate BugDrop inbox. That is a strong fit when engineering already assigns, labels, discusses, and closes work in GitHub. It is a limitation when product, support, or client teams need a standalone feedback workspace, surveys, voting, session replay, or two-way synchronization with several trackers.
 
-## Why Send Feedback to GitHub Issues?
+## Choose the reporting surface deliberately
 
-Most development teams already use GitHub for triage, assignment, labels, discussion, and release tracking. A separate feedback inbox creates another place to check. BugDrop keeps website feedback in the same workflow as engineering work.
+Start by deciding where the widget should appear:
 
-Each report can include a description, screenshot, annotations, feedback type, page URL, browser, operating system, viewport size, and labels. That makes the GitHub Issue useful immediately.
+- **Public marketing or documentation pages:** keep the form short and screenshots optional so visitors can skip visual capture.
+- **Product screens:** review masking before enabling screenshots around account, billing, or customer data.
+- **Preview and staging environments:** use a repository and labels that make review feedback easy to separate from production incidents.
+- **Internal tools:** decide whether the hosted public submission path is appropriate or whether a self-hosted authenticated deployment is required.
 
-## Install and Use the Widget
+BugDrop is loaded with a normal synchronous script tag without `async` or `defer` and a required `data-repo="owner/repo"` attribute. Appearance and behavior are configured through data attributes; there is no React provider or framework-specific package.
 
-1. Install the GitHub App and grant access to the repository that should receive feedback.
-2. Add the widget script tag from the [installation guide](/docs/installation) to the site or app shell.
-3. Configure labels, categories, theme, position, and screenshot behavior in [configuration](/docs/configuration).
-4. Open the page, click the feedback button, and submit a test report.
-5. Triage the created GitHub Issue with your existing labels, assignees, comments, and project board.
+## What a useful first report looks like
 
-## What Users Submit
+Suppose a reviewer sees a navigation button partly covered at a narrow viewport. A useful report says what the reviewer expected, identifies the affected page, and includes the visible state. BugDrop adds the environment fields automatically. If the reporter chooses a screenshot, they can capture the full page, an area, or an element, then annotate or redact before submitting.
 
-| Report detail | Why it helps |
-|---|---|
-| Description | Captures what the user expected or noticed |
-| Screenshot and annotation | Shows the exact visual state |
-| Page URL | Points developers to the affected route |
-| Browser, OS, and viewport | Explains environment-specific issues |
-| Category and labels | Speeds up triage in GitHub |
+The resulting issue gives the developer a concrete starting point without claiming that a screenshot proves the root cause. Reproduction steps, expected behavior, and any account-specific state still belong in the description.
 
-## Add It to a Site
+## Installation and privacy decisions
 
-Install the GitHub App, add the script tag from the [installation guide](/docs/installation), and configure the widget with [configuration options](/docs/configuration). For sensitive pages, review [security and screenshot masking](/docs/security) before launch.
+Before installation, choose the target repository and install the GitHub App with Issues and Contents permissions. Screenshots are stored on the dedicated `bugdrop-screenshots` branch, so that branch should be treated as user-generated content and excluded from privileged CI or deploy workflows.
 
-You can test the full flow in the [live demo](/demo) before adding it to your own site.
+For sensitive pages:
+
+- Mark stable private DOM regions with `data-bugdrop-mask` or another documented masking attribute.
+- Remember that visual masking is not data-loss prevention and cannot discover unmarked secrets.
+- Prefer the optional manual screenshot flow when a reporter should review and redact the image.
+- Disable screenshots on pages where sensitive pixels cannot be reliably enclosed by DOM boxes.
+
+Read [installation](/docs/installation), [configuration](/docs/configuration), and [screenshot security](/docs/security#screenshot-masking) before enabling the widget on a real site.
+
+## Decide with a small pilot
+
+Add BugDrop to one low-risk page, submit a Bug, Feature, and Question report, and inspect the issue body and screenshot branch. Confirm the labels, environment fields, button position, keyboard flow, masking behavior, and repository permissions. Then decide whether to expand the widget to more surfaces.
+
+If the pilot proves the category fit, [install the widget](/docs/installation). If the team needs a broader managed feedback system, [compare website feedback tools](/compare) before committing.

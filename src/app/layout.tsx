@@ -19,7 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
+  title: "BugDrop — Website Feedback to GitHub Issues",
   description: homeDescription,
   keywords: [
     "BugDrop",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   ],
   metadataBase: new URL("https://bugdrop.dev"),
   openGraph: {
-    title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
+    title: "BugDrop — Website Feedback to GitHub Issues",
     description: homeDescription,
     url: "https://bugdrop.dev",
     siteName: "BugDrop",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "BugDrop - Free Website Feedback Widget for GitHub Issues",
+    title: "BugDrop — Website Feedback to GitHub Issues",
     description: homeDescription,
   },
   verification: {

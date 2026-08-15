@@ -1,0 +1,81 @@
+# Visual Bug Report Template
+
+Use this visual bug report template to turn a screenshot into reproducible evidence. The template is available in the page, as copied text, as a Markdown download, and in print. It does not require BugDrop, JavaScript, an account, or a purchase.
+
+**Best for:** UI defects where layout, state, or rendering matters. For a process guide, read [Visual Bug Reporting](/use-cases/visual-bug-reporting).
+
+## Copy-ready template
+
+### Summary
+
+Write one sentence that names the broken behavior, affected surface, and user impact. Prefer “Checkout button is covered by the cookie banner at 375 px, blocking purchase” over “Mobile is broken.”
+
+### Expected behavior
+
+State the observable result a reviewer or test expects. Link to an accepted requirement when one exists. Avoid prescribing an implementation unless the implementation itself is the requirement.
+
+### Actual behavior
+
+Describe what appeared or happened instead. Include visible text, state, and timing. Separate observation from diagnosis: “The button is outside the viewport” is evidence; “the grid calculation is wrong” is a hypothesis until verified.
+
+### Reproduction steps
+
+1. Name the starting route, account state, feature flag, and test data needed.
+2. List one action per step, including scrolling, resizing, selection, or navigation.
+3. End on the action that exposes the problem.
+4. Say whether the result occurs always, sometimes, or only once.
+
+### Environment
+
+- Page URL, including a safe query string when relevant
+- Browser name and version
+- Operating system
+- Viewport width and height or device model
+- Locale and zoom level when they affect layout
+- Test account role or synthetic record state, without secrets or personal data
+
+### Visual evidence
+
+- Attach the smallest screenshot that proves the visible problem while retaining enough orientation.
+- Add an arrow, box, or short annotation that identifies the relevant region.
+- Include a wider screenshot only when surrounding layout is necessary.
+- Use a recording for time-dependent interaction, but still provide written steps.
+- Record what was redacted or intentionally omitted.
+
+### Privacy review
+
+- Confirm the image contains no credentials, access tokens, recovery codes, customer records, payment details, private conversations, or unreleased information outside the review scope.
+- Crop or redact before upload when manual inspection is possible.
+- Do not assume a masking tool discovers secrets. BugDrop's DOM masking visually covers marked regions in supported capture paths; it is not data-loss prevention.
+- Disable screenshots where sensitive pixels cannot be enclosed or reviewed reliably.
+
+### Triage
+
+- Severity and user impact
+- Affected component or owner
+- First known build and most recent reproduced build
+- Related or duplicate issue
+- Workaround, if verified
+- Acceptance evidence required to close
+
+## Worked example
+
+**Summary:** Account navigation covers the Save button at a 390 × 844 viewport, preventing profile changes.
+
+**Expected:** The Save button remains visible below the form and can be reached with touch and keyboard navigation.
+
+**Actual:** After opening account navigation, its fixed panel overlaps the final form row and Save button. Scrolling does not reveal the control.
+
+**Steps:** Open `/settings/profile` with a synthetic member account; set the viewport to 390 × 844; open Account; scroll to the final field. The overlap reproduces on every attempt in Chromium 140 on macOS.
+
+**Evidence:** Attach a cropped screenshot showing the panel edge, final field, and covered button. Redact the synthetic email anyway so the same habit applies to real reports. Note that the screenshot demonstrates overlap but does not identify the CSS rule responsible.
+
+## Adapt without weakening the evidence
+
+Remove fields that cannot affect your product, but keep expected behavior, actual behavior, steps, environment, and privacy review. For intermittent failures, add frequency and the last known successful attempt. For accessibility defects, include the input method, focused control, accessible name, and assistive technology version when applicable. For localization defects, include the locale and exact string.
+
+If a report has no useful visual dimension, use a normal issue template instead of forcing a screenshot. If a visual defect affects a client review round, pair this template with the [Client Website QA Checklist](/resources/client-website-qa-checklist). To capture reports in-page, evaluate the [Screenshot Feedback Widget](/use-cases/screenshot-feedback-widget) and [GitHub Issues workflow](/use-cases/github-issues-feedback).
+
+## Close with proof
+
+Retest the original steps at the recorded viewport and at one adjacent width. Attach the corrected state or record why visual proof is unnecessary. Confirm that the fix did not hide content, remove keyboard access, or expose a previously masked region. A complete-looking template is not proof by itself; the reporter and reviewer still need to validate every filled field.

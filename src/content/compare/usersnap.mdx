@@ -1,32 +1,29 @@
-# BugDrop vs Usersnap
+# Usersnap Alternative for Developer-Led Bug Intake
 
-BugDrop and Usersnap both collect feedback from websites and web apps. BugDrop focuses on free, open-source bug reports that become GitHub Issues. Usersnap is a paid customer feedback suite with broader survey, feedback, and product experience workflows.
+BugDrop and Usersnap can both collect visual feedback from a website. BugDrop is a focused route into GitHub Issues. Usersnap is a customer feedback platform that combines visual feedback, surveys, analysis, and communication workflows. [US-01](#source-usersnap-pricing "Claim US-01") [US-02](#source-usersnap-product "Claim US-02") [US-03](#source-bugdrop-repo-usersnap "Claim US-03")
 
-## What is Usersnap?
+## Quick comparison
 
-Usersnap is a hosted platform for collecting customer feedback, visual bug reports, surveys, and product insights. It is designed for product and customer experience teams that want a managed system for feedback collection and analysis.
-
-## What is BugDrop?
-
-BugDrop is a lightweight website feedback widget for developers. It captures user-submitted reports with screenshots, annotations, redaction controls, system info, and page URLs, then creates GitHub Issues in your repository.
-
-## Feature Comparison
-
-| Feature | BugDrop | Usersnap |
+| Decision factor | BugDrop | Usersnap |
 |---|---|---|
-| Price | Free / MIT | Paid SaaS |
-| Primary workflow | Bug reports to GitHub Issues | Customer feedback platform |
-| Setup | One script tag | Account + project setup |
-| Screenshots | Yes | Yes |
-| Surveys | No | Yes |
-| Self-hostable | Yes | No |
-| Open source | Yes | No |
-| Best fit | GitHub-native developers | Product teams collecting broad feedback |
+| Primary job | Screenshot-backed GitHub issue intake | Customer feedback collection and analysis [US-02](#source-usersnap-product "Claim US-02") |
+| Visual context | Screenshot, annotation, redaction, and system details | Screenshots and screen recordings are documented [US-01](#source-usersnap-pricing "Claim US-01") |
+| Research tools | No survey builder or analytics workspace | Surveys, targeting, and feedback analysis are documented [US-01](#source-usersnap-pricing "Claim US-01") |
+| Team workspace | GitHub Issues | Managed spaces with permissions and dashboards [US-01](#source-usersnap-pricing "Claim US-01") |
+| Product updates | No | User-facing update communication is documented [US-01](#source-usersnap-pricing "Claim US-01") |
 
-## When to Choose BugDrop
+## Different owners, different outputs
 
-Choose BugDrop when you want a simple visual bug reporting widget, no paid subscription, no new dashboard, and direct GitHub Issues integration. It is built for teams that prioritize developer workflow over customer feedback analytics.
+Usersnap's current product and plan materials describe feedback widgets and surveys with screenshot or screen-recording options, multiple spaces, permissions, categorization, summaries, replies, and product updates. [US-01](#source-usersnap-pricing "Claim US-01") [US-02](#source-usersnap-product "Claim US-02")
 
-## When to Choose Usersnap
+BugDrop does not analyze feedback or provide a customer-insight workspace. It creates a structured GitHub Issue for a specific report. [US-03](#source-bugdrop-repo-usersnap "Claim US-03")
 
-Usersnap can be a better fit when your team needs surveys, customer satisfaction signals, feedback analytics, and workflows that extend beyond bug reports. Product and customer experience teams may need those broader capabilities.
+## What “simpler” costs
+
+BugDrop avoids another dashboard, but the tradeoff is real: it has no screen recording, survey targeting, customer segmentation, feedback trend analysis, or user-facing announcement workflow. [US-01](#source-usersnap-pricing "Claim US-01") [US-03](#source-bugdrop-repo-usersnap "Claim US-03")
+
+Self-hosting BugDrop provides infrastructure control, not a managed analytics suite. Teams must still configure a GitHub App, Worker, repository access, and screenshot handling. [US-03](#source-bugdrop-repo-usersnap "Claim US-03")
+
+## A practical decision
+
+Choose BugDrop when the buyer and operator is an engineering team that wants reports in GitHub. Choose Usersnap when product research, customer experience, and insight management are central jobs and a dedicated platform is desirable.

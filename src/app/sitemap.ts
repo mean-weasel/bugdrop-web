@@ -1,53 +1,35 @@
 import type { MetadataRoute } from "next";
 import { compareNav } from "@/lib/compare-nav";
 import { docsNav } from "@/lib/docs-nav";
-import { SITE_UPDATED, SITE_URL } from "@/lib/seo";
+import { SITE_URL } from "@/lib/seo";
 import { useCasesNav } from "@/lib/use-cases-nav";
+import { resourceNav } from "@/lib/resource-nav";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = SITE_URL;
-  const lastModified = new Date(SITE_UPDATED);
 
   return [
-    { url: base, lastModified, changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/demo`, lastModified, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${base}/showcase`, lastModified, changeFrequency: "monthly", priority: 0.75 },
-    { url: `${base}/status`, lastModified, changeFrequency: "always", priority: 0.7 },
-    { url: `${base}/docs`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: base },
+    { url: `${base}/demo` },
+    { url: `${base}/sandbox` },
+    { url: `${base}/showcase` },
+    { url: `${base}/status` },
+    { url: `${base}/docs` },
     ...docsNav
       .filter((doc) => doc.slug !== "")
       .map((doc) => ({
         url: `${base}/docs/${doc.slug}`,
-        lastModified,
-        changeFrequency: "monthly" as const,
-        priority: ["installation", "security", "configuration"].includes(doc.slug)
-          ? 0.8
-          : doc.slug === "faq"
-            ? 0.6
-            : 0.7,
       })),
-    { url: `${base}/use-cases`, lastModified, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/use-cases` },
     ...useCasesNav.map((useCase) => ({
       url: `${base}/use-cases/${useCase.slug}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: [
-        "github-issues-feedback",
-        "website-feedback-widget",
-        "free-website-feedback-widget",
-        "screenshot-feedback-widget",
-        "visual-bug-reporting",
-        "nextjs-feedback-widget",
-      ].includes(useCase.slug)
-        ? 0.8
-        : 0.6,
     })),
-    { url: `${base}/compare`, lastModified, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/compare` },
     ...compareNav.map((comparison) => ({
       url: `${base}/compare/${comparison.slug}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.75,
+    })),
+    ...resourceNav.map((resource) => ({
+      url: `${base}/resources/${resource.slug}`,
     })),
   ];
 }

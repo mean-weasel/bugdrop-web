@@ -93,9 +93,10 @@ for (const journey of journeys) {
     permissions: ["clipboard-read", "clipboard-write"],
   });
   const capturedPostHog = [];
+  const capturedGoogle = [];
   const interceptedAnalyticsRequests = [];
 
-  await context.route("https://analytics.invalid/**", async (route) => {
+  await context.route(/https:\/\/(?:analytics\.invalid|us\.i\.posthog\.com)\/.*/, async (route) => {
     interceptedAnalyticsRequests.push({ method: route.request().method(), url: route.request().url() });
     const raw = route.request().postData();
     if (raw) {
@@ -117,10 +118,39 @@ for (const journey of journeys) {
   });
   await context.route(/https:\/\/www\.googletagmanager\.com\/.*/, async (route) => {
     interceptedAnalyticsRequests.push({ method: route.request().method(), url: route.request().url().split("?", 1)[0] });
-    await route.fulfill({ status: 200, contentType: "application/javascript", body: "" });
+    await route.fulfill({
+      status: 200,
+      contentType: "application/javascript",
+      body: `
+        (() => {
+          const deliver = (entry) => {
+            if (entry?.[0] !== "event") return;
+            void fetch("https://www.google-analytics.com/g/collect", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ event: entry[1], properties: entry[2] }),
+            });
+          };
+          (window.dataLayer ?? []).forEach((entry) => deliver(Array.from(entry)));
+          const queuedGtag = window.gtag;
+          window.gtag = (...entry) => {
+            queuedGtag?.(...entry);
+            deliver(entry);
+          };
+        })();
+      `,
+    });
   });
   await context.route(/https:\/\/(?:www|region1)\.google-analytics\.com\/.*/, async (route) => {
     interceptedAnalyticsRequests.push({ method: route.request().method(), url: route.request().url().split("?", 1)[0] });
+    const raw = route.request().postData();
+    if (raw) {
+      try {
+        capturedGoogle.push(JSON.parse(raw));
+      } catch {
+        failures.push(`${journey.name}: intercepted GA payload was not valid JSON`);
+      }
+    }
     await route.fulfill({ status: 204, body: "" });
   });
 
@@ -130,6 +160,24 @@ for (const journey of journeys) {
     referer: journey.referrer,
   });
   await page.waitForTimeout(2200);
+  const initialBrowserAudit = await page.evaluate(() => ({
+    googleEvents: (window.dataLayer ?? [])
+      .map((entry) => Array.isArray(entry) ? entry : Array.from(entry))
+      .filter((entry) => entry[0] === "event")
+      .map((entry) => ({ event: entry[1], properties: entry[2] })),
+    gaIntent: Boolean(window.bugdropGaIntent),
+    gaLibrary: Boolean(document.querySelector("[data-ga-intent-library]")),
+  }));
+  const initialGtmRequests = interceptedAnalyticsRequests.filter((request) =>
+    request.url === "https://www.googletagmanager.com/gtag/js"
+  );
+  const initialPostHogPageViews = capturedPostHog.filter((event) => event.event === "$pageview");
+  const initialQueuedGaPageViews = initialBrowserAudit.googleEvents.filter((event) => event.event === "page_view");
+  if (initialGtmRequests.length) failures.push(`${journey.name}: passive browsing requested GTM`);
+  if (initialBrowserAudit.gaIntent || initialBrowserAudit.gaLibrary) failures.push(`${journey.name}: GA activated before user intent`);
+  if (initialPostHogPageViews.length !== 1) failures.push(`${journey.name}: immediate PostHog page view count was ${initialPostHogPageViews.length}, expected 1`);
+  if (initialQueuedGaPageViews.length !== 1) failures.push(`${journey.name}: queued GA page view count was ${initialQueuedGaPageViews.length}, expected 1`);
+  if (capturedGoogle.length) failures.push(`${journey.name}: GA delivered before user intent`);
   await page.evaluate(() => {
     document.addEventListener("click", (event) => {
       if (event.target instanceof Element && event.target.closest("[data-analytics-event]")) {
@@ -142,13 +190,18 @@ for (const journey of journeys) {
     await page.getByLabel("GitHub repository").fill("private-owner/secret-repo");
   }
 
-  for (const eventName of journey.clicks) {
+  for (const [clickIndex, eventName] of journey.clicks.entries()) {
     const locator = page.locator(`[data-analytics-event="${eventName}"], [data-analytics-success-event="${eventName}"]`).first();
     if (await locator.count() !== 1) {
       failures.push(`${journey.name}: expected one rendered ${eventName} control`);
       continue;
     }
-    await locator.click();
+    if (journey.name === "organic-comparison" && clickIndex === 0) {
+      await locator.focus();
+      await page.keyboard.press("Enter");
+    } else {
+      await locator.click();
+    }
     await page.waitForTimeout(250);
   }
   await page.waitForTimeout(500);
@@ -158,9 +211,11 @@ for (const journey of journeys) {
       Array.isArray(entry) ? entry : Array.from(entry),
     );
     return {
-      googleEvents: entries
+      queuedGoogleEvents: entries
         .filter((entry) => entry[0] === "event")
         .map((entry) => ({ event: entry[1], properties: entry[2] })),
+      gaIntent: Boolean(window.bugdropGaIntent),
+      gaLibraryCount: document.querySelectorAll("[data-ga-intent-library]").length,
       nestedMarkers: document.querySelectorAll("[data-analytics-event] [data-analytics-event]").length,
       conflictingMarkers: document.querySelectorAll("[data-analytics-event][data-analytics-success-event]").length,
       unlabeledMarkers: [...document.querySelectorAll("[data-analytics-event]")]
@@ -173,8 +228,11 @@ for (const journey of journeys) {
   const relevantPostHog = capturedPostHog.filter((event) =>
     event.event === "$pageview" || journey.clicks.includes(event.event),
   );
-  const relevantGoogle = browserAudit.googleEvents.filter((event) =>
+  const relevantGoogle = capturedGoogle.filter((event) =>
     event.event === "page_view" || journey.clicks.includes(event.event),
+  );
+  const gtmRequests = interceptedAnalyticsRequests.filter((request) =>
+    request.url === "https://www.googletagmanager.com/gtag/js"
   );
 
   for (const eventName of ["$pageview", ...journey.clicks]) {
@@ -185,6 +243,8 @@ for (const journey of journeys) {
     const count = relevantGoogle.filter((event) => event.event === eventName).length;
     if (count !== 1) failures.push(`${journey.name}: GA4 ${eventName} count was ${count}, expected 1`);
   }
+  if (!browserAudit.gaIntent || browserAudit.gaLibraryCount !== 1) failures.push(`${journey.name}: user intent did not mount exactly one GA library`);
+  if (gtmRequests.length !== 1) failures.push(`${journey.name}: GTM request count was ${gtmRequests.length}, expected 1 after intent`);
   if (browserAudit.nestedMarkers) failures.push(`${journey.name}: nested analytics markers could double-count`);
   if (browserAudit.conflictingMarkers) failures.push(`${journey.name}: control has both click and success markers`);
   if (browserAudit.unlabeledMarkers.length) failures.push(`${journey.name}: unlabeled analytics markers: ${browserAudit.unlabeledMarkers.join(", ")}`);
@@ -213,6 +273,14 @@ for (const journey of journeys) {
     requestedPath: journey.path.split("?", 1)[0],
     posthogEvents: relevantPostHog,
     googleEvents: relevantGoogle,
+    initial: {
+      gtmRequests: initialGtmRequests.length,
+      posthogPageViews: initialPostHogPageViews.length,
+      queuedGaPageViews: initialQueuedGaPageViews.length,
+      deliveredGaEvents: 0,
+    },
+    activation: journey.name === "organic-comparison" ? "keyboard then pointer" : "pointer",
+    gtmRequestsAfterIntent: gtmRequests.length,
     interceptedAnalyticsRequests,
     nestedMarkers: browserAudit.nestedMarkers,
     conflictingMarkers: browserAudit.conflictingMarkers,
@@ -220,6 +288,109 @@ for (const journey of journeys) {
   });
   await context.close();
 }
+
+const navigationContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+const navigationGoogleEvents = [];
+const navigationGtmRequests = [];
+await navigationContext.route(/https:\/\/(?:analytics\.invalid|us\.i\.posthog\.com)\/.*/, async (route) => {
+  await route.fulfill({ status: 204, body: "" });
+});
+await navigationContext.route(/https:\/\/www\.googletagmanager\.com\/.*/, async (route) => {
+  navigationGtmRequests.push(route.request().url());
+  await route.fulfill({
+    status: 200,
+    contentType: "application/javascript",
+    body: `
+      (() => {
+        const deliver = (entry) => {
+          if (entry?.[0] !== "event") return;
+          void fetch("https://www.google-analytics.com/g/collect", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ event: entry[1], properties: entry[2] }),
+          });
+        };
+        (window.dataLayer ?? []).forEach((entry) => deliver(Array.from(entry)));
+        const queuedGtag = window.gtag;
+        window.gtag = (...entry) => {
+          queuedGtag?.(...entry);
+          deliver(entry);
+        };
+      })();
+    `,
+  });
+});
+await navigationContext.route(/https:\/\/(?:www|region1)\.google-analytics\.com\/.*/, async (route) => {
+  const raw = route.request().postData();
+  if (raw) navigationGoogleEvents.push(JSON.parse(raw));
+  await route.fulfill({ status: 204, body: "" });
+});
+const navigationPage = await navigationContext.newPage();
+await navigationPage.goto(new URL("/compare/userback", baseUrl).href, { waitUntil: "domcontentloaded" });
+await navigationPage.waitForTimeout(750);
+if (navigationGtmRequests.length) failures.push("navigation handoff: passive browsing requested GTM");
+await navigationContext.route("https://destination.invalid/**", async (route) => {
+  await route.fulfill({ status: 200, contentType: "text/html", body: "<!doctype html><title>Intent destination</title>" });
+});
+await navigationPage.evaluate(() => {
+  const link = document.createElement("a");
+  link.href = "https://destination.invalid/after-intent";
+  link.dataset.analyticsEvent = "compare_demo_click";
+  link.dataset.analyticsLabel = "navigation-handoff";
+  link.textContent = "Continue to the external demo";
+  document.body.append(link);
+});
+const navigationStartedAt = Date.now();
+await Promise.all([
+  navigationPage.waitForURL("https://destination.invalid/after-intent", { timeout: 5000 }),
+  navigationPage.getByText("Continue to the external demo").click(),
+]);
+const navigationDelayMs = Date.now() - navigationStartedAt;
+await navigationPage.waitForTimeout(250);
+const sourceNavigationEvents = navigationGoogleEvents.filter((event) =>
+  event.properties?.page_path === "/compare/userback"
+);
+for (const eventName of ["page_view", "compare_demo_click"]) {
+  const count = sourceNavigationEvents.filter((event) => event.event === eventName).length;
+  if (count !== 1) failures.push(`navigation handoff: GA ${eventName} count was ${count}, expected 1 before unload`);
+}
+if (navigationGtmRequests.length !== 1) failures.push(`navigation handoff: GTM request count was ${navigationGtmRequests.length}, expected 1`);
+if (navigationDelayMs > 2000) failures.push(`navigation handoff exceeded its bounded delay: ${navigationDelayMs}ms`);
+const navigationDelivery = {
+  sourcePath: "/compare/userback",
+  destinationUrl: "https://destination.invalid/after-intent",
+  navigationDelayMs,
+  maximumExpectedDelayMs: 1650,
+  passiveGtmRequests: 0,
+  gtmRequestsAfterIntent: navigationGtmRequests.length,
+  sourceEventsDeliveredBeforeUnload: sourceNavigationEvents,
+  passed: navigationGtmRequests.length === 1 &&
+    ["page_view", "compare_demo_click"].every((eventName) =>
+      sourceNavigationEvents.filter((event) => event.event === eventName).length === 1
+    ),
+};
+await navigationContext.close();
+
+const spaContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+await spaContext.route(/https:\/\/(?:analytics\.invalid|us\.i\.posthog\.com)\/.*/, async (route) => route.fulfill({ status: 204, body: "" }));
+await spaContext.route(/https:\/\/www\.googletagmanager\.com\/.*/, async (route) => route.fulfill({ status: 200, contentType: "application/javascript", body: "" }));
+await spaContext.route(/https:\/\/(?:www|region1)\.google-analytics\.com\/.*/, async (route) => route.fulfill({ status: 204, body: "" }));
+const spaPage = await spaContext.newPage();
+await spaPage.goto(new URL("/compare/userback", baseUrl).href, { waitUntil: "domcontentloaded" });
+await spaPage.waitForTimeout(500);
+const initialTimeOrigin = await spaPage.evaluate(() => performance.timeOrigin);
+await Promise.all([
+  spaPage.waitForURL((url) => url.pathname === "/demo", { timeout: 3000 }),
+  spaPage.locator('[data-analytics-event="compare_demo_click"]').first().click(),
+]);
+const finalTimeOrigin = await spaPage.evaluate(() => performance.timeOrigin);
+const spaNavigation = {
+  sourcePath: "/compare/userback",
+  destinationPath: "/demo",
+  preservedDocument: finalTimeOrigin === initialTimeOrigin,
+};
+if (!spaNavigation.preservedDocument) failures.push("same-origin conversion did not preserve SPA navigation");
+await spaContext.close();
 
 await browser.close();
 
@@ -243,6 +414,8 @@ const result = {
     nextScriptForbiddenForBugDrop: true,
   },
   journeys: evidence,
+  navigationDelivery,
+  spaNavigation,
   failures,
   passed: failures.length === 0,
 };

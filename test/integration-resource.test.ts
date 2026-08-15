@@ -56,6 +56,19 @@ describe("T012 integration and resource contracts", () => {
     expect(globals).not.toContain("--color-text-subtle: #787c99");
   });
 
+  it("keeps the heading font non-blocking without preloading the secondary mono font", async () => {
+    const layout = await readFile("src/app/layout.tsx", "utf8");
+
+    const spaceGrotesk = layout.match(/const spaceGrotesk = Space_Grotesk\(\{[\s\S]*?\n\}\);/)?.[0];
+    const jetbrainsMono = layout.match(/const jetbrainsMono = JetBrains_Mono\(\{[\s\S]*?\n\}\);/)?.[0];
+
+    expect(spaceGrotesk).toContain('display: "optional"');
+    expect(spaceGrotesk).not.toContain("preload: false");
+    expect(jetbrainsMono).toContain('display: "optional"');
+    expect(jetbrainsMono).toContain("preload: false");
+    expect(layout).toContain("`${spaceGrotesk.variable} ${jetbrainsMono.variable}`");
+  });
+
   it("publishes exactly the two approved reusable resources", async () => {
     expect(resourceNav.map(({ slug }) => slug).sort()).toEqual([
       "client-website-qa-checklist",

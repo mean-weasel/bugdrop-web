@@ -68,6 +68,9 @@ for (const route of routes) {
 
   if (axe.violations.length) failures.push(`${route}: ${axe.violations.map((item) => item.id).join(", ")}`);
   if (layout.overflowPx > 1) failures.push(`${route}: ${layout.overflowPx}px document overflow`);
+  if (route === "/" && requests.some((url) => /\/widget(?:\.v[\d.]+)?\.js(?:\?|$)/.test(url))) {
+    failures.push("homepage requested widget.js before demo activation");
+  }
   routeResults.push({ route, axe, layout, requestCount: requests.length, screenshot });
   await page.close();
 }
@@ -84,6 +87,8 @@ page.on("response", (response) => {
 await page.goto(new URL("/", baseUrl).href, { waitUntil: "domcontentloaded" });
 await page.waitForTimeout(1200);
 
+const initialWidgetRequests = initialRequests.filter((url) => /\/widget(?:\.v[\d.]+)?\.js(?:\?|$)/.test(url));
+if (initialWidgetRequests.length) failures.push(`initial widget requests: ${initialWidgetRequests.join(", ")}`);
 const initialThirdPartyMedia = initialRequests.filter((url) =>
   /youtube(?:-nocookie)?\.com|googlevideo\.com|ytimg\.com|api\.producthunt\.com/.test(url),
 );
@@ -105,15 +110,18 @@ for (let index = 0; index < 30; index += 1) {
       href: element.getAttribute("href"),
       analyticsEvent: element.dataset.analyticsEvent,
       videoConsent: element.hasAttribute("data-video-consent"),
+      widgetActivation: element.hasAttribute("data-homepage-widget-activate"),
     };
   }));
 }
 const keyboardReachedTry = keyboardSequence.some((item) => item?.analyticsEvent === "landing_cta_click");
 const keyboardReachedVideo = keyboardSequence.some((item) => item?.videoConsent);
+const keyboardReachedWidget = keyboardSequence.some((item) => item?.widgetActivation);
 if (!keyboardReachedTry) failures.push("keyboard sequence did not reach the primary try CTA");
 if (!keyboardReachedVideo) failures.push("keyboard sequence did not reach the deferred video control");
+if (!keyboardReachedWidget) failures.push("keyboard sequence did not reach the homepage feedback demo");
 
-const coreTouchTargets = await page.locator('[data-analytics-label="Try it on this page"], [data-analytics-label="Install from GitHub Marketplace"], [data-video-consent]').evaluateAll((elements) =>
+const coreTouchTargets = await page.locator('[data-analytics-label="Try it on this page"], [data-analytics-label="Install from GitHub Marketplace"], [data-video-consent], [data-homepage-widget-activate]').evaluateAll((elements) =>
   elements.map((element) => {
     const rect = element.getBoundingClientRect();
     return {
@@ -126,6 +134,33 @@ const coreTouchTargets = await page.locator('[data-analytics-label="Try it on th
 for (const target of coreTouchTargets) {
   if (target.width < 44 || target.height < 44) failures.push(`${target.label}: touch target smaller than 44px`);
 }
+
+const widgetButton = page.locator("[data-homepage-widget-activate]");
+await widgetButton.scrollIntoViewIfNeeded();
+await widgetButton.focus();
+const widgetFocusScreenshot = path.join(outputDir, "home-widget-keyboard-focus.png");
+await page.screenshot({ path: widgetFocusScreenshot, fullPage: false });
+await page.keyboard.press("Enter");
+await page.locator(".bd-modal").waitFor({ state: "visible", timeout: 15_000 });
+const widgetScriptContract = await page.locator("#bugdrop-homepage-demo").evaluate((script) => ({
+  src: script.getAttribute("src"),
+  repo: script.getAttribute("data-repo"),
+  async: script.hasAttribute("async"),
+  defer: script.hasAttribute("defer"),
+}));
+if (widgetScriptContract.repo !== "mean-weasel/bugdrop-widget-test") failures.push("homepage widget repository configuration drifted");
+if (widgetScriptContract.async || widgetScriptContract.defer) failures.push("homepage widget loader added async/defer attributes");
+const activatedWidgetRequests = initialRequests.filter((url) => /\/widget(?:\.v[\d.]+)?\.js(?:\?|$)/.test(url));
+if (activatedWidgetRequests.length !== 1) failures.push(`widget activation requested widget.js ${activatedWidgetRequests.length} times`);
+const widgetKeyboardScreenshot = path.join(outputDir, "home-widget-keyboard-open.png");
+await page.screenshot({ path: widgetKeyboardScreenshot, fullPage: false });
+await page.locator(".bd-close").click();
+await page.locator(".bd-modal").waitFor({ state: "hidden" });
+await widgetButton.click();
+await page.locator(".bd-modal").waitFor({ state: "visible" });
+const widgetPointerScreenshot = path.join(outputDir, "home-widget-pointer-open.png");
+await page.screenshot({ path: widgetPointerScreenshot, fullPage: false });
+await page.locator(".bd-close").click();
 
 const videoButton = page.locator("[data-video-consent]");
 await videoButton.scrollIntoViewIfNeeded();
@@ -161,6 +196,7 @@ const result = {
   keyboard: {
     reachedPrimaryTryCta: keyboardReachedTry,
     reachedDeferredVideoControl: keyboardReachedVideo,
+    reachedHomepageWidget: keyboardReachedWidget,
     sequence: keyboardSequence,
     focusScreenshot,
   },
@@ -171,6 +207,16 @@ const result = {
     iframeAfterKeyboardActivation: true,
     activatedVideoRequests,
     videoResponses,
+  },
+  homepageWidget: {
+    initialRequests: initialWidgetRequests,
+    activatedRequests: activatedWidgetRequests,
+    script: widgetScriptContract,
+    keyboardOperable: true,
+    pointerOperable: true,
+    focusScreenshot: widgetFocusScreenshot,
+    keyboardScreenshot: widgetKeyboardScreenshot,
+    pointerScreenshot: widgetPointerScreenshot,
   },
   conversions,
   failures,

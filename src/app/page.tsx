@@ -1,9 +1,8 @@
-/* eslint-disable @next/next/no-sync-scripts -- BugDrop reads configuration from the executing script; its official contract forbids async/defer. */
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
-import { LiveDemoCta } from "@/components/landing/live-demo-cta";
+import { HomepageWidget } from "@/components/landing/homepage-widget";
 import { DemoVideo } from "@/components/landing/demo-video";
 import { Features } from "@/components/landing/features";
 import { QuickStart } from "@/components/landing/quick-start";
@@ -17,10 +16,6 @@ import {
   softwareApplicationSchema,
   websiteSchema,
 } from "@/lib/seo";
-import {
-  SAMPLE_DEMO_REPO,
-  WIDGET_URL,
-} from "@/lib/links";
 import architecture from "@/lib/acquisition-architecture.json";
 
 const home = architecture.pages.find((page) => page.path === "/")!;
@@ -56,25 +51,9 @@ export default function Home() {
       <JsonLd data={softwareApplicationSchema()} />
       <JsonLd data={organizationSchema()} />
       <JsonLd data={websiteSchema()} />
-      <script
-        src={WIDGET_URL}
-        data-repo={SAMPLE_DEMO_REPO}
-        data-theme="dark"
-        data-position="bottom-right"
-        data-color="#7dcfff"
-        data-bg="#24283b"
-        data-text="#c0caf5"
-        data-border-color="#7dcfff"
-        data-border-width="1"
-        data-radius="10"
-        data-shadow="soft"
-        data-font="inherit"
-        data-label="Feedback"
-        data-welcome="This is the BugDrop landing page demo. Send a test report to see what your users would experience."
-      />
       <Hero />
       <DemoVideo />
-      <LiveDemoCta />
+      <HomepageWidget />
       <HowItWorks />
       <Features />
       <KeywordPositioning />

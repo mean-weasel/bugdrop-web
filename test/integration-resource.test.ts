@@ -20,6 +20,19 @@ describe("T012 integration and resource contracts", () => {
     expect(snippet).not.toMatch(/\b(?:async|defer)\b/);
   });
 
+  it("keeps the homepage widget out of the initial critical path", async () => {
+    const homepage = await readFile("src/app/page.tsx", "utf8");
+    const loader = await readFile("src/components/landing/homepage-widget.tsx", "utf8");
+
+    expect(homepage).toContain("<HomepageWidget />");
+    expect(homepage).not.toContain("<script");
+    expect(loader).toContain('data-homepage-widget-activate');
+    expect(loader).toContain('script.src = WIDGET_URL');
+    expect(loader).toContain('script.async = false');
+    expect(loader).toContain('script.dataset.repo = SAMPLE_DEMO_REPO');
+    expect(loader).toContain('document.body.append(script)');
+  });
+
   it("publishes exactly the two approved reusable resources", async () => {
     expect(resourceNav.map(({ slug }) => slug).sort()).toEqual([
       "client-website-qa-checklist",

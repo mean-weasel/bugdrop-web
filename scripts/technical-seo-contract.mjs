@@ -4,6 +4,7 @@ const baseUrl = new URL(
   process.argv.find((argument) => argument.startsWith("--base-url="))?.split("=")[1] ??
     "http://127.0.0.1:3000",
 );
+const auditBrowserNetwork = process.argv.includes("--audit-browser-network");
 const canonicalOrigin = "https://bugdrop.dev";
 const expectedHeaders = [
   "content-security-policy",
@@ -24,6 +25,12 @@ const requiredCspSources = {
     "https://www.google-analytics.com",
     "https://region1.google-analytics.com",
     "https://www.googletagmanager.com",
+  ],
+  "img-src": [],
+  "frame-src": ["https://www.youtube-nocookie.com"],
+};
+const forbiddenCspSources = {
+  "connect-src": [
     "https://api.producthunt.com",
     "https://img.youtube.com",
     "https://i.ytimg.com",
@@ -33,7 +40,7 @@ const requiredCspSources = {
     "https://img.youtube.com",
     "https://i.ytimg.com",
   ],
-  "frame-src": ["https://www.youtube.com", "https://www.youtube-nocookie.com"],
+  "frame-src": ["https://www.youtube.com"],
 };
 
 function assert(condition, message) {
@@ -189,14 +196,47 @@ for (const path of ["/", "/docs/installation", "/sandbox"]) {
 }
 
 const homepageResponse = await request("/");
+const homepageHtml = await homepageResponse.text();
+assert(
+  !homepageHtml.includes("https://api.producthunt.com"),
+  "homepage HTML must not initiate a Product Hunt API request",
+);
 const csp = parseCsp(homepageResponse.headers.get("content-security-policy"));
 for (const [directive, sources] of Object.entries(requiredCspSources)) {
   const configured = csp.get(directive);
   assert(configured, `CSP is missing ${directive}`);
   for (const source of sources) assert(configured.has(source), `CSP ${directive} blocks required origin ${source}`);
 }
+for (const [directive, sources] of Object.entries(forbiddenCspSources)) {
+  const configured = csp.get(directive);
+  assert(configured, `CSP is missing ${directive}`);
+  for (const source of sources) assert(!configured.has(source), `CSP ${directive} permits obsolete origin ${source}`);
+}
 assert(csp.get("object-src")?.has("'none'"), "CSP must block object embedding");
 assert(csp.get("frame-ancestors")?.has("'none'"), "CSP must block framing");
+
+let initialHomepageProductHuntRequests = null;
+if (auditBrowserNetwork) {
+  const { chromium } = await import("playwright");
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage();
+    const productHuntRequests = [];
+    page.on("request", (browserRequest) => {
+      if (new URL(browserRequest.url()).hostname === "api.producthunt.com") {
+        productHuntRequests.push(browserRequest.url());
+      }
+    });
+    await page.goto(new URL("/", baseUrl).href, { waitUntil: "networkidle" });
+    initialHomepageProductHuntRequests = productHuntRequests.length;
+    assert(
+      initialHomepageProductHuntRequests === 0,
+      `initial homepage requested the Product Hunt API: ${productHuntRequests.join(", ")}`,
+    );
+  } finally {
+    await browser.close();
+  }
+}
 
 const labResponse = await request("/labs/variants");
 const labHtml = await labResponse.text();
@@ -211,5 +251,7 @@ process.stdout.write(
     parsedJsonLdRoutes: sitemapUrls.length,
     representativeHeaderRoutes: 3,
     cspOriginChecks: Object.values(requiredCspSources).flat().length,
+    cspForbiddenOriginChecks: Object.values(forbiddenCspSources).flat().length,
+    initialHomepageProductHuntRequests,
   })}\n`,
 );

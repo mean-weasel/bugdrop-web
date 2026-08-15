@@ -1,29 +1,53 @@
 # Free Website Feedback Widget
 
-BugDrop gives teams a free website feedback widget that creates GitHub Issues instead of locking reports inside a hosted feedback dashboard. It is built for teams that want quick setup, screenshot context, and a workflow developers already use.
+A free website feedback widget is sufficient when the real job is small: collect structured website reports and put them in the tracker engineering already uses. BugDrop is MIT licensed and intentionally avoids a separate feedback dashboard, but “free” does not mean zero operational responsibility.
 
-## When a Free Feedback Widget Is Enough
+**Use this guide when:** cost, ownership, and scope are the primary decision. For the general widget workflow, read [Website Feedback Widget](/use-cases/website-feedback-widget).
 
-Many early-stage products, open-source projects, agencies, and internal teams do not need a full customer-feedback suite. They need a button that lets someone report a bug, capture the page state, and route the issue to the right repository.
+[Try BugDrop before installing](/demo) and [review the source and setup path](/docs/installation).
 
-BugDrop is a strong fit when your goal is:
+## What free should mean
 
-- Collect bug reports from a public website
-- Let users submit feedback without creating an account
-- Capture screenshots and browser metadata
-- Keep triage in GitHub Issues
-- Avoid paying for another feedback inbox before the workflow is proven
+Evaluate a free tool across three costs:
 
-## What You Get
+- **Software cost:** BugDrop's code is MIT licensed, so teams can inspect, adapt, and self-host it without a proprietary software license fee.
+- **Workflow cost:** reports land in GitHub Issues, which avoids operating another feedback inbox when the team already uses GitHub.
+- **Operations cost:** a self-hosted deployment still requires a Cloudflare Worker, GitHub App credentials, updates, abuse controls, screenshot retention decisions, and monitoring.
 
-BugDrop reports can include screenshots, annotations, redactions, page URLs, viewport size, browser, operating system, labels, and category fields. Developers see the report in GitHub and can assign, comment, label, prioritize, and close it in the normal issue workflow.
+The hosted path reduces setup, while self-hosting gives more control. Neither option removes the need to review repository permissions, screenshot privacy, and who will triage incoming issues.
 
-## How It Compares to Paid Tools
+## When the focused tool is enough
 
-Tools like Userback, Marker.io, BugHerd, and Usersnap are useful when you need hosted dashboards, account management, team workflows, and broad integrations. BugDrop is narrower: it focuses on fast GitHub-native website feedback with screenshot context.
+BugDrop fits an early workflow when all of these are true:
 
-That narrower scope is the point. If your team already lives in GitHub, a free widget that creates useful issues can be more efficient than adopting another product.
+1. Reporters need a simple in-page form and do not need BugDrop accounts.
+2. GitHub Issues is the desired system of record.
+3. Browser, OS, viewport, language, URL, category, and optional screenshot context are enough to start triage.
+4. The team can manage labels and assignment in GitHub.
+5. The team accepts that BugDrop is not a survey, voting, roadmap, session-replay, or client-approval platform.
 
-## Start Free
+A common pilot is a documentation or staging site. Add the widget to one page, submit several realistic reports, and measure whether developers can triage them without copying information into another system.
 
-Install BugDrop from GitHub Marketplace, add the widget script, and test a report on a staging page. The [getting started guide](/docs/getting-started) covers the fastest path.
+## What is included
+
+BugDrop can collect a title, description, category, optional submitter fields, system information, attachments, and screenshots. In the manual screenshot flow, reporters can choose a full-page, selected-element, or selected-area capture and review annotations or redactions before submission. Developers can mark sensitive DOM regions for supported visual masking.
+
+The GitHub App creates issues and stores screenshots in the repository on the `bugdrop-screenshots` branch. This keeps the artifact close to the issue, but it also means repository storage and branch workflow are part of the operating model.
+
+## When a paid platform may be the better value
+
+A hosted feedback suite may be worth paying for when non-engineering teams need a managed inbox, client-facing status updates, survey analysis, voting boards, replay, approvals, or several issue destinations. Paying for those workflows can be cheaper than assembling and maintaining them yourself.
+
+BugDrop's narrower scope should be treated as a product boundary, not as evidence that every paid feature is unnecessary. Compare the actual jobs with [Userback](/compare/userback), [Marker.io](/compare/marker-io), [BugHerd](/compare/bugherd), or the [open-source tool shortlist](/compare/open-source-feedback-tools).
+
+## A practical free-tool checklist
+
+Before adopting any free feedback widget, verify:
+
+- The license permits the way you plan to deploy and modify it.
+- The issue destination matches the team's normal triage process.
+- Screenshot storage, masking limits, and retention are acceptable.
+- Abuse protection is appropriate for a public form.
+- Removing or replacing the widget will not strand feedback in an inaccessible system.
+
+Start with the [installation guide](/docs/installation), read the [security model](/docs/security), and test on a low-risk page. Choose the free path only if its boundaries match the job.

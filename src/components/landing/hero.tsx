@@ -1,10 +1,8 @@
-import Image from "next/image";
 import { ArrowUpRight, Code2, MessageSquare } from "lucide-react";
 import {
   GITHUB_ORG_URL,
   GITHUB_REPO_URL,
   MARKETPLACE_URL,
-  PRODUCT_HUNT_BADGE_URL,
   PRODUCT_HUNT_URL,
 } from "@/lib/links";
 
@@ -12,7 +10,7 @@ export function Hero() {
   return (
     <header className="text-center py-16 pb-24 max-sm:-mt-6 max-sm:pt-0 max-sm:pb-16">
       <h1 className="text-[clamp(2.5rem,6vw,4rem)] font-light tracking-tight leading-[1.15] mb-6 text-text-primary max-sm:text-[2.35rem]">
-        Free GitHub Issues feedback widget with
+        BugDrop: website feedback to GitHub Issues with
         <br />
         <strong className="font-bold text-accent-warm">
           screenshots in 30 seconds
@@ -58,14 +56,13 @@ export function Hero() {
           data-analytics-label="Product Hunt badge"
           className="inline-flex transition-transform duration-300 hover:-translate-y-0.5"
         >
-          <Image
-            src={PRODUCT_HUNT_BADGE_URL}
-            alt="BugDrop - In-app feedback that creates GitHub Issues with screenshots | Product Hunt"
-            width={250}
-            height={54}
-            unoptimized
-            className="h-[54px] w-[250px]"
-          />
+          <span className="flex h-[54px] w-[250px] items-center justify-center gap-3 rounded-md border border-border bg-white px-4 text-left text-[#111827] shadow-sm">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#ff6154] text-lg font-bold text-white" aria-hidden="true">P</span>
+            <span className="leading-tight">
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.12em]">Featured on</span>
+              <span className="block text-base font-bold">Product Hunt</span>
+            </span>
+          </span>
         </a>
         <p className="text-sm font-medium text-text-muted">
           #6 Product of the Day · May 9, 2026

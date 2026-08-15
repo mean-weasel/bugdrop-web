@@ -1,0 +1,78 @@
+# Client Website QA Checklist
+
+This client website QA checklist creates a bounded review round before launch or handoff. Every check is visible in the page and printable without JavaScript; the same checklist is available as copied text or a Markdown download. No BugDrop installation, account, or purchase is required.
+
+**Best for:** agencies, freelancers, and product teams reviewing a named staging build with a client. For operating the round, read [Client Feedback Workflow for Web Projects](/use-cases/client-projects).
+
+## 1. Establish the review contract
+
+- [ ] Record the exact review URL, build identifier, and date opened.
+- [ ] Name the pages, components, browsers, languages, and devices in scope.
+- [ ] Record explicitly excluded work, such as new features or content still awaiting approval.
+- [ ] Name the client reviewers, delivery-team triage owner, final approval owner, and deadline.
+- [ ] Decide where defects, questions, and scope changes go; do not mix them silently.
+- [ ] Prepare synthetic accounts and test data. Do not place real credentials in the checklist or reports.
+- [ ] Agree on severity meanings and what blocks approval.
+
+A QA checklist does not replace acceptance criteria. Attach the current requirements, approved design, content source, and supported-browser policy so reviewers know what “correct” means.
+
+## 2. Review responsive and visual behavior
+
+- [ ] Check a narrow mobile width between 320 and 390 pixels, a tablet width, and the agreed desktop width.
+- [ ] Confirm navigation, dialogs, forms, tables, banners, cookie controls, and long text do not clip or create unexplained horizontal scrolling.
+- [ ] Test portrait and landscape where device rotation is supported.
+- [ ] Check logos, photographs, illustrations, icons, image crops, and high-density rendering.
+- [ ] Compare typography, spacing, borders, shadows, colors, and component states with the approved design.
+- [ ] Exercise hover, focus, active, disabled, loading, empty, success, and error states.
+- [ ] Zoom text and page content according to the project's accessibility test policy; record any loss of content or operation.
+
+When a defect is visual, use the [Visual Bug Report Template](/resources/visual-bug-report-template). A screenshot should identify the affected state, not replace expected behavior and reproduction steps.
+
+## 3. Check content, navigation, and forms
+
+- [ ] Read page titles, headings, labels, helper text, errors, legal copy, addresses, dates, prices, and calls to action.
+- [ ] Confirm internal links, external links, downloads, telephone links, and email links reach the intended destination.
+- [ ] Exercise primary navigation, breadcrumbs, footer navigation, browser back/forward, and deep links.
+- [ ] Submit every form with valid data, missing required data, invalid formats, duplicate actions, and a simulated failure when feasible.
+- [ ] Verify confirmation messages explain what happened and what happens next.
+- [ ] Confirm analytics and consent behavior against the project's approved measurement plan rather than assuming events fired.
+- [ ] Review the browser console and failed network requests; classify third-party noise separately from product failures.
+
+## 4. Run an accessibility-oriented pass
+
+- [ ] Navigate the full critical path with a keyboard and confirm focus is visible and ordered logically.
+- [ ] Confirm links and buttons have understandable accessible names.
+- [ ] Check form controls have labels, instructions, and errors that are programmatically associated.
+- [ ] Confirm meaningful images have useful text alternatives and decorative images are ignored appropriately.
+- [ ] Check headings describe page structure without using size alone as hierarchy.
+- [ ] Verify content is not conveyed by color alone and that text and controls meet the project's contrast requirements.
+- [ ] Test with the agreed screen reader and browser combination when accessibility acceptance requires it.
+
+These are preliminary checks, not a conformance audit. The source link below points to W3C WAI Easy Checks; select additional WCAG evaluation appropriate to the product and applicable obligations.
+
+## 5. Protect privacy and preview access
+
+- [ ] Confirm the staging or preview access model matches the intended reviewer group.
+- [ ] Remove production customer data, secrets, private conversations, access tokens, and unnecessary third-party embeds.
+- [ ] Inspect every screenshot before sharing it outside the approved group.
+- [ ] Verify marked private regions are actually covered in each supported capture mode.
+- [ ] Remember that a protected preview does not automatically authenticate a separate hosted feedback endpoint.
+- [ ] Define retention and deletion for uploaded screenshots, reports, recordings, and test accounts.
+
+Read [BugDrop screenshot security](/docs/security) if the review uses in-page capture. Disable screenshots on pages where sensitive pixels cannot be bounded reliably.
+
+## 6. Triage and hand off
+
+- [ ] Give every accepted defect an owner, severity, affected build, and acceptance check.
+- [ ] Merge duplicates without losing distinct evidence or affected pages.
+- [ ] Route questions and new requests to the agreed channel instead of treating them as defects.
+- [ ] Retest blockers and critical paths on the candidate release.
+- [ ] Record deferred work, its owner, and the release or decision where it will return.
+- [ ] Capture client approval with the reviewed build and known exceptions.
+- [ ] Remove or restrict the feedback surface after the round if ongoing collection was not approved.
+
+For Vercel-hosted review, follow [Vercel Preview Feedback](/use-cases/vercel-preview-feedback) and prove that the preview-only script is absent from production. If clients need a broader managed review workspace, compare the requirements in [Client Website Feedback Tool](/use-cases/client-website-feedback-tool) before installing anything.
+
+## Suggested exit criteria
+
+Close the round only when blocking defects are resolved or explicitly accepted, the critical path passes at supported widths, privacy checks pass, remaining issues have owners, and the approval owner identifies the exact build being accepted. Save the completed checklist with the release record. An unchecked box is evidence of incomplete review, not permission to assume the behavior is correct.

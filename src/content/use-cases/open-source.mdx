@@ -1,49 +1,45 @@
-# Open Source Projects
+# Bug Reporting for Open-Source Projects
 
-Collecting structured bug reports from an open source community is one of the most persistent challenges maintainers face. Users file vague issues with titles like "it's broken" or "doesn't work for me," forget to include system information, and rarely attach screenshots. Maintainers then spend more time triaging and requesting additional context than actually fixing bugs. For projects that depend on volunteer effort, this wasted time is especially costly.
+Bug reporting for open-source projects is a maintainer workflow: make reports accessible to the community, collect enough context to act, and protect limited triage time. BugDrop can place a reporter-facing form on a project's documentation, demo, or web interface and route the result to that project's GitHub Issues.
 
-## The Problem with Traditional Bug Reporting
+**Use this guide when:** maintainers and community reporters are the audience. For choosing inspectable software or self-hosting, use [Open-Source Feedback Widget](/use-cases/open-source-feedback-widget).
 
-Most open source projects rely on GitHub issue templates to guide reporters through providing useful information. In theory, templates prompt users to include their browser version, operating system, steps to reproduce, and expected versus actual behavior. In practice, many community users skip the template entirely, delete the placeholder text, or fill it in with one-liners that leave maintainers guessing.
+[Try the community reporter flow](/demo) or [review GitHub issue routing](/use-cases/github-issues-feedback).
 
-Even well-intentioned reporters struggle. Describing a visual bug in words is inherently difficult. "The sidebar overlaps the main content on mobile" could mean a dozen different things depending on the viewport width, browser, and which sidebar element is involved. Without a screenshot, the maintainer has to reproduce the issue blind — often on a different operating system or browser than the reporter is using.
+## Reduce the distance between the bug and the issue
 
-The result is a growing backlog of issues that are difficult to act on, frustrated maintainers who feel like they spend all their time asking clarifying questions, and frustrated users who feel like their reports disappear into a void.
+GitHub issue templates are useful for contributors who already know where the repository lives and how to describe a defect. A visitor on a documentation or demo page may not. An in-page form can collect the report at the moment the problem is visible, without requiring the reporter to create a BugDrop or GitHub account.
 
-## How BugDrop Solves This
+BugDrop adds the current URL, browser, OS, language, and viewport automatically. The reporter supplies the title, description, and Bug, Feature, or Question category. An optional screenshot can show the visual state, and the manual flow supports annotation and redaction.
 
-BugDrop adds a lightweight feedback button directly to your project's demo site, documentation pages, or any web-based interface. When a community member encounters a bug, they click the button, type a short description, and a screenshot of the current page is automatically captured. The reporter can then annotate the screenshot — circling the broken element, drawing an arrow to the misaligned text, or highlighting the area that looks wrong. Once they submit, a well-formatted GitHub issue is created in your repository with the description, the annotated screenshot, and automatically captured system information.
+This does not replace contribution guidelines or reproduction discipline. A screenshot may show that a tab is misaligned, but maintainers may still need example inputs, version information, or reproduction steps that the widget cannot infer.
 
-There is no signup, no account creation, and no friction. The reporter never leaves your site.
+## Design a maintainer-friendly intake
 
-### A Typical Scenario
+Decide these points before adding the widget:
 
-Imagine a user browsing your project's documentation site. They notice that a CSS transition is broken on the code example tabs — clicking between tabs causes a flash of unstyled content. With BugDrop embedded on the docs site, the user clicks the feedback button in the corner, types "Tab switching flashes unstyled content," and the widget captures a screenshot of the exact state of the page. The user circles the tab area in the annotation tool and submits. Thirty seconds later, you have a GitHub issue with a clear description, a visual reference, and the user's browser and OS information — everything you need to investigate and fix the bug without a single follow-up question.
+1. **Placement:** use it where the project has a real web surface—docs, examples, demos, or a hosted interface.
+2. **Destination:** choose a repository with active issue triage and clear ownership.
+3. **Categories:** document how Bug, Feature, and Question submissions are handled.
+4. **Templates and bots:** make sure new issues created by the app do not bypass important contributor guidance or trigger unsafe automation.
+5. **Screenshots:** treat the storage branch as unauthenticated user-generated content and exclude it from privileged workflows.
 
-## Why It Works for OSS
+Public forms can attract spam or sensitive submissions. The hosted service uses rate and size limits, but it is not a moderation product. High-traffic or adversarial projects should evaluate self-hosting with their own WAF, CAPTCHA, logging, retention, and content-filtering controls.
 
-- **No account required** — users do not need a GitHub account or any account at all to report issues, which dramatically lowers the barrier for community members who are not developers
-- **Low friction** — one click to open the widget, a short description, and submit; the entire process takes under a minute
-- **Auto-formatted** — every issue follows a consistent structure with description, screenshot, and system info, so your issue tracker stays organized
-- **Free and open source** — BugDrop itself is MIT licensed, so there is no cost and no vendor lock-in for your project
-- **Screenshots with annotations** — reporters can circle, arrow, and highlight exactly what they see, eliminating the ambiguity of text-only descriptions
-- **System info captured** — browser name and version, operating system, screen resolution, and viewport size are included automatically
-- **Feedback categories** — reporters can tag their submission as a Bug, Feature request, or Question, helping you triage without reading every issue
+## Example: documentation regression
 
-## How to Set It Up
+A user sees that code-example tabs flash an unstyled state after switching. They submit the affected docs URL, state what they expected, and select the tab region for a screenshot. The issue includes the browser and viewport so a maintainer can test the same environment.
 
-Adding BugDrop to your documentation or demo site takes a single script tag:
+The maintainer still checks the current release, asks for missing steps if needed, and links the eventual fix. The widget improves the starting evidence; it does not guarantee a complete or valid bug report.
 
-```html
-<script
-  defer
-  src="https://bugdrop.dev/widget.js"
-  data-repo="your-org/your-repo"
-></script>
-```
+## Protect community and repository data
 
-Replace `your-org/your-repo` with your GitHub repository. The widget appears as a small feedback button in the corner of the page.
+Reporters can redact screenshot regions in the manual flow. Project owners can mark sensitive DOM elements for supported visual masking. Masking is not automatic secret discovery, and media, iframes, canvas, native viewport fallback, and layout changes introduce limits.
 
-## Public and Private Repos
+The GitHub App needs Issues and Contents access to the selected repositories. Grant only the repositories that should receive reports, review app access periodically, and define how screenshots on `bugdrop-screenshots` are retained or removed.
 
-BugDrop works with both public and private GitHub repositories. For public repos, issues are visible to the community. For private repos, issues are only visible to collaborators — useful for projects that want to collect feedback from a public demo site but keep their issue tracker private during early development.
+## Pilot with real maintainer questions
+
+Add the widget to one low-risk documentation or demo route and ask contributors to submit three cases: a visual bug, a feature idea, and a question. Measure whether maintainers can route each report, whether issue automation behaves safely, and what context is still missing.
+
+Use the findings to adjust form fields, contribution copy, labels, and screenshot policy. Then follow [installation](/docs/installation), [security](/docs/security), and the [open-source tool comparison](/compare/open-source-feedback-tools) before expanding the workflow.

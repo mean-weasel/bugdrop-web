@@ -1,63 +1,29 @@
-# BugDrop vs Sentry User Feedback
+# Sentry User Feedback Alternative for GitHub Issues
 
-BugDrop and Sentry's User Feedback widget both collect feedback from users, but they trigger at different moments and serve different purposes. BugDrop lets users proactively report what they see. Sentry captures feedback in response to errors that the application has already detected. Understanding when each tool activates is the key to choosing between them — or using both.
+BugDrop and Sentry User Feedback can both place a feedback control inside an application. BugDrop is centered on a reporter-selected screenshot and GitHub Issue. Sentry User Feedback can attach screenshots with Highlight and Hide tools and connect feedback to replay and application context. [SE-01](#source-sentry-feedback-config "Claim SE-01") [SE-02](#source-sentry-replay "Claim SE-02") [SE-03](#source-bugdrop-repo-sentry "Claim SE-03")
 
-## What is Sentry User Feedback?
+## Quick comparison
 
-Sentry is a production error monitoring platform used by thousands of development teams. When an application throws an unhandled exception, Sentry captures the error, stack trace, breadcrumbs, and user context. Sentry's User Feedback widget extends this by prompting the user to describe what they were doing when the error occurred. The feedback is attached to the error event, giving developers both the technical stack trace and the user's perspective.
-
-Sentry's feedback is error-triggered. The widget appears when the application encounters a JavaScript exception, a failed API call, or another error that Sentry's SDK detects. If the application is working correctly but something looks wrong visually — a misaligned layout, incorrect data, a missing image — Sentry's feedback widget will not activate because there is no error event to trigger it.
-
-Sentry's pricing is based on event volume, with a free tier for small projects and paid plans for higher volumes and advanced features.
-
-## What is BugDrop?
-
-BugDrop is an open-source feedback widget that lets users report bugs at any time, regardless of whether the application has thrown an error. The user clicks a feedback button, describes the issue, and the widget captures an annotated screenshot. The report is submitted as a GitHub Issue with the description, screenshot, system information, and page URL.
-
-BugDrop is user-initiated. It is always available as a button on the page, and the user decides when something looks wrong and worth reporting. This captures a class of issues that automated error monitoring misses entirely — visual bugs, content errors, UX confusion, and design regressions that do not throw exceptions.
-
-## The Key Difference
-
-Sentry User Feedback is reactive — it responds to errors the application has already detected.
-BugDrop is proactive — it lets users report issues the application does not know about.
-
-A CSS bug that causes a button to render off-screen will never trigger a Sentry error. A data display issue where the chart shows the wrong numbers but the API returned a 200 response will not appear in Sentry. A confusing user flow that leads people to the wrong page is invisible to error monitoring. These are the issues BugDrop catches.
-
-Conversely, a JavaScript exception that crashes a feature may not be visually obvious to the user, but Sentry captures it with a full stack trace. BugDrop would only know about it if the user notices something wrong and reports it.
-
-## Feature Comparison
-
-| Feature | BugDrop | Sentry User Feedback |
+| Decision factor | BugDrop | Sentry User Feedback |
 |---|---|---|
-| **Price** | Free / MIT | Free tier + usage-based pricing |
-| **Trigger** | User-initiated (always available) | Error-triggered (appears on exceptions) |
-| **Screenshots** | Yes (with annotations) | No |
-| **Error context** | No (visual reports only) | Yes (stack traces, breadcrumbs) |
-| **Setup** | 1 script tag | Sentry SDK integration |
-| **GitHub Issues** | Yes (native) | Via Sentry-GitHub integration |
-| **Stack traces** | No | Yes |
+| Triage destination | GitHub Issues | Sentry feedback and observability workflow [SE-01](#source-sentry-feedback-config "Claim SE-01") |
+| Trigger options | Widget and JavaScript API | Injected button, custom button, or programmatic dialog [SE-01](#source-sentry-feedback-config "Claim SE-01") |
+| Visual context | Screenshot annotation and redaction | Screenshot attachment with Highlight and Hide tools in SDK 10.10.0+; optional replay context [SE-01](#source-sentry-feedback-config "Claim SE-01") [SE-02](#source-sentry-replay "Claim SE-02") |
+| Observability | No error, trace, or performance monitoring | Sentry platform context [SE-02](#source-sentry-replay "Claim SE-02") |
+| Operations | Hosted widget or self-hosted Worker | Sentry SDK and project configuration [SE-01](#source-sentry-feedback-config "Claim SE-01") |
 
-## When to Choose BugDrop
+## Feedback inside observability
 
-BugDrop is the right choice when you need to capture issues that do not generate errors:
+Sentry's JavaScript documentation describes automatic widget injection, attachment to a custom button, programmatic opening, screenshot attachments, and Highlight and Hide screenshot tools starting in SDK 10.10.0. Its replay documentation describes connecting feedback with behavioral context. [SE-01](#source-sentry-feedback-config "Claim SE-01") [SE-02](#source-sentry-replay "Claim SE-02")
 
-- **Visual bugs** — layout regressions, styling issues, missing images, and rendering problems that look wrong to users but do not throw JavaScript exceptions. BugDrop's screenshot with annotations captures exactly what the user sees.
-- **Content and data errors** — when a chart shows the wrong data, a price is incorrect, or text is truncated, these are issues that only a human can identify. BugDrop gives users a way to flag them.
-- **User-reported UX issues** — confusing flows, misleading button labels, and unclear error messages are not application errors, but they matter. BugDrop captures the user's perspective with visual context.
-- **No error monitoring needed** — for simpler projects, documentation sites, or staging environments where full error monitoring is overkill, BugDrop provides lightweight feedback collection without the overhead of an error monitoring SDK.
+BugDrop does not correlate reports with exceptions, traces, releases, or performance data. Its context is intentionally smaller: reporter text, page and browser details, and an optional annotated screenshot delivered to GitHub. [SE-03](#source-bugdrop-repo-sentry "Claim SE-03")
 
-## When to Choose Sentry User Feedback
+## Screenshot versus replay
 
-Sentry's feedback widget makes sense when you already use Sentry and want to add user context to error reports:
+Both tools document screenshot markup: BugDrop provides its annotation and redaction flow, while Sentry documents Highlight and Hide tools for attached screenshots. Replay can add preceding behavior, but it creates different privacy and retention decisions. [SE-01](#source-sentry-feedback-config "Claim SE-01") [SE-02](#source-sentry-replay "Claim SE-02") [SE-03](#source-bugdrop-repo-sentry "Claim SE-03")
 
-- **Production error tracking** — Sentry's core value is capturing and triaging production errors with stack traces, release tracking, and performance monitoring. The feedback widget adds the user's description to existing error events.
-- **Error context enrichment** — when you have a stack trace but do not know what the user was trying to do, Sentry's feedback connects the technical error to the user's experience.
-- **Crash reporting workflows** — if your error resolution workflow is built around Sentry's issue grouping, assignment, and alerting, keeping user feedback within the same platform maintains a single source of truth.
+The documentation establishes that both products can mark screenshot regions; it does not establish hands-on parity between their editing interfaces or destinations. Evaluate the actual evidence your developers need and review both products' masking and data-handling documentation before enabling capture on sensitive screens. [SE-01](#source-sentry-feedback-config "Claim SE-01") [SE-02](#source-sentry-replay "Claim SE-02") [SE-03](#source-bugdrop-repo-sentry "Claim SE-03")
 
-## Using Both Together
+## A practical decision
 
-BugDrop and Sentry User Feedback are complementary tools that cover different parts of the quality spectrum. Sentry catches what the application knows is wrong — exceptions, failed requests, and performance regressions — and enriches those errors with user feedback. BugDrop catches what only users can see — visual bugs, data errors, and UX confusion — and routes those reports to GitHub Issues.
-
-Running both tools together gives your team comprehensive coverage. Sentry handles the automated error detection layer with deep technical context. BugDrop handles the human observation layer with visual context. Together, they ensure that neither machine-detectable errors nor human-observable issues slip through the cracks.
-
-For teams already using Sentry for error monitoring, adding BugDrop takes one script tag and provides the visual bug reporting that Sentry's feedback widget was not designed to cover.
+Choose BugDrop when the desired endpoint is GitHub and a deliberate visual report is sufficient. Choose Sentry User Feedback when feedback should sit beside errors and replay in an existing Sentry workflow. Using both may be reasonable, but only if their buttons and ownership are clearly differentiated.

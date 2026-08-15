@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PlayCircle } from "lucide-react";
 import { DEMO_PATH } from "@/lib/links";
 import { JsonLd } from "@/components/json-ld";
-import { articleSchema, breadcrumbSchema, pageMetadata } from "@/lib/seo";
+import { breadcrumbSchema, pageMetadata, pageSchema } from "@/lib/seo";
 
 const description =
   "Documentation for installing, configuring, styling, testing, securing, and self-hosting the BugDrop website feedback widget.";
@@ -12,7 +12,6 @@ export const metadata: Metadata = pageMetadata({
   title: "BugDrop Docs",
   description,
   path: "/docs",
-  type: "article",
 });
 
 export default function DocsIndex() {
@@ -25,11 +24,11 @@ export default function DocsIndex() {
         ])}
       />
       <JsonLd
-        data={articleSchema({
+        data={pageSchema({
           title: "BugDrop Docs",
           description,
           path: "/docs",
-          type: "TechArticle",
+          type: "CollectionPage",
         })}
       />
       <h1 className="text-3xl font-bold text-text-primary mb-4">Getting Started</h1>

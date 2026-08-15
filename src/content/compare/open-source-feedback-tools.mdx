@@ -1,36 +1,41 @@
-# Open-Source Feedback Tools
+# Open-Source Website Feedback Tools by Workflow
 
-Open-source website feedback tools are useful when teams want control over cost, data flow, and integration behavior. BugDrop fits this category as a free, MIT-licensed feedback widget that sends screenshot bug reports directly to GitHub Issues.
+“Open-source feedback tool” is not one product category. A visual bug report, a survey response, and a session replay produce different evidence and require different infrastructure. Start with the job after collection, then evaluate license and hosting details. [OS-01](#source-bugdrop-repo-open-source "Claim OS-01") [OS-02](#source-formbricks-repo "Claim OS-02") [OS-03](#source-openreplay-repo "Claim OS-03")
 
-## What to Look For
+## Shortlist by job
 
-When evaluating open-source feedback tools, focus on the workflow you want after a user submits feedback:
+| Tool | Best-aligned workflow | Important tradeoff |
+|---|---|---|
+| BugDrop | Reporter-authored screenshot and context to GitHub Issues | No surveys, replay, analytics, or standalone dashboard [OS-01](#source-bugdrop-repo-open-source "Claim OS-01") |
+| Formbricks | Website, in-app, link, and email surveys with analysis | Broader application and data stack; repository includes core and enterprise licensing [OS-02](#source-formbricks-repo "Claim OS-02") |
+| OpenReplay | Self-hosted session replay and debugging context | Captures behavioral data rather than a concise reporter-authored issue [OS-03](#source-openreplay-repo "Claim OS-03") |
 
-- **Issue destination** -- where does the report land?
-- **Visual context** -- are screenshots and annotations included?
-- **Privacy controls** -- can sensitive page content be redacted or masked?
-- **Setup complexity** -- does it require a backend, database, or account system?
-- **Self-hosting** -- can your team run the infrastructure?
-- **Maintenance fit** -- does it align with your existing development workflow?
+This documentation-based shortlist groups workflows; it does not claim that the products are interchangeable.
 
-## Where BugDrop Fits
+## BugDrop: focused issue intake
 
-BugDrop is strongest when GitHub Issues is already your team's issue tracker. It does not try to be a customer feedback portal, survey product, or roadmap tool. It focuses on one workflow: users report what they see, and developers receive a useful GitHub Issue.
+BugDrop is the narrowest option here. A reporter can describe a problem, capture or select a screenshot, annotate or redact it, and create a GitHub Issue with page and browser context. The project is MIT licensed, and self-hosting uses a Cloudflare Worker plus a GitHub App. [OS-01](#source-bugdrop-repo-open-source "Claim OS-01")
 
-## Strengths
+That fit is strongest when GitHub already owns triage. It is weak when feedback must be aggregated into research, replayed as behavior, or presented on a public portal.
 
-- Free and MIT licensed
-- One-script installation
-- Screenshots, annotations, and system information
-- Manual screenshot redaction and `data-bugdrop-mask`
-- GitHub App integration
-- Self-hostable Cloudflare Worker architecture
-- No reporter accounts required
+## Formbricks: surveys and experience research
 
-## Tradeoffs
+Formbricks describes website, in-app, link, and email surveys, targeting, templates, collaboration, integrations, and analysis. Its core is AGPLv3, while its repository also contains enterprise-licensed functionality. Review that boundary against your deployment and modification plans rather than treating “open source” as a single permission set. [OS-02](#source-formbricks-repo "Claim OS-02")
 
-BugDrop is intentionally focused. It does not include voting boards, customer feedback analytics, session replay, product roadmaps, or a standalone dashboard. If you need those features, a hosted feedback suite may be a better fit.
+Choose it over BugDrop when structured questions and response analysis are the product requirement. A survey can surface sentiment and demand; it does not automatically become a reproducible visual bug report.
 
-## Recommended Next Step
+## OpenReplay: behavioral debugging context
 
-Try the [BugDrop demo](/demo), then follow the [installation guide](/docs/installation). If your site contains private customer or billing information, review [security and screenshot masking](/docs/security) before installing.
+OpenReplay describes self-hosted session replay, developer tooling, captured technical activity, privacy controls, and product analytics. Its repository notes that the monorepo uses several licenses, so inspect the exact components you plan to deploy. [OS-03](#source-openreplay-repo "Claim OS-03")
+
+Choose it over BugDrop when the team needs to reconstruct what happened before an issue or investigate behavior across sessions. Its documented session-replay workflow captures a different evidence set than a user-submitted screenshot. [OS-03](#source-openreplay-repo "Claim OS-03")
+
+## Evaluation checklist
+
+- Define whether the output should be an issue, survey dataset, or replay.
+- Inspect the exact license for the deployed components and planned modifications.
+- Map captured data, storage location, retention, access, and deletion.
+- Estimate operations for authentication, databases, queues, object storage, upgrades, and backups.
+- Confirm the destination fits the team that must act on the feedback.
+
+For a screenshot-to-GitHub workflow, begin with BugDrop. For another job, choose the tool designed for that job rather than forcing a bug widget to become a research or observability platform.

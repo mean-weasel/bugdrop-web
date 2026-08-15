@@ -4,10 +4,10 @@ import { docsNav } from "@/lib/docs-nav";
 import Link from "next/link";
 import { JsonLd } from "@/components/json-ld";
 import {
-  articleSchema,
   breadcrumbSchema,
   faqSchema,
   pageMetadata,
+  pageSchema,
   videoSchema,
 } from "@/lib/seo";
 
@@ -59,7 +59,7 @@ export default async function DocPage({
           ])}
         />
         <JsonLd
-          data={articleSchema({
+          data={pageSchema({
             title: `${doc.title} — BugDrop Docs`,
             description: doc.description,
             path: `/docs/${slug}`,

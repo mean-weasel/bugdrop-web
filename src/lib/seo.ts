@@ -10,7 +10,6 @@ import {
 
 export const SITE_URL = "https://bugdrop.dev";
 export const SITE_NAME = "BugDrop";
-export const SITE_UPDATED = "2026-05-30";
 
 export const homeDescription =
   "Free, open-source website feedback widget for GitHub Issues. Capture bug reports with screenshots, annotations, browser metadata, and privacy controls from one script tag.";
@@ -157,16 +156,16 @@ export function breadcrumbSchema(items: Array<{ name: string; path: string }>) {
   };
 }
 
-export function articleSchema({
+export function pageSchema({
   title,
   description,
   path,
-  type = "Article",
+  type = "WebPage",
 }: {
   title: string;
   description: string;
   path: string;
-  type?: "Article" | "TechArticle";
+  type?: "WebPage" | "CollectionPage" | "TechArticle";
 }) {
   return {
     "@context": "https://schema.org",
@@ -174,23 +173,30 @@ export function articleSchema({
     headline: title,
     description,
     url: absoluteUrl(path),
-    datePublished: SITE_UPDATED,
-    dateModified: SITE_UPDATED,
-    author: {
-      "@type": "Organization",
-      name: "mean-weasel",
-      url: GITHUB_ORG_URL,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "mean-weasel",
-      url: GITHUB_ORG_URL,
+    isPartOf: {
+      "@type": "WebSite",
+      name: SITE_NAME,
+      url: SITE_URL,
     },
     about: {
       "@type": "SoftwareApplication",
       name: SITE_NAME,
       url: SITE_URL,
     },
+    ...(type === "TechArticle"
+      ? {
+          author: {
+            "@type": "Organization",
+            name: "mean-weasel",
+            url: GITHUB_ORG_URL,
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "mean-weasel",
+            url: GITHUB_ORG_URL,
+          },
+        }
+      : {}),
   };
 }
 

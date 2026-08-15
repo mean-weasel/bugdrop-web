@@ -9,7 +9,7 @@ const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const posthogHost =
   process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
-const attributionStorageKey = "bugdrop_attribution";
+const attributionStorageKey = "bugdrop_attribution_v2";
 const campaignParamKeys = [
   "utm_source",
   "utm_medium",
@@ -22,6 +22,30 @@ const campaignParamKeys = [
   "msclkid",
   "fbclid",
 ] as const;
+const paidClickParamKeys = ["gclid", "gbraid", "wbraid", "msclkid", "fbclid"] as const;
+const paidMediums = new Set(["cpc", "ppc", "paid", "paid-search", "paid_search"]);
+const organicMediums = new Set(["organic", "organic-search", "organic_search"]);
+const emailMediums = new Set(["email", "newsletter"]);
+const socialMediums = new Set(["social", "social-media", "social_media"]);
+const searchEngines = [
+  [/(^|\.)google\./, "google"],
+  [/(^|\.)bing\.com$/, "bing"],
+  [/(^|\.)duckduckgo\.com$/, "duckduckgo"],
+  [/(^|\.)search\.yahoo\./, "yahoo"],
+  [/(^|\.)brave\.com$/, "brave"],
+  [/(^|\.)ecosia\.org$/, "ecosia"],
+] as const;
+const socialHosts = /(^|\.)(facebook\.com|instagram\.com|linkedin\.com|reddit\.com|t\.co|x\.com|youtube\.com)$/;
+
+type StoredAttribution = {
+  first_landing_page: string;
+  first_acquisition_channel: string;
+  first_referrer_type: string;
+  first_search_engine?: string;
+  first_campaign_present: boolean;
+  first_paid_click_present: boolean;
+  first_seen_at: string;
+};
 
 declare global {
   interface Window {
@@ -30,9 +54,8 @@ declare global {
   }
 }
 
-function currentUrl(pathname: string, searchParams: URLSearchParams) {
-  const query = searchParams.toString();
-  return query ? `${pathname}?${query}` : pathname;
+function pagePath(pathname: string) {
+  return pathname.startsWith("/") ? pathname.split(/[?#]/, 1)[0] : "/";
 }
 
 function safeLocalStorageGet(key: string) {
@@ -51,75 +74,125 @@ function safeLocalStorageSet(key: string, value: string) {
   }
 }
 
-function searchParamsObject(searchParams: URLSearchParams) {
-  const params: Record<string, string> = {};
+function campaignSignals(searchParams: URLSearchParams) {
+  const medium = searchParams.get("utm_medium")?.trim().toLowerCase();
+  const campaignPresent = campaignParamKeys.some((key) => searchParams.has(key));
+  const paidClickPresent = paidClickParamKeys.some((key) => searchParams.has(key));
+  const mediumCategory = !medium
+    ? undefined
+    : paidMediums.has(medium)
+      ? "paid"
+      : organicMediums.has(medium)
+        ? "organic"
+        : emailMediums.has(medium)
+          ? "email"
+          : socialMediums.has(medium)
+            ? "social"
+            : "other";
 
-  for (const key of campaignParamKeys) {
-    const value = searchParams.get(key);
-    if (value) params[key] = value;
-  }
-
-  return params;
+  return {
+    campaign_present: campaignPresent,
+    paid_click_present: paidClickPresent,
+    campaign_medium_category: mediumCategory,
+  };
 }
 
-function parseStoredAttribution() {
+function parseStoredAttribution(): StoredAttribution | null {
   const stored = safeLocalStorageGet(attributionStorageKey);
   if (!stored) return null;
 
   try {
-    return JSON.parse(stored) as Record<string, string | undefined>;
+    const parsed = JSON.parse(stored) as Partial<StoredAttribution>;
+    if (
+      typeof parsed.first_landing_page !== "string" ||
+      !parsed.first_landing_page.startsWith("/") ||
+      parsed.first_landing_page.includes("?") ||
+      typeof parsed.first_acquisition_channel !== "string" ||
+      typeof parsed.first_referrer_type !== "string" ||
+      typeof parsed.first_campaign_present !== "boolean" ||
+      typeof parsed.first_paid_click_present !== "boolean" ||
+      typeof parsed.first_seen_at !== "string"
+    ) return null;
+    return parsed as StoredAttribution;
   } catch {
     return null;
   }
 }
 
-function referrerDomain(referrer: string) {
-  if (!referrer) return undefined;
+function referrerSignals(referrer: string) {
+  if (!referrer) return { referrer_type: "none" as const };
 
   try {
-    return new URL(referrer).hostname;
+    const hostname = new URL(referrer).hostname.toLowerCase().replace(/^www\./, "");
+    if (hostname === window.location.hostname) return { referrer_type: "internal" as const };
+    const searchEngine = searchEngines.find(([pattern]) => pattern.test(hostname))?.[1];
+    if (searchEngine) return { referrer_type: "search" as const, search_engine: searchEngine };
+    if (socialHosts.test(hostname)) return { referrer_type: "social" as const };
+    return { referrer_type: "referral" as const };
   } catch {
-    return undefined;
+    return { referrer_type: "invalid" as const };
   }
 }
 
-function attributionProperties(pagePath: string, searchParams: URLSearchParams) {
-  const currentParams = searchParamsObject(searchParams);
+function acquisitionChannel(
+  campaign: ReturnType<typeof campaignSignals>,
+  referrer: ReturnType<typeof referrerSignals>,
+) {
+  if (campaign.paid_click_present || campaign.campaign_medium_category === "paid") return "paid_search";
+  if (campaign.campaign_medium_category === "organic" || referrer.referrer_type === "search") return "organic_search";
+  if (campaign.campaign_medium_category === "email") return "email";
+  if (campaign.campaign_medium_category === "social" || referrer.referrer_type === "social") return "social";
+  if (campaign.campaign_present) return "campaign";
+  if (referrer.referrer_type === "referral") return "referral";
+  return "direct";
+}
+
+function attributionProperties(currentPagePath: string, searchParams: URLSearchParams) {
+  const campaign = campaignSignals(searchParams);
+  const referrer = referrerSignals(document.referrer);
+  const channel = acquisitionChannel(campaign, referrer);
   const stored = parseStoredAttribution();
-  const firstTouch = {
-    ...(stored ?? {}),
-    first_landing_page: stored?.first_landing_page ?? pagePath,
-    first_referrer: (stored?.first_referrer ?? document.referrer) || undefined,
-    first_referring_domain:
-      stored?.first_referring_domain ?? referrerDomain(document.referrer),
-    first_seen_at: stored?.first_seen_at ?? new Date().toISOString(),
-    ...Object.fromEntries(
-      Object.entries(currentParams)
-        .filter(([key]) => !stored?.[`first_${key}`])
-        .map(([key, value]) => [`first_${key}`, value]),
-    ),
+  const firstTouch: StoredAttribution = stored ?? {
+    first_landing_page: currentPagePath,
+    first_acquisition_channel: channel,
+    first_referrer_type: referrer.referrer_type,
+    first_search_engine: "search_engine" in referrer ? referrer.search_engine : undefined,
+    first_campaign_present: campaign.campaign_present,
+    first_paid_click_present: campaign.paid_click_present,
+    first_seen_at: new Date().toISOString(),
   };
 
-  if (!stored) {
-    safeLocalStorageSet(attributionStorageKey, JSON.stringify(firstTouch));
-  } else if (!stored.first_landing_page) {
-    safeLocalStorageSet(attributionStorageKey, JSON.stringify(firstTouch));
-  }
+  if (!stored) safeLocalStorageSet(attributionStorageKey, JSON.stringify(firstTouch));
 
   return {
     ...firstTouch,
-    referrer: document.referrer || undefined,
-    referring_domain: referrerDomain(document.referrer),
-    landing_page: pagePath,
-    ...currentParams,
+    landing_page: currentPagePath,
+    acquisition_channel: channel,
+    referrer_type: referrer.referrer_type,
+    search_engine: "search_engine" in referrer ? referrer.search_engine : undefined,
+    ...campaign,
+    event_model_version: "2026-08-14",
   };
 }
 
 function currentAttributionProperties() {
   return attributionProperties(
-    `${window.location.pathname}${window.location.search}`,
+    pagePath(window.location.pathname),
     new URLSearchParams(window.location.search),
   );
+}
+
+function safeDestination(href: string | null) {
+  if (!href) return undefined;
+  try {
+    const destination = new URL(href, window.location.origin);
+    if (!new Set(["http:", "https:"]).has(destination.protocol)) return destination.protocol;
+    return destination.origin === window.location.origin
+      ? destination.pathname
+      : `${destination.origin}${destination.pathname}`;
+  } catch {
+    return undefined;
+  }
 }
 
 function sendGoogleAnalytics(command: string, ...args: unknown[]) {
@@ -155,7 +228,7 @@ function capturePostHogEvent(
     event: eventName,
     distinct_id: posthogDistinctId(),
     properties: {
-      $current_url: window.location.href,
+      $current_url: `${window.location.origin}${pagePath(window.location.pathname)}`,
       $host: window.location.host,
       $pathname: window.location.pathname,
       ...properties,
@@ -181,13 +254,12 @@ function captureEvent(eventName: string, properties: Record<string, unknown>) {
 }
 
 function sendGooglePageView(
-  pagePath: string,
+  currentPagePath: string,
   properties: Record<string, unknown>,
 ) {
   sendGoogleAnalytics("event", "page_view", {
-    page_location: window.location.href,
-    page_path: pagePath,
-    page_title: document.title,
+    page_location: `${window.location.origin}${pagePath(window.location.pathname)}`,
+    page_path: currentPagePath,
     ...properties,
   });
 }
@@ -197,13 +269,13 @@ function PageViewTracker() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const pagePath = currentUrl(pathname, searchParams);
-    const attribution = attributionProperties(pagePath, searchParams);
+    const currentPagePath = pagePath(pathname);
+    const attribution = attributionProperties(currentPagePath, searchParams);
     let cancelled = false;
     let attempts = 0;
 
     capturePostHogEvent("$pageview", {
-      page_path: pagePath,
+      page_path: currentPagePath,
       ...attribution,
     });
 
@@ -211,7 +283,7 @@ function PageViewTracker() {
       if (cancelled) return;
 
       if (window.gtag || attempts >= 20) {
-        sendGooglePageView(pagePath, attribution);
+        sendGooglePageView(currentPagePath, attribution);
         return;
       }
 
@@ -235,15 +307,35 @@ function PageViewTracker() {
       if (!el) return;
 
       captureEvent(el.dataset.analyticsEvent ?? "site_interaction", {
-        label: el.dataset.analyticsLabel ?? el.textContent?.trim() ?? undefined,
-        destination: el.getAttribute("href") ?? undefined,
-        page_path: currentUrl(pathname, searchParams),
-        ...attributionProperties(currentUrl(pathname, searchParams), searchParams),
+        label: el.dataset.analyticsLabel ?? "unlabeled",
+        destination: safeDestination(el.getAttribute("href")),
+        page_path: pagePath(pathname),
+        ...attributionProperties(pagePath(pathname), searchParams),
       });
     };
 
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
+  }, [pathname, searchParams]);
+
+  useEffect(() => {
+    const handleSuccessEvent = (event: Event) => {
+      const detail = (event as CustomEvent<{ eventName?: string; label?: string }>).detail;
+      if (
+        !detail ||
+        !detail.eventName?.match(/^[a-z0-9_]{3,64}$/) ||
+        !detail.label?.match(/^[A-Za-z0-9 .:/+_-]{3,80}$/)
+      ) return;
+
+      captureEvent(detail.eventName, {
+        label: detail.label,
+        page_path: pagePath(pathname),
+        ...attributionProperties(pagePath(pathname), searchParams),
+      });
+    };
+
+    window.addEventListener("bugdrop:analytics-success", handleSuccessEvent);
+    return () => window.removeEventListener("bugdrop:analytics-success", handleSuccessEvent);
   }, [pathname, searchParams]);
 
   return null;

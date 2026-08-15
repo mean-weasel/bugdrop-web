@@ -1,0 +1,175 @@
+[
+  {
+    "slug": "userback",
+    "verifiedDate": "2026-08-14",
+    "publisher": "BugDrop",
+    "reviewMethod": "First-party documentation review",
+    "researchBasis": "Documentation review only; no hands-on competitor testing is claimed.",
+    "summary": "Choose BugDrop for a focused annotated-screenshot-to-GitHub workflow. Choose Userback when a managed feedback workspace, session replay, surveys, or a feature portal matters more than keeping triage entirely in GitHub.",
+    "bugdropWins": "GitHub Issues is already the source of truth and the team wants an inspectable, self-hostable widget without a separate feedback inbox.",
+    "competitorWins": "A product or agency team needs a hosted feedback inbox, session replay, surveys, portal workflows, or integrations beyond GitHub.",
+    "bugdropLimitation": "BugDrop has no session replay, survey builder, voting portal, standalone dashboard, or multi-tracker integration catalog.",
+    "claimRefs": { "summary": ["UB-01", "UB-02", "UB-04"], "bugdropWins": ["UB-04"], "competitorWins": ["UB-01", "UB-02", "UB-03"], "bugdropLimitation": ["UB-01", "UB-02", "UB-04"] },
+    "sources": [
+      { "id": "userback-features", "label": "Userback features", "url": "https://userback.io/features/", "supports": "Visual feedback, annotations, video, session replay, surveys, portal, and integrations.", "claimIds": ["UB-01", "UB-02"] },
+      { "id": "userback-pricing", "label": "Userback pricing", "url": "https://userback.io/pricing/", "supports": "Current plan structure, availability limits, and plan-specific capabilities.", "claimIds": ["UB-03"] },
+      { "id": "bugdrop-repo-userback", "label": "BugDrop source and license", "url": "https://github.com/mean-weasel/bugdrop", "supports": "Open-source implementation, GitHub Issue destination, capabilities, and repository license.", "claimIds": ["UB-04"] }
+    ]
+  },
+  {
+    "slug": "marker-io",
+    "verifiedDate": "2026-08-14",
+    "publisher": "BugDrop",
+    "reviewMethod": "First-party documentation review",
+    "researchBasis": "Documentation review only; no hands-on competitor testing is claimed.",
+    "summary": "Both products can route visual reports to GitHub. BugDrop is the smaller GitHub-native path; Marker.io adds a managed reporter workflow, two-way synchronization, and a broader integration catalog.",
+    "bugdropWins": "The team only needs visual reports to become GitHub Issues and values open-source control over a managed review layer.",
+    "competitorWins": "Guests, clients, and QA need managed forms, reporter notifications, two-way synchronization, or destinations such as Jira, Linear, Trello, and Asana.",
+    "bugdropLimitation": "BugDrop does not provide two-way status synchronization, a hosted guest portal, reporter notifications, or non-GitHub issue destinations.",
+    "claimRefs": { "summary": ["MK-01", "MK-02", "MK-03"], "bugdropWins": ["MK-03"], "competitorWins": ["MK-01", "MK-02"], "bugdropLimitation": ["MK-02", "MK-03"] },
+    "sources": [
+      { "id": "marker-features", "label": "Marker.io product tour", "url": "https://marker.io/features", "supports": "Annotations, screen capture, technical metadata, install options, and supported integrations.", "claimIds": ["MK-01"] },
+      { "id": "marker-github", "label": "Marker.io GitHub integration", "url": "https://help.marker.io/en/articles/6442000-github-integration", "supports": "GitHub issue routing, field mapping, reporter updates, and two-way synchronization.", "claimIds": ["MK-02"] },
+      { "id": "bugdrop-repo-marker", "label": "BugDrop source and license", "url": "https://github.com/mean-weasel/bugdrop", "supports": "Open-source implementation, GitHub Issue destination, capabilities, and repository license.", "claimIds": ["MK-03"] }
+    ]
+  },
+  {
+    "slug": "bugherd",
+    "verifiedDate": "2026-08-14",
+    "publisher": "BugDrop",
+    "reviewMethod": "First-party documentation review",
+    "researchBasis": "Documentation review only; no hands-on competitor testing is claimed.",
+    "summary": "Choose BugDrop when website reports should land directly in GitHub Issues. Choose BugHerd when client review should be managed on a dedicated task board before or alongside engineering delivery.",
+    "bugdropWins": "A developer-led team wants a direct GitHub destination, open-source code, and no additional client-review board.",
+    "competitorWins": "An agency needs pinned client comments, guest permissions, feedback deadlines, deliverable review, and a dedicated task board.",
+    "bugdropLimitation": "BugDrop has no client-facing task board, feedback deadlines, guest permission model, PDF/design review, or built-in approval workflow.",
+    "claimRefs": { "summary": ["BH-01", "BH-03"], "bugdropWins": ["BH-03"], "competitorWins": ["BH-01", "BH-02"], "bugdropLimitation": ["BH-01", "BH-02", "BH-03"] },
+    "sources": [
+      { "id": "bugherd-product", "label": "BugHerd product overview", "url": "https://bugherd.com/", "supports": "Pinned comments, screenshots, technical details, client collaboration, task board, deliverable review, and integrations.", "claimIds": ["BH-01"] },
+      { "id": "bugherd-feedback", "label": "BugHerd feedback settings", "url": "https://support.bugherd.com/en/articles/11425144-feedback-settings", "supports": "Feedback triage, public feedback, and scheduled feedback deadlines.", "claimIds": ["BH-02"] },
+      { "id": "bugdrop-repo-bugherd", "label": "BugDrop source and license", "url": "https://github.com/mean-weasel/bugdrop", "supports": "Open-source implementation, GitHub Issue destination, capabilities, and repository license.", "claimIds": ["BH-03"] }
+    ]
+  },
+  {
+    "slug": "usersnap",
+    "verifiedDate": "2026-08-14",
+    "publisher": "BugDrop",
+    "reviewMethod": "First-party documentation review",
+    "researchBasis": "Documentation review only; no hands-on competitor testing is claimed.",
+    "summary": "BugDrop is a focused GitHub issue intake widget. Usersnap is a broader customer feedback platform spanning visual feedback, surveys, analysis, and product communication.",
+    "bugdropWins": "Engineering owns intake in GitHub and needs annotated screenshots and browser context without adopting a customer-insight platform.",
+    "competitorWins": "Product and customer-experience teams need surveys, feedback analysis, multiple spaces, screen recordings, and user-facing follow-up workflows.",
+    "bugdropLimitation": "BugDrop does not aggregate customer insights, run surveys, record screens, publish updates, or provide a feedback analytics workspace.",
+    "claimRefs": { "summary": ["US-01", "US-02", "US-03"], "bugdropWins": ["US-03"], "competitorWins": ["US-01", "US-02"], "bugdropLimitation": ["US-01", "US-03"] },
+    "sources": [
+      { "id": "usersnap-pricing", "label": "Usersnap pricing and feature matrix", "url": "https://usersnap.com/pricing", "supports": "Current visual feedback, screen recording, survey, space, analysis, and update capabilities.", "claimIds": ["US-01"] },
+      { "id": "usersnap-product", "label": "Usersnap product overview", "url": "https://usersnap.com/", "supports": "Customer feedback platform positioning and core feedback workflows.", "claimIds": ["US-02"] },
+      { "id": "bugdrop-repo-usersnap", "label": "BugDrop source and license", "url": "https://github.com/mean-weasel/bugdrop", "supports": "Open-source implementation, GitHub Issue destination, capabilities, and repository license.", "claimIds": ["US-03"] }
+    ]
+  },
+  {
+    "slug": "canny",
+    "verifiedDate": "2026-08-14",
+    "publisher": "BugDrop",
+    "reviewMethod": "First-party documentation review",
+    "researchBasis": "Documentation review only; no hands-on competitor testing is claimed.",
+    "summary": "BugDrop reports concrete website problems to GitHub. Canny gathers and prioritizes product demand through feedback boards, roadmaps, and changelogs. Many teams may use both.",
+    "bugdropWins": "The immediate job is to capture a visual defect with page and browser context for developer triage in GitHub.",
+    "competitorWins": "The product team needs voting, segmentation, prioritization, a public roadmap, and a changelog to close the feature-feedback loop.",
+    "bugdropLimitation": "BugDrop has no voting board, request deduplication, prioritization scoring, roadmap, changelog, or customer segmentation.",
+    "claimRefs": { "summary": ["CA-01", "CA-03"], "bugdropWins": ["CA-03"], "competitorWins": ["CA-01", "CA-02"], "bugdropLimitation": ["CA-01", "CA-03"] },
+    "sources": [
+      { "id": "canny-features", "label": "Canny features", "url": "https://canny.io/features", "supports": "Feedback boards, analysis, prioritization, roadmaps, and changelog capabilities.", "claimIds": ["CA-01"] },
+      { "id": "canny-billing", "label": "Canny current billing plans", "url": "https://help.canny.io/en/articles/9131812-canny-s-billing-plans", "supports": "Current plan names, tracked-user model, and integration availability.", "claimIds": ["CA-02"] },
+      { "id": "bugdrop-repo-canny", "label": "BugDrop source and license", "url": "https://github.com/mean-weasel/bugdrop", "supports": "Open-source implementation, GitHub Issue destination, capabilities, and repository license.", "claimIds": ["CA-03"] }
+    ]
+  },
+  {
+    "slug": "sentry-user-feedback",
+    "verifiedDate": "2026-08-14",
+    "publisher": "BugDrop",
+    "reviewMethod": "First-party documentation review",
+    "researchBasis": "Documentation review only; no hands-on competitor testing is claimed.",
+    "summary": "BugDrop centers an annotated screenshot and GitHub Issue. Sentry User Feedback can attach a screenshot with Highlight and Hide tools, and can associate feedback with replay inside its observability platform.",
+    "bugdropWins": "GitHub is the only required triage destination and the team wants BugDrop's dedicated screenshot-to-issue workflow.",
+    "competitorWins": "The application already uses Sentry and wants feedback with optional screenshots, Highlight and Hide markup, errors, traces, or replay context in that platform.",
+    "bugdropLimitation": "BugDrop is not an observability product: it has no error monitoring, tracing, performance monitoring, or session replay.",
+    "claimRefs": { "summary": ["SE-01", "SE-02", "SE-03"], "bugdropWins": ["SE-03"], "competitorWins": ["SE-01", "SE-02"], "bugdropLimitation": ["SE-02", "SE-03"] },
+    "sources": [
+      { "id": "sentry-feedback-config", "label": "Sentry User Feedback configuration", "url": "https://docs.sentry.io/platforms/javascript/guides/react/user-feedback/configuration/", "supports": "Screenshot attachments plus Highlight and Hide screenshot tools (SDK 10.10.0+), injected/custom triggers, and programmatic dialogs.", "claimIds": ["SE-01"] },
+      { "id": "sentry-replay", "label": "Sentry Session Replay", "url": "https://docs.sentry.io/platforms/javascript/session-replay/", "supports": "Replay setup, privacy controls, and observability context.", "claimIds": ["SE-02"] },
+      { "id": "bugdrop-repo-sentry", "label": "BugDrop source and license", "url": "https://github.com/mean-weasel/bugdrop", "supports": "Open-source implementation, GitHub Issue destination, capabilities, and repository license.", "claimIds": ["SE-03"] }
+    ]
+  },
+  {
+    "slug": "open-source-feedback-tools",
+    "verifiedDate": "2026-08-14",
+    "publisher": "BugDrop",
+    "reviewMethod": "First-party documentation review",
+    "researchBasis": "Documentation review only; no hands-on testing of the listed projects is claimed.",
+    "summary": "Open source describes licensing and inspectability, not one workflow. BugDrop fits visual reports to GitHub; Formbricks fits surveys; OpenReplay fits session replay and debugging context.",
+    "bugdropWins": "A team wants the smallest focused path from a reporter-selected screenshot to a structured GitHub Issue.",
+    "competitorWins": "Choose Formbricks for survey design and analysis, or OpenReplay when reproducing behavior through self-hosted session replay matters more than a reporter-authored screenshot.",
+    "bugdropLimitation": "BugDrop is not a survey platform, session replay system, analytics suite, or general-purpose feedback portal; self-hosting also requires operating a Cloudflare Worker and GitHub App.",
+    "claimRefs": { "summary": ["OS-01", "OS-02", "OS-03"], "bugdropWins": ["OS-01"], "competitorWins": ["OS-02", "OS-03"], "bugdropLimitation": ["OS-01", "OS-02", "OS-03"] },
+    "sources": [
+      { "id": "bugdrop-repo-open-source", "label": "BugDrop source and license", "url": "https://github.com/mean-weasel/bugdrop", "supports": "MIT-licensed widget implementation, GitHub Issue workflow, capabilities, and self-hosting materials.", "claimIds": ["OS-01"] },
+      { "id": "formbricks-repo", "label": "Formbricks repository", "url": "https://github.com/formbricks/formbricks", "supports": "Survey workflows, self-hosting, and the core/enterprise licensing distinction.", "claimIds": ["OS-02"] },
+      { "id": "openreplay-repo", "label": "OpenReplay repository", "url": "https://github.com/openreplay/openreplay", "supports": "Self-hosted session replay, debugging context, privacy controls, and repository licensing caveat.", "claimIds": ["OS-03"] }
+    ]
+  },
+  {
+    "slug": "markup-io",
+    "verifiedDate": "2026-08-14",
+    "publisher": "BugDrop",
+    "reviewMethod": "First-party documentation review",
+    "researchBasis": "Documentation review only; no hands-on competitor testing is claimed.",
+    "intentEvidence": {
+      "query": "MarkUp.io alternative",
+      "observedDate": "2026-08-14",
+      "resultUrls": [
+        "https://www.annot.io/blog/annot-vs-markup",
+        "https://filestage.io/blog/markup-io-alternatives/",
+        "https://www.snapmark.io/en/"
+      ],
+      "rationale": "Current results consistently frame the query as selection among website annotation and visual-review products, distinct from existing vendor owners."
+    },
+    "summary": "Choose BugDrop when annotated website reports should become GitHub Issues. Choose MarkUp.io when the review job spans websites, images, PDFs, and videos in a shared visual-commenting workspace.",
+    "bugdropWins": "GitHub Issues is the required destination and the team wants an open-source widget with no separate review workspace.",
+    "competitorWins": "Clients or creative teams need shared commenting and review across websites plus images, PDFs, videos, and other file formats.",
+    "bugdropLimitation": "BugDrop does not provide a multi-format review workspace, threaded creative approvals, or review projects for uploaded PDFs, images, and videos.",
+    "claimRefs": { "summary": ["MU-01", "MU-02", "MU-03"], "bugdropWins": ["MU-03"], "competitorWins": ["MU-01", "MU-02"], "bugdropLimitation": ["MU-01", "MU-03"] },
+    "sources": [
+      { "id": "markup-product", "label": "MarkUp.io product overview", "url": "https://www.markup.io/", "supports": "Visual commenting, shared review, and support for websites, images, PDFs, videos, and more than 30 file types.", "claimIds": ["MU-01"] },
+      { "id": "markup-website-guide", "label": "MarkUp.io website annotation guide", "url": "https://www.markup.io/blog/how-to-annotate-a-website/", "supports": "URL-based website MarkUps, pinned comments, attachments, real-time collaboration, resolved comments, and reviewer environment context.", "claimIds": ["MU-02"] },
+      { "id": "bugdrop-repo-markup", "label": "BugDrop source and license", "url": "https://github.com/mean-weasel/bugdrop", "supports": "Open-source implementation, annotated screenshot workflow, GitHub Issue destination, capabilities, and repository license.", "claimIds": ["MU-03"] }
+    ]
+  },
+  {
+    "slug": "jam-dev",
+    "verifiedDate": "2026-08-14",
+    "publisher": "BugDrop",
+    "reviewMethod": "First-party documentation review",
+    "researchBasis": "Documentation review only; no hands-on competitor testing is claimed.",
+    "intentEvidence": {
+      "query": "Jam.dev alternative",
+      "observedDate": "2026-08-14",
+      "resultUrls": [
+        "https://capture.dev/compare/jam-dev-alternative",
+        "https://www.betterbugs.io/comparisons/jam-dev-alternative",
+        "https://crikket.io/"
+      ],
+      "rationale": "Current results consistently frame the query as selection among browser bug-capture products with developer context, distinct from visual client-review and observability owners."
+    },
+    "summary": "Choose BugDrop for an embedded annotated-screenshot path directly into GitHub Issues. Choose Jam when reporters need recordings, instant replay, console and network context, or an artifact shared across several triage and AI workflows.",
+    "bugdropWins": "A site-embedded reporter should create the GitHub Issue directly and the team values an open-source, screenshot-first workflow.",
+    "competitorWins": "QA, support, or engineering needs screenshot, video, or instant-replay capture with console logs, network requests, user events, device data, and AI-agent access.",
+    "bugdropLimitation": "BugDrop has no video capture, instant replay, console or network log capture, iOS recorder, or MCP interface.",
+    "claimRefs": { "summary": ["JM-01", "JM-02", "JM-03"], "bugdropWins": ["JM-03"], "competitorWins": ["JM-01", "JM-02"], "bugdropLimitation": ["JM-01", "JM-02", "JM-03"] },
+    "sources": [
+      { "id": "jam-creating", "label": "Jam capture documentation", "url": "https://jam.dev/docs/creating-a-jam", "supports": "Chrome and iOS capture, screenshots, video, instant replay, console logs, network requests, user events, device data, and sharing to GitHub Issues.", "claimIds": ["JM-01"] },
+      { "id": "jam-mcp", "label": "Jam MCP documentation", "url": "https://jam.dev/docs/jam-mcp", "supports": "AI coding-tool access to recordings, screenshots, user events, console logs, network requests, transcripts, and metadata.", "claimIds": ["JM-02"] },
+      { "id": "bugdrop-repo-jam", "label": "BugDrop source and license", "url": "https://github.com/mean-weasel/bugdrop", "supports": "Open-source implementation, annotated screenshot workflow, direct GitHub Issue destination, capabilities, and repository license.", "claimIds": ["JM-03"] }
+    ]
+  }
+]

@@ -1,50 +1,53 @@
-# Internal Tools
+# Feedback Widget for Internal Tools
 
-Internal dashboards, admin panels, and developer tools rarely get formal QA. They are built quickly to serve internal needs, iterated on by small teams, and almost never have dedicated testers. Bugs pile up quietly because reporting friction is too high — nobody wants to stop what they are doing, open Jira, write a ticket, take a screenshot, upload it, and fill out required fields just to report that a chart is rendering the wrong date range.
+A feedback widget for internal tools gives coworkers a low-friction way to report problems from dashboards, admin panels, and operational interfaces. The hard part is not adding the button; it is choosing an authentication, privacy, screenshot, and triage model appropriate for sensitive internal data.
 
-## The Problem with Internal Bug Reporting
+**Use this guide when:** authenticated dashboards and internal reporters are the job. For the broad product category, read [Website Feedback Widget](/use-cases/website-feedback-widget).
 
-Most teams rely on informal channels to report internal tool issues. Someone posts a screenshot in Slack with "this looks wrong." Someone else replies "yeah I saw that too." A week later, the thread is buried and the bug is forgotten. When teams do use formal issue trackers for internal tools, the tickets tend to be vague — "analytics dashboard is broken" with no screenshot, no browser info, and no indication of which specific widget or data point is wrong.
+[Inspect the widget in the sandbox](/sandbox) and [read the security model](/docs/security) before using it behind a login.
 
-The people using internal tools are often not engineers. Product managers, operations staff, and customer support teams interact with admin panels and reporting dashboards daily, but they do not have the technical vocabulary to describe frontend bugs precisely. They know something looks wrong, but explaining whether it is a rendering issue, a data issue, or a layout issue in a way that helps an engineer reproduce it is difficult.
+## Why internal reports lose context
 
-The result is a steady accumulation of small bugs that erode trust in internal tools, push teams back toward manual processes or spreadsheets, and create a death-by-a-thousand-cuts experience for everyone in the organization.
+An operations teammate may notice a truncated customer name, an incorrect chart state, or a filter that resets unexpectedly. A message in chat often omits the exact route, viewport, and browser, and the thread may never become assigned engineering work.
 
-## How BugDrop Solves This
+BugDrop can create a GitHub Issue with the reporter's description, category, URL, browser, OS, language, viewport, and optional screenshot. That places the report in engineering triage without requiring the coworker to use GitHub directly.
 
-BugDrop eliminates reporting friction by embedding a feedback button directly on your internal tools. One script tag on your admin panel, analytics dashboard, or developer tool, and every team member can report issues in seconds. They click the button, see the widget open with a screenshot already captured, type a quick description, annotate the screenshot to highlight the problem, and submit. A well-formatted GitHub issue appears in your team's repo with the description, annotated screenshot, browser info, and screen dimensions.
+The widget does not determine whether the displayed value is wrong or whether the reporter is authorized to disclose it. Internal teams must design those controls.
 
-No training sessions. No workflow documentation. No extra accounts.
+## Choose the access model first
 
-### A Typical Scenario
+The hosted BugDrop endpoint accepts unauthenticated submissions and applies rate limits. Being on an authenticated page or private repository does not authenticate the reporter to the hosted Worker.
 
-Picture a product manager reviewing the weekly metrics on your team's analytics dashboard. She notices that the revenue chart for Q1 is showing a negative value that does not match the spreadsheet export. She clicks the BugDrop button in the corner, types "Q1 revenue chart shows -$12K but export shows +$48K," circles the offending chart in the annotation tool, and submits. Two minutes later, the engineering team has a GitHub issue with her description, a screenshot of the exact chart state, her browser version, and her screen resolution. The engineer can immediately see which chart component is affected and start investigating — no Slack thread, no follow-up questions, no lost context.
+If the form must accept only signed-in employees, self-host BugDrop and use the documented host-app auth-token flow. Add your own identity checks, allowlists, WAF rules, logging, and retention policy. Do not treat a hidden URL, VPN, or repository privacy as submission authentication.
 
-## Why It Works for Internal Tools
+Decide whether submitter name and email should remain off, be optional, or be required. When enabled, those values are supplied by the reporter and included in the GitHub Issue; they are not verified identity by themselves.
 
-- **No training needed** — the widget is self-explanatory with a clear button, a text field, and a submit action; anyone who can use a web browser can report a bug
-- **Visual context with screenshots** — annotated screenshots eliminate ambiguity; reporters show exactly what they see, not what they think they see
-- **Sensitive fields stay covered** — users can redact screenshot regions before submitting, and developers can mark customer data, account details, or admin-only fields with `data-bugdrop-mask`
-- **System info auto-captured** — browser version, operating system, screen size, and viewport dimensions are included with every report, which is critical for debugging layout and rendering issues
-- **Categories for triage** — reporters select Bug, Feature, or Question, allowing the engineering team to filter and prioritize without reading every submission
-- **Works behind VPN** — BugDrop is entirely client-side; the widget runs in the user's browser and communicates with GitHub through BugDrop's backend, so it works on internal networks without any special network configuration
-- **Dismissible button** — power users who do not need the feedback widget can dismiss the button, keeping it out of the way for team members who prefer to file issues directly
+## Design screenshots around sensitive data
 
-## How to Set It Up
+Internal screens commonly contain customer records, account identifiers, financial values, or support conversations. Use several layers:
 
-Add the widget to your internal tool with a script tag. Here is an example with dark theme configuration, which is common for developer tools and dashboards:
+- Mark stable private DOM containers with `data-bugdrop-mask` or another supported attribute.
+- Prefer optional manual capture so the reporter can inspect and redact the screenshot.
+- Avoid automatic capture on pages with unpredictable sensitive content.
+- Disable screenshots where private pixels cannot be reliably enclosed by DOM boxes.
+- Limit access to the target repository and define cleanup for the screenshot branch.
 
-```html
-<script
-  defer
-  src="https://bugdrop.dev/widget.js"
-  data-repo="your-org/internal-tools"
-  data-theme="dark"
-></script>
-```
+BugDrop does not inspect pixels to find secrets. Native viewport fallback cannot apply DOM masks, and embedded or rendered media needs explicit container-level treatment.
 
-The dark theme matches the visual style of most internal dashboards and admin panels, so the widget feels like a natural part of the interface rather than an add-on.
+## Example: dashboard discrepancy
 
-## A Low-Cost Quality Investment
+An analyst sees a chart total that conflicts with an export. A good report names the metric and date range, states the expected source, and captures only the chart and relevant filter state. The issue records the route and environment, while the developer investigates whether the defect is presentation, query logic, or source data.
 
-Internal tools do not need a full QA team to improve. They just need a way for the people who use them every day to report what is wrong without friction. BugDrop turns every team member into a tester — and because the reports include screenshots and system info, the engineering team can act on them without the usual back-and-forth.
+Avoid putting real customer values in examples or screenshots used for testing. Use seeded or synthetic records when validating the workflow.
+
+## Route reports into engineering
+
+Choose a repository and labels with a real owner. Categories can distinguish Bug, Feature, and Question, but the team should define service expectations and escalation for operational incidents. BugDrop is not an incident management or access-review system.
+
+For private repositories, configure whether the success view exposes the GitHub link. Only authorized collaborators can open it, but showing a private URL may still reveal repository naming to reporters who do not need it.
+
+## Run a controlled pilot
+
+Start on one non-critical internal route with synthetic data. Test an authorized and unauthorized submission, every enabled screenshot path, masking failure, reporter fields, issue-link visibility, and the screenshot branch's CI behavior. Have security or platform owners review the results before expansion.
+
+Then follow [installation](/docs/installation), [configuration](/docs/configuration), [self-hosting](/docs/self-hosting), and the [GitHub Issues workflow](/use-cases/github-issues-feedback). Internal convenience is valuable only when it preserves the application's security boundary.

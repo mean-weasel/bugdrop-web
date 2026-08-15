@@ -1,25 +1,53 @@
 # Open-Source Feedback Widget
 
-BugDrop is an open-source feedback widget for teams that want to inspect, adapt, and self-host their feedback workflow. It is designed around GitHub Issues, so reports land where maintainers already track bugs and feature requests.
+An open-source feedback widget should be evaluated by license, inspectability, deployment control, data flow, and the work required to operate it. BugDrop is MIT licensed, uses GitHub Issues as its destination, and supports both a hosted path and self-hosting with a Cloudflare Worker and GitHub App.
 
-## Why Open Source Matters for Feedback
+**Use this guide when:** the software and governance choice is primary. For the community-maintainer process, read [Bug Reporting for Open-Source Projects](/use-cases/open-source).
 
-Feedback widgets sit on public websites and sometimes inside authenticated apps. Teams should be able to understand what the widget loads, what it captures, where data goes, and how screenshots are handled. An open-source widget makes that review possible.
+[Inspect the widget in the sandbox](/sandbox), [review the self-hosting path](/docs/self-hosting), or [compare open-source feedback tools](/compare/open-source-feedback-tools).
 
-Open source is also useful when your workflow is specific. You may want custom labels, masking rules, issue templates, styling, or deployment constraints that do not fit a generic hosted tool.
+## What inspectability should answer
 
-## Best Fits
+Reviewing source code is useful only when it resolves concrete questions:
 
-- Open-source projects that want community reports in GitHub
-- Developer tools with public docs and examples
-- Internal teams that need auditability
-- Agencies that want a repeatable client feedback workflow
-- Startups that want to avoid feedback-tool lock-in
+- Which script runs in the browser?
+- What page and environment data does it collect?
+- Where do issue text, attachments, and screenshots go?
+- Which GitHub permissions are required?
+- How are public submissions rate-limited and validated?
+- Can the team pin versions, audit changes, and remove stored artifacts?
 
-## GitHub Issues as the Feedback Backend
+BugDrop documents a browser widget, Cloudflare Worker API, and GitHub App. Issues are created in the configured repository. PNG screenshots are stored under `.bugdrop/screenshots/` on the dedicated `bugdrop-screenshots` branch. The hosted Worker acts as the API path; self-hosters operate their own Worker and credentials.
 
-BugDrop uses GitHub Issues as the system of record for feedback. That means maintainers can use labels, projects, assignees, milestones, comments, notifications, and automation without syncing from another dashboard.
+## Hosted versus self-hosted
 
-## Add It to Your Project
+The hosted path is appropriate when the team accepts BugDrop's public endpoint, rate limits, and documented data flow. It offers the smallest installation: install the GitHub App and add the normal synchronous script tag without `async` or `defer`.
 
-Install the GitHub App, add the widget script, and configure labels, screenshots, masking, and submitter fields. The [self-hosting guide](/docs/self-hosting) covers teams that want more control over deployment.
+Self-hosting is appropriate when the team needs its own domain, credentials, edge controls, logs, category-label policy, authentication token flow, or retention process. It also transfers operational responsibility for deployment, monitoring, secret rotation, abuse protection, and updates.
+
+Open source does not automatically make either path private or secure. The deployment and page configuration determine who can submit and which pixels may appear in a screenshot.
+
+## Adaptation boundaries
+
+BugDrop uses data attributes for supported configuration such as theme, position, color, locale, screenshot mode, and submitter fields. Self-hosted deployments can control server-side category-label mappings and host-app authentication.
+
+A source fork can change deeper behavior, but it also creates maintenance work. Prefer documented configuration when it satisfies the requirement. Fork only with an owner for rebasing security and product updates.
+
+## A selection checklist
+
+Choose an open-source feedback widget only after confirming:
+
+1. The license fits commercial, internal, and redistribution needs.
+2. The tracker destination fits the team; BugDrop is GitHub-specific.
+3. Screenshot storage and repository permissions are acceptable.
+4. Masking limitations fit the pages where capture will run.
+5. Public abuse and content risks have an explicit control plan.
+6. Someone owns upgrades, credentials, logs, and retention for self-hosting.
+
+BugDrop is not a general survey platform, session replay system, analytics suite, or voting portal. Formbricks and OpenReplay solve different open-source jobs, which is why the [multi-tool comparison](/compare/open-source-feedback-tools) should be read by teams seeking those capabilities.
+
+## Validate the code-to-operation path
+
+Use a test repository and non-sensitive page. Pin the widget version, inspect the network requests, submit a report, confirm the issue and screenshot branch, and test removal. If self-hosting, rotate test credentials and verify failure behavior before using production secrets.
+
+Continue with [installation](/docs/installation), [version pinning](/docs/version-pinning), [security](/docs/security), and [self-hosting](/docs/self-hosting). The best open-source choice is the smallest auditable system that the team can operate responsibly.

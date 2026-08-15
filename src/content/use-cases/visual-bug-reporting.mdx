@@ -1,25 +1,55 @@
 # Visual Bug Reporting
 
-BugDrop helps users report visual bugs by capturing what they see, not just what they can describe. Reports include screenshots, annotations, system information, and page URLs so developers can understand layout, styling, rendering, and content problems quickly.
+Visual bug reporting is a QA practice, not merely a screenshot feature. A useful report combines the broken state with expected behavior, reproduction context, environment details, and a clear owner for triage. BugDrop can collect the visual artifact and structured browser context; the team still owns investigation and verification.
 
-## The Problem with Text-Only Reports
+**Use this guide when:** you are designing the reporting and triage process. For widget capture controls, read [Screenshot Feedback Widget](/use-cases/screenshot-feedback-widget).
 
-Visual bugs are hard to describe precisely. A user might say "the button is broken" when the actual issue is a responsive layout overlap, clipped text, missing image, dark-mode contrast problem, or browser-specific rendering bug. Without a screenshot, developers often spend more time asking clarifying questions than fixing the issue.
+[Practice the reporter flow](/demo) and [review the CI verification guide](/docs/ci-testing).
 
-BugDrop turns that report into a visual artifact. The screenshot shows the broken state, and annotations let the reporter circle, point to, or highlight the important region.
+## A five-part visual bug report
 
-## Best Fits
+Ask reporters for five things:
 
-- Marketing sites where layout regressions affect conversion
-- Documentation sites where examples, tabs, or navigation render incorrectly
-- SaaS apps with dense dashboards and responsive UI states
-- Internal tools with charts, tables, filters, and customer data
-- Staging sites where clients and QA reviewers need structured feedback
+1. **Observed state:** what is visibly wrong?
+2. **Expected state:** what should the interface show or allow?
+3. **Location:** which page, component, or selected element is affected?
+4. **Reproduction:** what actions and data state produced the problem?
+5. **Environment:** which viewport, browser, OS, and language were present?
 
-## Privacy Controls
+BugDrop automatically contributes the current URL and environment fields. Its manual screenshot flow can add a full-page, area, or element capture with annotation. The reporter's description should supply the expectation and reproduction steps that pixels cannot explain.
 
-Visual context can expose sensitive content. BugDrop supports manual redaction before submit and developer-configured masking with `data-bugdrop-mask`. Password and credit-card fields are protected by default. Review [screenshot masking](/docs/security) before enabling visual reports on pages with private data.
+## Match evidence to the defect
 
-## How to Add It
+Different defects need different evidence:
 
-Install the GitHub App, add the script tag from the [installation guide](/docs/installation), and configure screenshot behavior in [configuration](/docs/configuration). Use [CI testing](/docs/ci-testing) to verify the widget appears and works on important pages before release.
+- **Layout overlap or clipping:** capture the affected region and enough neighboring context to show the constraint.
+- **Responsive mismatch:** record the viewport and describe whether resizing or rotation triggered the state.
+- **Wrong content or style:** point to the exact element and state the expected value or design rule.
+- **Interaction failure:** describe each action; a still screenshot usually shows only the final state.
+- **Intermittent or network behavior:** include reproduction timing and use a tool with logs or replay when necessary.
+
+BugDrop is strongest for reporter-authored visual evidence routed to GitHub. It does not capture session replay or network traffic. Console log submission is optional and reporter-controlled when configured, so it should not be treated as automatic telemetry.
+
+## Triage without guessing
+
+When a report arrives, the reviewer should first check whether the expected behavior is clear and the issue is safe to reproduce. Then:
+
+1. Reproduce at the reported viewport and route.
+2. Confirm whether the issue is visual, data-related, or behavioral.
+3. Request missing steps without assuming the screenshot is current truth.
+4. Link the fix and verification evidence to the GitHub Issue.
+5. Close only after the corrected state has been checked at relevant breakpoints.
+
+Categories and labels can route Bug, Feature, and Question submissions, but label mapping is not a substitute for human triage.
+
+## Privacy belongs in the process
+
+Visual reports can expose account data, messages, analytics, and customer identifiers. Mark sensitive DOM regions, prefer manual review, and teach reporters to redact visible information before submission. Treat masking as visual coverage with known browser limitations, not as a security boundary.
+
+The `bugdrop-screenshots` branch contains user-generated artifacts. Keep it outside privileged automation and define retention or cleanup for the project.
+
+## Build a small visual QA loop
+
+Start with one surface and three representative defects: a responsive overlap, a content mismatch, and an interaction state. Have a non-developer report them, then ask a developer to triage without verbal context. Record which fields or screenshots were useful and which questions remained.
+
+If the gaps are mostly form or screenshot configuration, adjust BugDrop. If the gaps require replay, automatic logs, or a managed review workspace, choose a better-fitting tool through the [comparison hub](/compare). When the workflow is sound, [install BugDrop](/docs/installation) and add a [CI smoke check](/docs/ci-testing).

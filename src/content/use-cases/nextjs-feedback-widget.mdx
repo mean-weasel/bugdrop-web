@@ -1,30 +1,55 @@
 # Next.js Feedback Widget
 
-BugDrop works as a Next.js feedback widget because it loads from a plain script tag and renders inside a Shadow DOM. It does not require a React provider, npm package, API route, or build-time integration.
+A Next.js feedback widget should survive App Router navigation, carry its repository configuration at execution time, and avoid duplicate global instances. BugDrop uses a normal browser script rather than a React provider, npm package, route handler, or framework-specific client SDK.
 
-## Why It Fits Next.js Sites
+**Use this guide when:** the Next.js App Router integration is the decision. For general reporting behavior, read [Website Feedback Widget](/use-cases/website-feedback-widget); for a deployment-review workflow, use [Vercel Preview Feedback](/use-cases/vercel-preview-feedback).
 
-Next.js apps often have multiple surfaces where feedback matters: marketing pages, docs, dashboards, preview deployments, and internal admin tools. BugDrop can be added to any of them with the same script tag, and reports land in GitHub Issues with screenshots and system information.
+[Inspect the isolated widget](/sandbox) or [review the maintained installation contract](/docs/installation) before changing a shared layout.
 
-Because the widget is framework-agnostic, it works with the App Router, Pages Router, static pages, server-rendered pages, and client-heavy application screens.
+## Add one synchronous script in the App Router
 
-## Basic Setup
+Place the script near the end of the root layout body when every route should accept reports. Use a plain script element without `async` or `defer`; BugDrop reads its configuration from the executing element. The official BugDrop README documents this loading contract.
 
-Add the script tag near the end of your HTML body or in the appropriate root layout for the pages where you want feedback:
-
-```html
-<script
-  src="https://bugdrop.neonwatty.workers.dev/widget.js"
-  data-repo="owner/repo"
-></script>
+```tsx
+// app/layout.tsx
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <script
+          src="https://bugdrop.neonwatty.workers.dev/widget.js"
+          data-repo="owner/repo"
+          data-screenshot="optional"
+        />
+      </body>
+    </html>
+  );
+}
 ```
 
-For production, review [version pinning](/docs/version-pinning) so widget updates are predictable. For design alignment, use the [styling options](/docs/styling). For sensitive dashboards, add `data-bugdrop-mask` to private UI and read the [security guide](/docs/security).
+Do not wrap this integration in `next/script`. Its strategies deliberately alter when a third-party script is injected or executed, while BugDrop's authoritative snippet relies on normal parser execution. Do not place copies in both root and nested layouts. If reporting belongs only to one route group, place one copy in that group's shared layout and verify another group does not receive it.
 
-## Preview Deployment Feedback
+## Configure the reporting surface
 
-BugDrop is especially useful on Vercel or other preview deployments. Clients, QA reviewers, and product managers can report exactly what they see on a preview URL, and the report creates a GitHub Issue your engineering team can triage beside the pull request.
+`data-repo="owner/repo"` is required. Theme, position, accent, locale, label, screenshot mode, optional reporter fields, and button behavior are data attributes. Use the [configuration reference](/docs/configuration) rather than selectors against widget internals; the widget uses an open Shadow DOM and application CSS should not be its configuration channel.
 
-## Testing
+For authenticated dashboards, decide whether the hosted unauthenticated submission model is acceptable. A logged-in Next.js page does not pass its session to BugDrop automatically. Mark stable private regions for supported visual masking, prefer optional manual screenshots when reporters need a review step, and read [screenshot security limits](/docs/security) before enabling capture on customer or billing screens.
 
-Use the [Playwright CI guide](/docs/ci-testing) to confirm the widget initializes, the Shadow DOM renders, and your expected configuration is present before deploying changes.
+## Test the integration after navigation
+
+Register a `bugdrop:ready` listener on `window` before page load, then verify `#bugdrop-host` exists and its Shadow DOM contains `.bd-trigger`. Open the trigger and assert `.bd-modal` and `.bd-close`; those are the current executable selectors. Navigate through two client-side routes and confirm that only one host remains.
+
+The [Playwright CI guide](/docs/ci-testing) contains a copyable test. Its smoke path does not create an issue. A separate deliberate canary can submit a report to a test repository, verify the created GitHub Issue, and clean it up. Keep synthetic submissions out of a production project repository unless the team has explicitly designed that lifecycle.
+
+## Validate build-time and browser behavior
+
+Run the production Next.js build, serve it locally, and inspect the initial HTML. The configured script should be present once with neither `async` nor `defer`. In a browser, confirm the ready event, current host and controls, configuration, and absence of console errors. Repeat after a client-side navigation because a static HTML inspection alone cannot disprove duplicate initialization.
+
+If Content Security Policy is enabled, allow the BugDrop worker origin in `script-src` and the required API connection. If the widget does not appear, verify that the response is JavaScript rather than an HTML error document and that the GitHub App is installed for the exact repository.
+
+## Choose global, subtree, or preview-only scope
+
+Use the root layout for a site-wide channel, a route-group layout for one application surface, or the [tested Vercel preview pattern](/use-cases/vercel-preview-feedback) for review builds only. Preview-only loading is useful when production should not expose this particular review channel, but it requires a server-side environment gate and a negative production assertion.
+
+Start with one low-risk route, [try the reporting flow](/demo), then follow [installation](/docs/installation) and [GitHub Issues routing](/use-cases/github-issues-feedback). Expand only after the browser proof, privacy review, repository permissions, and triage ownership all pass.

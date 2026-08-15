@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { MARKETPLACE_URL } from "@/lib/links";
+import { MARKETPLACE_URL, WIDGET_URL, widgetScriptTag } from "@/lib/links";
 
 export function QuickStart() {
   const [copied, setCopied] = useState(false);
-  const codeSnippet = `<script src="https://bugdrop.neonwatty.workers.dev/widget.js" data-repo="owner/repo"></script>`;
+  const codeSnippet = widgetScriptTag();
 
   function handleCopy() {
     navigator.clipboard.writeText(codeSnippet);
@@ -32,9 +32,10 @@ export function QuickStart() {
             <div className="font-mono text-sm bg-bg-deep border border-border rounded-lg p-4 pr-12 overflow-x-auto relative max-w-full">
               <button onClick={handleCopy} className="absolute top-3 right-3 bg-bg-elevated border border-border text-text-subtle px-3 py-1.5 rounded-md text-xs cursor-pointer hover:bg-border hover:text-text-primary transition-all">{copied ? "Copied!" : "Copy"}</button>
               <code className="text-text-subtle">
-                <span className="text-accent-rose">&lt;script</span>{" "}
+                <span className="text-accent-rose">&lt;script</span>
+                {"\n  "}
                 <span className="text-accent-purple">src</span>=
-                <span className="text-accent-green">&quot;https://bugdrop.neonwatty.workers.dev/widget.js&quot;</span>
+                <span className="text-accent-green">&quot;{WIDGET_URL}&quot;</span>
                 {"\n  "}
                 <span className="text-accent-purple">data-repo</span>=
                 <span className="text-accent-green">&quot;owner/repo&quot;</span>

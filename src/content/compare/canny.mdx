@@ -1,59 +1,29 @@
-# BugDrop vs Canny
+# Canny Alternative for Bug Reporting
 
-BugDrop and Canny are both feedback tools, but they solve fundamentally different problems. BugDrop captures bug reports with screenshots and sends them to GitHub Issues. Canny collects feature requests, organizes them with voting boards, and helps product teams prioritize what to build next. Understanding this distinction is key to choosing the right tool — or deciding to use both.
+BugDrop and Canny accept user input, but they answer different questions. BugDrop helps a developer understand a concrete problem on a page. Canny helps a product team collect, group, prioritize, and communicate demand for what should be built next. [CA-01](#source-canny-features "Claim CA-01") [CA-03](#source-bugdrop-repo-canny "Claim CA-03")
 
-## What is Canny?
+## Quick comparison
 
-Canny is a feature request and feedback management platform. It provides public-facing boards where users can submit ideas, vote on existing suggestions, and comment on feature requests. Product teams use Canny to understand what their users want most, prioritize their roadmap based on real demand, and communicate progress through a public changelog.
-
-Canny's core workflow is built around voting and prioritization. Users submit feature requests, other users upvote them, and the product team uses the aggregated votes to decide what to build next. Canny integrates with tools like Jira, Linear, and Intercom, and offers a public roadmap view so users can see what is planned, in progress, and shipped. Pricing starts with a free tier for small teams and scales to paid plans for advanced features.
-
-## What is BugDrop?
-
-BugDrop is an open-source bug reporting widget. It captures what users see right now — a broken layout, a rendering error, an incorrect data display — and turns that into a GitHub Issue with a screenshot, annotations, and system information. BugDrop is not designed for feature requests, roadmap planning, or voting. It is designed to catch bugs quickly and route them to the team's existing issue tracker.
-
-BugDrop is MIT licensed, free to use, and requires only a single script tag to install. Reports go directly to GitHub Issues, where development teams already manage their work.
-
-## The Key Difference
-
-Canny answers the question: "What should we build next?"
-BugDrop answers the question: "What is broken right now?"
-
-These are complementary problems. A team might use Canny to collect and prioritize feature requests from their user base while using BugDrop to catch visual bugs on their staging site, documentation, or production application. The tools do not compete — they serve different stages of the product feedback loop.
-
-## Feature Comparison
-
-| Feature | BugDrop | Canny |
+| Decision factor | BugDrop | Canny |
 |---|---|---|
-| **Price** | Free / MIT | Free tier + paid plans |
-| **Primary use** | Bug reports with screenshots | Feature requests and voting |
-| **Screenshots** | Yes (with annotations) | No (text-based submissions) |
-| **Voting / roadmap** | No | Yes (core feature) |
-| **GitHub integration** | Native (creates Issues) | Integration available |
-| **Setup complexity** | 1 script tag | Account + board configuration |
-| **User accounts needed** | No | Optional (for voting tracking) |
+| Primary input | A specific bug, question, or feature note with page context | Feedback posts, votes, and customer signals [CA-01](#source-canny-features "Claim CA-01") |
+| Primary output | GitHub Issue | Prioritized feedback, roadmap, and changelog workflows [CA-01](#source-canny-features "Claim CA-01") |
+| Visual defect capture | Screenshot selection, annotation, and redaction | Not the core workflow described by Canny [CA-01](#source-canny-features "Claim CA-01") |
+| Prioritization | GitHub's issue/project tools | Segmentation, scoring, voter context, and roadmap tools [CA-01](#source-canny-features "Claim CA-01") |
+| Best owner | Engineering | Product management [CA-01](#source-canny-features "Claim CA-01") |
 
-## When to Choose BugDrop
+## When the request is “this page is broken”
 
-BugDrop is the right choice when you need to catch and fix bugs efficiently:
+BugDrop captures a report at the page where the problem appears, along with a screenshot and browser context, then creates a GitHub Issue. [CA-03](#source-bugdrop-repo-canny "Claim CA-03")
 
-- **Catching visual bugs** — when users encounter rendering issues, layout problems, or visual regressions, BugDrop captures exactly what they see with an annotated screenshot. This is the fastest path from "something looks wrong" to a developer understanding and fixing the issue.
-- **GitHub-native workflow** — if your team tracks work in GitHub Issues and PRs, BugDrop feeds reports directly into that workflow with no additional tools or dashboards. Issues include screenshots, system info, and page URLs.
-- **Open source projects** — BugDrop is free and MIT licensed, making it ideal for OSS projects that want to collect bug reports from community users on documentation and demo sites.
-- **Low-friction reporting** — reporters do not need accounts, do not need to navigate a feedback board, and do not need to check if someone already reported the same issue. They click, describe, annotate, and submit.
-- **Staging and preview environments** — embed BugDrop on staging sites during client review or QA passes to collect visual feedback as trackable GitHub Issues.
+Canny's official feature set is organized around collecting feedback, analyzing it, prioritizing and roadmapping, then announcing changes. It does not document a screenshot-first bug intake workflow as a core feature. [CA-01](#source-canny-features "Claim CA-01")
 
-## When to Choose Canny
+## When the request is “please build this”
 
-Canny is the right choice when you need to understand and prioritize user demand:
+Canny is the stronger fit when teams need voters, user segments, prioritization, status updates, a public roadmap, or a changelog. Its current plan model has plan-specific integrations and controls; buyers should check the linked current plan guide for exact limits. [CA-01](#source-canny-features "Claim CA-01") [CA-02](#source-canny-billing "Claim CA-02")
 
-- **Feature prioritization** — when you want to know which features your users care about most, Canny's voting system aggregates demand and surfaces the most-requested items.
-- **Public roadmaps** — if transparency about your product direction is important, Canny's roadmap and changelog features let users see what is planned and what has shipped.
-- **User engagement** — Canny creates a community around your product's future direction, where users discuss ideas, refine suggestions, and feel heard.
-- **Cross-tool workflows** — if your team uses Jira, Linear, or another project management tool rather than GitHub Issues, Canny's integrations provide a broader fit.
+BugDrop has none of those product-management functions. A feature-category submission becomes a GitHub Issue, but BugDrop does not provide Canny's demand-analysis workflow. [CA-01](#source-canny-features "Claim CA-01") [CA-03](#source-bugdrop-repo-canny "Claim CA-03")
 
-## Using Both Together
+## Using both without confusing users
 
-Many teams benefit from using BugDrop and Canny together. Canny collects and prioritizes feature requests through its voting boards, giving the product team clarity on what to build. BugDrop sits on the live application and catches bugs as users encounter them, routing visual reports to GitHub Issues where the engineering team works.
-
-This combination covers both halves of the user feedback loop — proactive feature planning with Canny and reactive bug fixing with BugDrop — without either tool stepping on the other's toes.
+A team can use BugDrop for page-specific defects and Canny for product demand. Label the entry points clearly—“Report a problem” versus “Request a feature”—and define which system owns follow-up. Two generic “Feedback” buttons create routing work for the user.

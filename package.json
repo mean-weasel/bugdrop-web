@@ -9,6 +9,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "seo:evidence": "node scripts/seo-evidence.mjs",
+    "performance:budget": "node scripts/performance-budget.mjs",
+    "experience:audit": "node scripts/performance-experience-audit.mjs",
     "monitoring:migrate": "node scripts/migrate-monitoring.mjs",
     "indexnow": "node scripts/submit-indexnow.mjs"
   },
@@ -31,6 +34,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
+    "axe-core": "4.11.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.13.3",
     "@types/react": "^19",

@@ -11,8 +11,8 @@
   --color-bg-surface: #24283b;
   --color-bg-elevated: #414868;
   --color-text-primary: #c0caf5;
-  --color-text-muted: #565f89;
-  --color-text-subtle: #787c99;
+  --color-text-muted: #b8c2e8;
+  --color-text-subtle: #b4bde5;
   --color-accent-warm: #ff9e64;
   --color-accent-rose: #f7768e;
   --color-accent-cyan: #7dcfff;
@@ -175,4 +175,12 @@ body {
   html {
     @apply font-sans;
   }
+}
+
+p a,
+li a,
+td a {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }

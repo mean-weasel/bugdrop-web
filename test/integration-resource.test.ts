@@ -33,6 +33,29 @@ describe("T012 integration and resource contracts", () => {
     expect(loader).toContain('document.body.append(script)');
   });
 
+  it("loads GA only after a tracked intent while preserving the queued page view", async () => {
+    const analytics = await readFile("src/components/analytics.tsx", "utf8");
+    const journeyAudit = await readFile("scripts/analytics-journey-audit.mjs", "utf8");
+
+    expect(analytics).toContain("window.bugdropGaConfigured");
+    expect(analytics).toContain('window.gtag("config", gaMeasurementId, { send_page_view: false })');
+    expect(analytics).toContain("sendGooglePageView(currentPagePath, attribution)");
+    expect(analytics).toMatch(/sendGoogleAnalytics\("event", eventName, properties\);\s+activateGoogleAnalytics\(\);/);
+    expect(analytics).toContain("gaMeasurementId && gaActivated");
+    expect(analytics).toContain("data-ga-intent-library");
+    expect(journeyAudit).toContain("passive browsing requested GTM");
+    expect(journeyAudit).toContain("expected 1 after intent");
+  });
+
+  it("keeps corrected text colors explicit for emitted-palette proof", async () => {
+    const globals = await readFile("src/app/globals.css", "utf8");
+
+    expect(globals).toContain("--color-text-muted: #b8c2e8");
+    expect(globals).toContain("--color-text-subtle: #b4bde5");
+    expect(globals).not.toContain("--color-text-muted: #565f89");
+    expect(globals).not.toContain("--color-text-subtle: #787c99");
+  });
+
   it("publishes exactly the two approved reusable resources", async () => {
     expect(resourceNav.map(({ slug }) => slug).sort()).toEqual([
       "client-website-qa-checklist",

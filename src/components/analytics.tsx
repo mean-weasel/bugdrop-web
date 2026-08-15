@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useReportWebVitals } from "next/web-vitals";
 
@@ -10,6 +10,8 @@ const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const posthogHost =
   process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
 const attributionStorageKey = "bugdrop_attribution_v2";
+const gaIntentEvent = "bugdrop:ga-intent";
+const gaReadyEvent = "bugdrop:ga-ready";
 const campaignParamKeys = [
   "utm_source",
   "utm_medium",
@@ -51,6 +53,9 @@ declare global {
   interface Window {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
+    bugdropGaConfigured?: boolean;
+    bugdropGaIntent?: boolean;
+    bugdropGaReady?: boolean;
   }
 }
 
@@ -195,16 +200,47 @@ function safeDestination(href: string | null) {
   }
 }
 
-function sendGoogleAnalytics(command: string, ...args: unknown[]) {
-  if (!gaMeasurementId) return;
-
-  if (window.gtag) {
-    window.gtag(command, ...args);
-    return;
-  }
+function ensureGoogleAnalyticsQueue() {
+  if (!gaMeasurementId) return null;
 
   window.dataLayer = window.dataLayer ?? [];
-  window.dataLayer.push([command, ...args]);
+  window.gtag = window.gtag ?? ((...args: unknown[]) => {
+    window.dataLayer?.push(args);
+  });
+
+  if (!window.bugdropGaConfigured) {
+    window.gtag("js", new Date());
+    window.gtag("config", gaMeasurementId, { send_page_view: false });
+    window.bugdropGaConfigured = true;
+  }
+
+  return window.gtag;
+}
+
+function activateGoogleAnalytics() {
+  if (!gaMeasurementId || window.bugdropGaIntent) return;
+  window.bugdropGaIntent = true;
+  window.dispatchEvent(new Event(gaIntentEvent));
+}
+
+function waitForGoogleAnalytics() {
+  if (!gaMeasurementId || window.bugdropGaReady) return Promise.resolve();
+
+  return new Promise<void>((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      window.removeEventListener(gaReadyEvent, finish);
+      window.setTimeout(resolve, 150);
+    };
+    window.addEventListener(gaReadyEvent, finish, { once: true });
+    window.setTimeout(finish, 1500);
+  });
+}
+
+function sendGoogleAnalytics(command: string, ...args: unknown[]) {
+  ensureGoogleAnalyticsQueue()?.(command, ...args);
 }
 
 function posthogDistinctId() {
@@ -250,6 +286,7 @@ function capturePostHogEvent(
 
 function captureEvent(eventName: string, properties: Record<string, unknown>) {
   sendGoogleAnalytics("event", eventName, properties);
+  activateGoogleAnalytics();
   capturePostHogEvent(eventName, properties);
 }
 
@@ -271,31 +308,12 @@ function PageViewTracker() {
   useEffect(() => {
     const currentPagePath = pagePath(pathname);
     const attribution = attributionProperties(currentPagePath, searchParams);
-    let cancelled = false;
-    let attempts = 0;
 
     capturePostHogEvent("$pageview", {
       page_path: currentPagePath,
       ...attribution,
     });
-
-    const sendPageViewWhenReady = () => {
-      if (cancelled) return;
-
-      if (window.gtag || attempts >= 20) {
-        sendGooglePageView(currentPagePath, attribution);
-        return;
-      }
-
-      attempts += 1;
-      window.setTimeout(sendPageViewWhenReady, 100);
-    };
-
-    sendPageViewWhenReady();
-
-    return () => {
-      cancelled = true;
-    };
+    sendGooglePageView(currentPagePath, attribution);
   }, [pathname, searchParams]);
 
   useEffect(() => {
@@ -306,12 +324,34 @@ function PageViewTracker() {
       const el = target.closest<HTMLElement>("[data-analytics-event]");
       if (!el) return;
 
+      const anchor = el instanceof HTMLAnchorElement ? el : el.closest<HTMLAnchorElement>("a[href]");
+      const anchorOrigin = anchor ? new URL(anchor.href, window.location.href).origin : null;
+      const delaySameTabNavigation = Boolean(
+        gaMeasurementId &&
+        anchor &&
+        anchorOrigin !== window.location.origin &&
+        !event.defaultPrevented &&
+        !anchor.hasAttribute("download") &&
+        (!anchor.target || anchor.target === "_self") &&
+        event.button === 0 &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !event.shiftKey &&
+        !event.altKey,
+      );
+      if (delaySameTabNavigation) event.preventDefault();
+
       captureEvent(el.dataset.analyticsEvent ?? "site_interaction", {
         label: el.dataset.analyticsLabel ?? "unlabeled",
         destination: safeDestination(el.getAttribute("href")),
         page_path: pagePath(pathname),
         ...attributionProperties(pagePath(pathname), searchParams),
       });
+
+      if (delaySameTabNavigation && anchor) {
+        const destination = anchor.href;
+        void waitForGoogleAnalytics().then(() => window.location.assign(destination));
+      }
     };
 
     document.addEventListener("click", handleClick);
@@ -342,6 +382,15 @@ function PageViewTracker() {
 }
 
 export function Analytics() {
+  const [gaActivated, setGaActivated] = useState(false);
+
+  useEffect(() => {
+    const handleIntent = () => setGaActivated(true);
+    if (window.bugdropGaIntent) handleIntent();
+    window.addEventListener(gaIntentEvent, handleIntent);
+    return () => window.removeEventListener(gaIntentEvent, handleIntent);
+  }, []);
+
   useReportWebVitals((metric) => {
     const attribution = currentAttributionProperties();
     const value =
@@ -365,22 +414,17 @@ export function Analytics() {
 
   return (
     <>
-      {gaMeasurementId ? (
-        <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
-            strategy="afterInteractive"
-          />
-          <Script id="ga4" strategy="afterInteractive">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){window.dataLayer.push(arguments);}
-              window.gtag = gtag;
-              gtag('js', new Date());
-              gtag('config', '${gaMeasurementId}', { send_page_view: false });
-            `}
-          </Script>
-        </>
+      {gaMeasurementId && gaActivated ? (
+        <Script
+          id="ga4-intent-library"
+          src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
+          strategy="afterInteractive"
+          data-ga-intent-library
+          onLoad={() => {
+            window.bugdropGaReady = true;
+            window.dispatchEvent(new Event(gaReadyEvent));
+          }}
+        />
       ) : null}
       <Suspense fallback={null}>
         <PageViewTracker />

@@ -25,6 +25,15 @@ const context = await browser.newContext({
   hasTouch: true,
   reducedMotion: "reduce",
 });
+await context.route(/https:\/\/www\.googletagmanager\.com\/.*/, async (route) => {
+  await route.fulfill({ status: 200, contentType: "application/javascript", body: "" });
+});
+await context.route(/https:\/\/(?:www|region1)\.google-analytics\.com\/.*/, async (route) => {
+  await route.fulfill({ status: 204, body: "" });
+});
+await context.route(/https:\/\/(?:analytics\.invalid|us\.i\.posthog\.com)\/.*/, async (route) => {
+  await route.fulfill({ status: 204, body: "" });
+});
 
 const routes = [
   "/",
@@ -89,11 +98,44 @@ await page.waitForTimeout(1200);
 
 const initialWidgetRequests = initialRequests.filter((url) => /\/widget(?:\.v[\d.]+)?\.js(?:\?|$)/.test(url));
 if (initialWidgetRequests.length) failures.push(`initial widget requests: ${initialWidgetRequests.join(", ")}`);
+const initialGtmRequests = initialRequests.filter((url) => /www\.googletagmanager\.com\/gtag\/js/.test(url));
+if (initialGtmRequests.length) failures.push(`passive homepage requested GTM: ${initialGtmRequests.join(", ")}`);
 const initialThirdPartyMedia = initialRequests.filter((url) =>
   /youtube(?:-nocookie)?\.com|googlevideo\.com|ytimg\.com|api\.producthunt\.com/.test(url),
 );
 if (initialThirdPartyMedia.length) failures.push(`initial third-party media requests: ${initialThirdPartyMedia.join(", ")}`);
 if (await page.locator("iframe").count()) failures.push("homepage contains an iframe before video activation");
+
+const palette = await page.evaluate(async () => {
+  const stylesheetUrls = [...document.querySelectorAll('link[rel="stylesheet"]')]
+    .map((link) => link instanceof HTMLLinkElement ? link.href : "")
+    .filter(Boolean);
+  const emittedCss = (await Promise.all(stylesheetUrls.map(async (url) => {
+    const response = await fetch(url);
+    return response.ok ? response.text() : "";
+  }))).join("\n").toLowerCase();
+  const computedColor = (selector) => {
+    const element = document.querySelector(selector);
+    return element ? getComputedStyle(element).color : null;
+  };
+  return {
+    stylesheetUrls,
+    emitted: {
+      correctedMuted: emittedCss.includes("#b8c2e8"),
+      correctedSubtle: emittedCss.includes("#b4bde5"),
+      staleMuted: emittedCss.includes("#565f89"),
+      staleSubtle: emittedCss.includes("#787c99"),
+    },
+    computed: {
+      muted: computedColor(".text-text-muted"),
+      subtle: computedColor(".text-text-subtle"),
+    },
+  };
+});
+if (!palette.emitted.correctedMuted || !palette.emitted.correctedSubtle) failures.push("emitted CSS is missing the corrected text palette");
+if (palette.emitted.staleMuted || palette.emitted.staleSubtle) failures.push("emitted CSS retains stale text palette tokens");
+if (palette.computed.muted !== "rgb(184, 194, 232)") failures.push(`computed muted text color was ${palette.computed.muted}`);
+if (palette.computed.subtle !== "rgb(180, 189, 229)") failures.push(`computed subtle text color was ${palette.computed.subtle}`);
 
 const keyboardSequence = [];
 await page.evaluate(() => {
@@ -134,6 +176,11 @@ const coreTouchTargets = await page.locator('[data-analytics-label="Try it on th
 for (const target of coreTouchTargets) {
   if (target.width < 44 || target.height < 44) failures.push(`${target.label}: touch target smaller than 44px`);
 }
+
+await page.locator('[data-analytics-label="Try it on this page"]').click();
+await page.waitForTimeout(250);
+const activatedGtmRequests = initialRequests.filter((url) => /www\.googletagmanager\.com\/gtag\/js/.test(url));
+if (activatedGtmRequests.length !== 1) failures.push(`tracked intent requested GTM ${activatedGtmRequests.length} times`);
 
 const widgetButton = page.locator("[data-homepage-widget-activate]");
 await widgetButton.scrollIntoViewIfNeeded();
@@ -218,6 +265,11 @@ const result = {
     keyboardScreenshot: widgetKeyboardScreenshot,
     pointerScreenshot: widgetPointerScreenshot,
   },
+  analytics: {
+    passiveGtmRequests: initialGtmRequests,
+    intentGtmRequests: activatedGtmRequests,
+  },
+  palette,
   conversions,
   failures,
   passed: failures.length === 0,

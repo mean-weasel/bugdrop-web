@@ -66,6 +66,15 @@ describe("T012 integration and resource contracts", () => {
     }
   });
 
+  it("keeps the final render path on explicit native font stacks", async () => {
+    const layout = await readFile("src/app/layout.tsx", "utf8");
+    const globals = await readFile("src/app/globals.css", "utf8");
+
+    expect(layout).not.toContain("next/font");
+    expect(globals).toContain('--font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;');
+    expect(globals).toContain('--font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;');
+  });
+
   it("publishes exactly the two approved reusable resources", async () => {
     expect(resourceNav.map(({ slug }) => slug).sort()).toEqual([
       "client-website-qa-checklist",

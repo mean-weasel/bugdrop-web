@@ -148,12 +148,36 @@ function waitForClassicClose(api: object, onClose: () => void): () => void {
   return () => window.clearInterval(interval);
 }
 
+function waitForFlowClose(flowId: string, onClose: () => void): () => void {
+  const selector = `[data-bugdrop-flow="${CSS.escape(flowId)}"]`;
+  let disposed = false;
+  const observer = new MutationObserver(() => {
+    if (disposed || document.querySelector(selector)) return;
+    disposed = true;
+    observer.disconnect();
+    onClose();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  queueMicrotask(() => {
+    if (!disposed && !document.querySelector(selector)) {
+      disposed = true;
+      observer.disconnect();
+      onClose();
+    }
+  });
+  return () => {
+    disposed = true;
+    observer.disconnect();
+  };
+}
+
 function FlowHomepageWidget() {
   const [state, dispatch] = useReducer(reduceHomepageDemo, initialHomepageDemoState);
   const activeExperience = useRef<HomepageActiveExperience | null>(null);
   const activeLaunchRef = useRef<HTMLElement | null>(null);
   const launchInFlight = useRef(false);
   const classicCloseCleanup = useRef<(() => void) | null>(null);
+  const flowCloseCleanup = useRef<(() => void) | null>(null);
   const restoreFocusPending = useRef(false);
   const mounted = useRef(false);
   const launchGeneration = useRef(0);
@@ -162,6 +186,8 @@ function FlowHomepageWidget() {
     if (!mounted.current || generation !== launchGeneration.current) return;
     classicCloseCleanup.current?.();
     classicCloseCleanup.current = null;
+    flowCloseCleanup.current?.();
+    flowCloseCleanup.current = null;
     activeExperience.current = null;
     launchInFlight.current = false;
     restoreFocusPending.current = true;
@@ -198,7 +224,12 @@ function FlowHomepageWidget() {
       if (experience.id === "classic") {
         classicCloseCleanup.current = waitForClassicClose(api, () => settle(generation));
       } else {
-        void experience.result.then(() => settle(generation), () => settle(generation));
+        const waitForClosedHost = () => {
+          if (!isCurrent()) return;
+          flowCloseCleanup.current?.();
+          flowCloseCleanup.current = waitForFlowClose(experience.id, () => settle(generation));
+        };
+        void experience.result.then(waitForClosedHost, waitForClosedHost);
       }
     } catch {
       if (!isCurrent()) return;
@@ -214,6 +245,7 @@ function FlowHomepageWidget() {
       mounted.current = false;
       launchGeneration.current += 1;
       classicCloseCleanup.current?.();
+      flowCloseCleanup.current?.();
       activeExperience.current?.close();
       activeExperience.current = null;
       launchInFlight.current = false;

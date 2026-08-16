@@ -30,3 +30,9 @@ The browser regression delays the exact local pinned-runtime path, starts Bug Re
 ## Fix round 2 — runtime-host contract correction
 
 Corrected the pending-load regression to match the SDK's intentional SPA lifecycle: released v1.56.2 may retain an inert, zero-height page-global `#bugdrop-host` and `window.BugDrop` after loading. Those are not leaks and match the documented SDK and pre-change Classic behavior. The test now targets only the user-visible and mutation-capable invariant: no Flow instance, dialog, modal, trigger, scroll-lock change, preflight request, or feedback request after the originating homepage controller unmounts.
+
+## Fix round 3 — submission-to-close lifecycle boundary
+
+Composable submission results resolve when the success surface is shown, before the user closes that surface with Done. The homepage controller now keeps ownership through that success state and uses a `MutationObserver` scoped to the active Flow ID to settle only after that exact Flow host is removed. This preserves the visible success message and public Issue link, keeps launchers disabled while the Flow remains visible, and restores focus to the exact initiating launcher only after actual closure. The observer is disconnected during settle or unmount, and the existing generation guard still prevents stale work.
+
+The production-faithful three-Flow browser journey previously failed at the first post-Done focus assertion. With this fix it passes that assertion and proceeds into Product Triage; its later current failure is an unrelated Task 5 screenshot-default expectation under active development. Task 4's focused direct-close lifecycle, enabled discovery, delayed-load navigation, Classic-only browser path, Vitest contracts, lint, build, and diff check all pass.

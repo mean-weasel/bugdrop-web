@@ -1,6 +1,6 @@
 # Task 4 report — homepage launcher and synchronized experience section
 
-Commit: `feat: add homepage feedback experience picker` (this commit)
+Commits: `feat: add homepage feedback experience picker` and its Task 4 fix round 1 follow-up
 
 Implemented the feature-flagged homepage experience picker:
 
@@ -20,3 +20,9 @@ Verification passed:
 - `git diff --check` — passed.
 
 Strongest falsification: the enabled browser journey selects Bug Report through the floating menu, receives a mocked installation response and blocks the feedback endpoint, verifies exactly one Flow host while the launcher is disabled, closes the Flow, and verifies focus returns to the original floating launcher. The flag-unset journey verifies the chooser is absent and the classic `BugDrop.open()` path is still invoked by a mocked runtime. No real GitHub Issue or external mutation was made.
+
+## Fix round 1 — stale asynchronous launch
+
+Added a mounted-generation guard around the asynchronous Flow launch. Every continuation after the runtime await now verifies that the originating launcher is still mounted and current; stale continuations return without dispatching, registering, or opening. If an experience is created after a generation becomes stale, it is immediately closed. Cleanup invalidates the current generation before it closes active state, so it does not dispatch after unmount.
+
+The browser regression delays the exact local pinned-runtime path, starts Bug Report, navigates through `Explore the building blocks`, then releases the mocked delayed runtime. It checks that no Flow host or widget host is left and that body scroll is not locked. The pre-fix implementation fails this test by creating an orphan host after navigation; the guarded implementation passes.

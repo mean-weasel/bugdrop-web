@@ -58,3 +58,61 @@ test("opens one selected Flow and restores the floating launcher focus", async (
   await expect(flow).toHaveCount(0);
   await expect(launcher).toBeFocused();
 });
+
+test("does not open an orphan Flow after navigation during a delayed runtime load", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  test.skip(process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED !== "true");
+
+  let releaseScript: (() => void) | undefined;
+  let noteScriptRequested: () => void;
+  const scriptRequested = new Promise<void>((resolve) => {
+    noteScriptRequested = resolve;
+  });
+  await page.route("**/vendor/bugdrop/**/widget.js", async (route) => {
+    noteScriptRequested();
+    await new Promise<void>((release) => {
+      releaseScript = release;
+    });
+    await route.fulfill({ contentType: "application/javascript", body: "" });
+  });
+  await page.route("**/check/**", (route) =>
+    route.fulfill({ contentType: "application/json", body: '{"installed":true,"appName":"BugDrop"}' }),
+  );
+  await page.route("**/feedback", (route) => route.abort());
+  await page.goto("/");
+
+  await page.getByRole("radio", { name: "Bug Report" }).check();
+  await page.getByRole("button", { name: "Open Bug Report" }).click();
+  await scriptRequested;
+  await page.getByRole("link", { name: "Explore the building blocks" }).click();
+  await expect(page).toHaveURL(/\/labs\/variants$/);
+  await page.evaluate(() => {
+    const addOrphan = () => {
+      const host = document.createElement("div");
+      host.dataset.bugdropInstance = "orphan-flow";
+      document.body.style.overflow = "hidden";
+      document.body.append(host);
+      return {
+        instanceId: "orphan-flow",
+        close() {
+          host.remove();
+          document.body.style.removeProperty("overflow");
+        },
+        result: new Promise(() => undefined),
+      };
+    };
+    (window as unknown as { BugDrop?: unknown }).BugDrop = {
+      open() {},
+      close() {},
+      registerFlow(config: { id: string }) {
+        return { id: config.id, open: addOrphan };
+      },
+    };
+    document.dispatchEvent(new CustomEvent("bugdrop:ready"));
+  });
+  if (!releaseScript) throw new Error("The delayed pinned runtime did not become releasable.");
+  releaseScript();
+
+  await expect(page.locator('[data-bugdrop-instance], #bugdrop-host')).toHaveCount(0);
+  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+});

@@ -155,8 +155,11 @@ function FlowHomepageWidget() {
   const launchInFlight = useRef(false);
   const classicCloseCleanup = useRef<(() => void) | null>(null);
   const restoreFocusPending = useRef(false);
+  const mounted = useRef(false);
+  const launchGeneration = useRef(0);
 
-  const settle = () => {
+  const settle = (generation: number) => {
+    if (!mounted.current || generation !== launchGeneration.current) return;
     classicCloseCleanup.current?.();
     classicCloseCleanup.current = null;
     activeExperience.current = null;
@@ -167,6 +170,8 @@ function FlowHomepageWidget() {
 
   const launch = async (id: HomepageExperienceId, initiator: HTMLElement | null) => {
     if (launchInFlight.current || activeExperience.current) return;
+    const generation = ++launchGeneration.current;
+    const isCurrent = () => mounted.current && generation === launchGeneration.current;
     launchInFlight.current = true;
     activeLaunchRef.current = initiator;
     dispatch({ type: "select", id });
@@ -175,21 +180,28 @@ function FlowHomepageWidget() {
 
     try {
       const api = await loadHomepageBugDrop();
+      if (!isCurrent()) return;
       const handles = id === "classic" ? undefined : registerHomepageFlows(api);
+      if (!isCurrent()) return;
       const experience = openHomepageExperience(
         api,
         handles ?? ({} as ReturnType<typeof registerHomepageFlows>),
         id,
       );
+      if (!isCurrent()) {
+        experience.close();
+        return;
+      }
       activeExperience.current = experience;
       dispatch({ type: "runtime-ready" });
 
       if (experience.id === "classic") {
-        classicCloseCleanup.current = waitForClassicClose(api, settle);
+        classicCloseCleanup.current = waitForClassicClose(api, () => settle(generation));
       } else {
-        void experience.result.then(settle, settle);
+        void experience.result.then(() => settle(generation), () => settle(generation));
       }
     } catch {
+      if (!isCurrent()) return;
       activeExperience.current = null;
       launchInFlight.current = false;
       dispatch({ type: "runtime-error" });
@@ -197,12 +209,14 @@ function FlowHomepageWidget() {
   };
 
   useEffect(() => {
+    mounted.current = true;
     return () => {
+      mounted.current = false;
+      launchGeneration.current += 1;
       classicCloseCleanup.current?.();
       activeExperience.current?.close();
       activeExperience.current = null;
       launchInFlight.current = false;
-      dispatch({ type: "unmount" });
     };
   }, []);
 

@@ -23,6 +23,7 @@ describe("T012 integration and resource contracts", () => {
   it("keeps the homepage widget out of the initial critical path", async () => {
     const homepage = await readFile("src/app/page.tsx", "utf8");
     const loader = await readFile("src/components/landing/homepage-widget.tsx", "utf8");
+    const runtime = await readFile("src/components/landing/homepage-demo-runtime.ts", "utf8");
 
     expect(homepage).toContain("<HomepageWidget />");
     expect(homepage).not.toContain("<script");
@@ -31,6 +32,11 @@ describe("T012 integration and resource contracts", () => {
     expect(loader).toContain('script.async = false');
     expect(loader).toContain('script.dataset.repo = SAMPLE_DEMO_REPO');
     expect(loader).toContain('document.body.append(script)');
+    expect(runtime).toContain('const SCRIPT_ID = "bugdrop-homepage-demo"');
+    expect(runtime).toContain('script.async = false');
+    expect(runtime).toContain('document.body.append(script)');
+    expect(runtime).toContain('button: "false"');
+    expect(runtime).toContain('showIssueLink: "always"');
   });
 
   it("loads GA only after a tracked intent while preserving the queued page view", async () => {

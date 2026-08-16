@@ -1,6 +1,6 @@
 # Task 4 report — homepage launcher and synchronized experience section
 
-Commits: `feat: add homepage feedback experience picker` and its Task 4 fix round 1 follow-up
+Commits: `feat: add homepage feedback experience picker` and its Task 4 fix follow-ups
 
 Implemented the feature-flagged homepage experience picker:
 
@@ -25,4 +25,8 @@ Strongest falsification: the enabled browser journey selects Bug Report through 
 
 Added a mounted-generation guard around the asynchronous Flow launch. Every continuation after the runtime await now verifies that the originating launcher is still mounted and current; stale continuations return without dispatching, registering, or opening. If an experience is created after a generation becomes stale, it is immediately closed. Cleanup invalidates the current generation before it closes active state, so it does not dispatch after unmount.
 
-The browser regression delays the exact local pinned-runtime path, starts Bug Report, navigates through `Explore the building blocks`, then releases the mocked delayed runtime. It checks that no Flow host or widget host is left and that body scroll is not locked. The pre-fix implementation fails this test by creating an orphan host after navigation; the guarded implementation passes.
+The browser regression delays the exact local pinned-runtime path, starts Bug Report, navigates through `Explore the building blocks`, then releases the mocked delayed runtime. It checks that no Flow instance is opened and that no modal, trigger, scroll lock, preflight, or feedback request appears. The pre-fix implementation fails this test by creating an orphan Flow after navigation; the guarded implementation passes.
+
+## Fix round 2 — runtime-host contract correction
+
+Corrected the pending-load regression to match the SDK's intentional SPA lifecycle: released v1.56.2 may retain an inert, zero-height page-global `#bugdrop-host` and `window.BugDrop` after loading. Those are not leaks and match the documented SDK and pre-change Classic behavior. The test now targets only the user-visible and mutation-capable invariant: no Flow instance, dialog, modal, trigger, scroll-lock change, preflight request, or feedback request after the originating homepage controller unmounts.

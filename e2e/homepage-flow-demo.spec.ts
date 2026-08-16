@@ -63,6 +63,8 @@ test("does not open an orphan Flow after navigation during a delayed runtime loa
   test.skip(testInfo.project.name !== "desktop-chromium");
   test.skip(process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED !== "true");
 
+  let checkRequests = 0;
+  let feedbackRequests = 0;
   let releaseScript: (() => void) | undefined;
   let noteScriptRequested: () => void;
   const scriptRequested = new Promise<void>((resolve) => {
@@ -75,11 +77,22 @@ test("does not open an orphan Flow after navigation during a delayed runtime loa
     });
     await route.fulfill({ contentType: "application/javascript", body: "" });
   });
-  await page.route("**/check/**", (route) =>
-    route.fulfill({ contentType: "application/json", body: '{"installed":true,"appName":"BugDrop"}' }),
-  );
-  await page.route("**/feedback", (route) => route.abort());
+  await page.route("**/check/**", (route) => {
+    checkRequests += 1;
+    return route.fulfill({
+      contentType: "application/json",
+      body: '{"installed":true,"appName":"BugDrop"}',
+    });
+  });
+  await page.route("**/feedback", (route) => {
+    feedbackRequests += 1;
+    return route.abort();
+  });
   await page.goto("/");
+  const initialOverflow = await page.evaluate(() => ({
+    body: document.body.style.overflow,
+    html: document.documentElement.style.overflow,
+  }));
 
   await page.getByRole("radio", { name: "Bug Report" }).check();
   await page.getByRole("button", { name: "Open Bug Report" }).click();
@@ -113,6 +126,18 @@ test("does not open an orphan Flow after navigation during a delayed runtime loa
   if (!releaseScript) throw new Error("The delayed pinned runtime did not become releasable.");
   releaseScript();
 
-  await expect(page.locator('[data-bugdrop-instance], #bugdrop-host')).toHaveCount(0);
-  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+  await expect(page.getByRole("heading", { name: "Build feedback your way." })).toBeVisible();
+  await expect(page.locator("[data-bugdrop-flow], [data-bugdrop-instance]")).toHaveCount(0);
+  await expect(page.locator(".bd-modal, .bd-trigger")).toHaveCount(0);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() => ({
+        body: document.body.style.overflow,
+        html: document.documentElement.style.overflow,
+      })),
+    )
+    .toEqual(initialOverflow);
+  expect(checkRequests).toBe(0);
+  expect(feedbackRequests).toBe(0);
 });

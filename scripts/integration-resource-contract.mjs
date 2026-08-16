@@ -50,6 +50,11 @@ for (const slug of slugs) {
   assert(visibleText.includes(secondary.printLabel), `${route} print action label is not resource-specific`);
   assert(html.includes(`href="/resources/${slug}.md"`), `${route} is missing its portable download`);
   assert((html.match(/data-resource-related-link/g) ?? []).length >= 3, `${route} needs contextual links`);
+  const relatedHrefs = actionTags
+    .filter((tag) => tag.includes("data-resource-related-link"))
+    .map((tag) => tag.match(/href=["']([^"']+)/i)?.[1])
+    .filter(Boolean);
+  assert.equal(new Set(relatedHrefs).size, relatedHrefs.length, `${route} must not repeat a related-link destination`);
   assert(visibleText.includes("JavaScript is off"), `${route} lacks an explicit no-JavaScript path`);
   const canonical = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)/i)?.[1]
     ?? html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["']/i)?.[1];

@@ -7,6 +7,16 @@ import { widgetScriptTag } from "@/lib/links";
 import { mdxHeadingId } from "@/mdx-components";
 
 describe("T012 integration and resource contracts", () => {
+  it("keeps the screenshot privacy checklist identical across page and portable actions", async () => {
+    const pageChecklist = await readFile("src/content/resources/screenshot-privacy-checklist.mdx", "utf8");
+    const checklistItems = (markdown: string) =>
+      [...markdown.matchAll(/^- \[ \] (.+)$/gm)].map((match) => match[1]);
+
+    expect(checklistItems(portableResourceText["screenshot-privacy-checklist"])).toEqual(
+      checklistItems(pageChecklist),
+    );
+  });
+
   it("generates stable MDX heading IDs without changing heading text", () => {
     expect(mdxHeadingId("Screenshot masking")).toBe("screenshot-masking");
     expect(mdxHeadingId("What “simpler” costs")).toBe("what-simpler-costs");

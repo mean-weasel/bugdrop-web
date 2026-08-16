@@ -117,7 +117,9 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
         {related.map(([href, label]) => (
           <Link data-resource-related-link={href} href={href} key={href}>{label}</Link>
         ))}
-        <Link data-resource-related-link href="/docs/security">Review screenshot privacy</Link>
+        {resource.slug !== "screenshot-privacy-checklist" && (
+          <Link data-resource-related-link href="/docs/security">Review screenshot privacy</Link>
+        )}
       </nav>
     </main>
   );

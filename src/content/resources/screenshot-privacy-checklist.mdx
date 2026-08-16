@@ -1,0 +1,94 @@
+# Screenshot Privacy Checklist
+
+Use this screenshot privacy checklist before capture, before sharing, and when reviewing retention. Every check is visible and printable without JavaScript, and the same checklist is available as copied text or a Markdown download. It does not require BugDrop, an account, installation, or a purchase.
+
+**Best for:** bug reports, QA evidence, support tickets, documentation, client review, and any workflow where an image can expose more than the intended defect.
+
+## Start with the boundary
+
+A screenshot is a data artifact, not just a picture. It can contain credentials, customer records, private messages, financial or health data, filenames, account identity, unreleased work, browser chrome, notifications, and clues in the URL. Decide what the image must prove, who should receive it, and how long it should remain available before opening a capture tool.
+
+- [ ] Confirm a screenshot is necessary. Prefer written steps, synthetic output, or a smaller artifact when it proves the same point.
+- [ ] Name the intended destination and audience before capture.
+- [ ] Use a synthetic account and test data where possible.
+- [ ] Identify the smallest useful page, component, area, tab, or window.
+- [ ] Record the applicable data classification, access rule, and retention owner.
+
+This checklist reduces avoidable exposure; it cannot discover every sensitive fact or establish legal compliance. Adapt it to your organization’s threat model, contracts, policies, and applicable law.
+
+## 1. Prepare the capture surface
+
+- [ ] Close or hide unrelated tabs, notifications, password managers, developer tools, chat, email, and system UI.
+- [ ] Remove credentials, access tokens, recovery codes, payment data, health information, customer records, private conversations, and unreleased material from the capture surface.
+- [ ] Check the page title, URL and query string, bookmarks bar, filenames, account avatar, workspace name, and visible browser extensions.
+- [ ] Freeze or dismiss transient UI such as toasts, autocomplete suggestions, notification previews, and background windows.
+- [ ] Mark stable sensitive DOM regions when the capture tool supports masking.
+- [ ] Prefer a selected element or selected area over an entire display when the smaller scope still proves the issue.
+
+Browser screen-capture controls help establish user intent, but they are not a content review. [MDN documents that display capture requires a fresh permission prompt and user activation](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia#security), while capture options are applied after the user chooses a source rather than silently restricting the choices shown. The person taking the screenshot must still verify the chosen surface and its contents.
+
+## 2. Inspect the actual image
+
+- [ ] Open the exported image at full size. Do not approve only the live page or a reduced capture preview.
+- [ ] Crop unnecessary surroundings while retaining enough orientation to understand the evidence.
+- [ ] Apply opaque redaction before upload. Do not rely on blur, light pixelation, or a promise to delete later.
+- [ ] Inspect every edge of each covered region and confirm the final flattened file contains the coverage.
+- [ ] Check content revealed by scrolling, sticky elements, reflow, animation, overlays, and responsive changes.
+- [ ] Check images, canvas, video, SVG, iframes, Shadow DOM, and native capture fallbacks separately; a DOM-aware tool may not inspect their internal pixels.
+- [ ] Confirm arrows, labels, and annotations do not repeat or reconstruct the hidden value.
+- [ ] Retake the screenshot if any region is uncertain.
+
+[OWASP’s screenshot evidence guidance requires sensitive data to be redacted unless explicitly authorized](https://owasp.org/APTS/standard/5_Auditability/). That guidance is written for audit evidence, but its practical lesson transfers: decide whether the artifact is authorized, minimize it, and inspect the artifact that will actually be stored.
+
+## 3. Verify the destination before upload
+
+- [ ] Confirm the exact repository, issue, ticket, channel, document, or support case.
+- [ ] Verify who can access the destination now and after forwarding, export, or a repository visibility change.
+- [ ] Treat public-repository GitHub attachments as public.
+- [ ] Keep credentials, unpublished exploit details, and security vulnerabilities out of ordinary public issues.
+- [ ] Put no secret in the description as a substitute for removing it from the image.
+- [ ] Add only the environment context needed to reproduce the report.
+- [ ] Name the person responsible for triage and removal if the artifact is later found unsafe.
+
+[GitHub documents that files uploaded to public repositories can be accessed without authentication](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files); files attached in private and internal repositories are limited to people with repository access. Repository access is therefore part of the screenshot review, not an assumption to make after upload.
+
+## 4. Store and retire deliberately
+
+- [ ] Identify where the original and edited copies live, including downloads, clipboard history, chat, issue storage, repository branches, and backups.
+- [ ] Apply the destination’s access controls and retention policy.
+- [ ] Keep user-generated screenshot storage out of privileged CI and deployment paths.
+- [ ] Delete superseded local copies and review shared copies on the agreed schedule.
+- [ ] Record an exception when the image must be retained longer for audit, support, or legal reasons.
+- [ ] Escalate accidental exposure through the organization’s incident process. Deletion alone may not undo access, caching, notifications, or copies.
+
+Avoid claiming that one deletion removes every copy. The useful question is whether the team knows each controlled storage location, its access model, and the owner of retention and incident response.
+
+## BugDrop-specific review
+
+BugDrop renders screenshots in the user’s browser and stores submitted images in the configured repository’s dedicated `bugdrop-screenshots` branch. Its manual flow can let the reporter cover additional regions before submitting. Developer-configured attributes such as `data-bugdrop-mask` cover measured element boxes in supported DOM-rendered capture paths.
+
+- [ ] Prefer the manual screenshot flow when the reporter must inspect or redact the image.
+- [ ] Test every enabled capture path on the actual page before collecting real reports.
+- [ ] Mark the smallest stable container that encloses sensitive content.
+- [ ] Check media, embedded content, closed Shadow DOM, custom rendering, and native viewport fallbacks against the documented limitations.
+- [ ] Avoid screenshots where sensitive pixels cannot be enclosed and verified reliably.
+- [ ] Review access and retention for the `bugdrop-screenshots` branch.
+
+Masking is visual coverage, not secret discovery or data-loss prevention. BugDrop does not inspect text or pixels to discover unmarked secrets, native viewport fallback cannot apply element masks, and automatic mode has no reporter review step. Read the current [BugDrop screenshot masking and storage documentation](/docs/security#screenshot-masking) before choosing a capture mode.
+
+## Quick decision test
+
+Before selecting **Submit**, answer these four questions aloud:
+
+1. Does this exact final image prove something the written report cannot?
+2. Have I inspected every visible region at full size?
+3. Do I know who can access the destination?
+4. Do I know where the image will be stored and when it will be reviewed or removed?
+
+If any answer is “no,” stop and change the artifact or workflow. A delayed report is easier to repair than an unnecessary disclosure.
+
+## Source and review record
+
+This checklist was reviewed on **2026-08-16** against current primary documentation from [OWASP](https://owasp.org/APTS/standard/5_Auditability/), [MDN](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia#security), [GitHub](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files), and [BugDrop](/docs/security#screenshot-masking). Source links support the platform-specific statements above; the remaining checks are conservative workflow recommendations that teams should adapt to their own risk model.
+
+Pair this asset with the [Visual Bug Report Template](/resources/visual-bug-report-template), use it during a [client website QA review](/resources/client-website-qa-checklist), or inspect the [Screenshot Feedback Widget](/use-cases/screenshot-feedback-widget) workflow. When the page is suitable for capture, [try the reporter flow](/demo).

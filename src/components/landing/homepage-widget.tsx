@@ -1,7 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { SAMPLE_DEMO_REPO, WIDGET_URL } from "@/lib/links";
+import { useEffect, useReducer, useRef, useState } from "react";
+import Link from "next/link";
+import { HomepageDemoLauncher, homepageExperienceLabel } from "./homepage-demo-launcher";
+import {
+  homepageExperiences,
+  initialHomepageDemoState,
+  reduceHomepageDemo,
+  type HomepageExperienceId,
+} from "./homepage-demo-model";
+import {
+  loadHomepageBugDrop,
+  openHomepageExperience,
+  registerHomepageFlows,
+  type HomepageActiveExperience,
+} from "./homepage-demo-runtime";
+import { BUILDING_BLOCKS_PATH, SAMPLE_DEMO_REPO, WIDGET_URL } from "@/lib/links";
 
 declare global {
   interface Window {
@@ -36,7 +50,7 @@ function configureScript(script: HTMLScriptElement) {
   script.dataset.welcome = WELCOME;
 }
 
-export function HomepageWidget() {
+export function ClassicHomepageWidget() {
   const [loadState, setLoadState] = useState<LoadState>("idle");
 
   const openDemo = () => {
@@ -113,5 +127,185 @@ export function HomepageWidget() {
         </div>
       </div>
     </section>
+  );
+}
+
+function waitForClassicClose(api: object, onClose: () => void): () => void {
+  const maybeApi = api as { isOpen?: () => boolean };
+  if (typeof maybeApi.isOpen !== "function") return () => undefined;
+
+  let sawOpen = false;
+  const interval = window.setInterval(() => {
+    if (maybeApi.isOpen?.()) {
+      sawOpen = true;
+      return;
+    }
+    if (sawOpen) {
+      window.clearInterval(interval);
+      onClose();
+    }
+  }, 150);
+  return () => window.clearInterval(interval);
+}
+
+function FlowHomepageWidget() {
+  const [state, dispatch] = useReducer(reduceHomepageDemo, initialHomepageDemoState);
+  const activeExperience = useRef<HomepageActiveExperience | null>(null);
+  const activeLaunchRef = useRef<HTMLElement | null>(null);
+  const launchInFlight = useRef(false);
+  const classicCloseCleanup = useRef<(() => void) | null>(null);
+  const restoreFocusPending = useRef(false);
+
+  const settle = () => {
+    classicCloseCleanup.current?.();
+    classicCloseCleanup.current = null;
+    activeExperience.current = null;
+    launchInFlight.current = false;
+    restoreFocusPending.current = true;
+    dispatch({ type: "settled" });
+  };
+
+  const launch = async (id: HomepageExperienceId, initiator: HTMLElement | null) => {
+    if (launchInFlight.current || activeExperience.current) return;
+    launchInFlight.current = true;
+    activeLaunchRef.current = initiator;
+    dispatch({ type: "select", id });
+    dispatch({ type: "launch" });
+    dispatch({ type: "runtime-loading" });
+
+    try {
+      const api = await loadHomepageBugDrop();
+      const handles = id === "classic" ? undefined : registerHomepageFlows(api);
+      const experience = openHomepageExperience(
+        api,
+        handles ?? ({} as ReturnType<typeof registerHomepageFlows>),
+        id,
+      );
+      activeExperience.current = experience;
+      dispatch({ type: "runtime-ready" });
+
+      if (experience.id === "classic") {
+        classicCloseCleanup.current = waitForClassicClose(api, settle);
+      } else {
+        void experience.result.then(settle, settle);
+      }
+    } catch {
+      activeExperience.current = null;
+      launchInFlight.current = false;
+      dispatch({ type: "runtime-error" });
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      classicCloseCleanup.current?.();
+      activeExperience.current?.close();
+      activeExperience.current = null;
+      launchInFlight.current = false;
+      dispatch({ type: "unmount" });
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!restoreFocusPending.current || state.activeId !== null) return;
+    restoreFocusPending.current = false;
+    activeLaunchRef.current?.focus();
+  }, [state.activeId]);
+
+  const selected = homepageExperiences.find(({ id }) => id === state.selectedId)!;
+  const launchDisabled = state.runtimeState === "loading" || state.activeId !== null;
+
+  return (
+    <>
+      <HomepageDemoLauncher
+        experiences={homepageExperiences}
+        selectedId={state.selectedId}
+        menuOpen={state.menuOpen}
+        disabled={launchDisabled}
+        onMenuOpenChange={(open) => dispatch({ type: open ? "open-menu" : "close-menu" })}
+        onSelect={(id) => dispatch({ type: "select", id })}
+        onLaunch={(id) => {
+          const trigger = document.querySelector<HTMLElement>(
+            '[aria-label="Try BugDrop experiences"]',
+          );
+          void launch(id, trigger);
+        }}
+      />
+      <section
+        id="try-bugdrop"
+        className="mb-20 rounded-2xl border border-accent-cyan/25 bg-accent-cyan/10 px-8 py-7"
+        aria-labelledby="homepage-experience-heading"
+      >
+        <div className="max-w-3xl">
+          <p className="mb-2 text-sm font-medium text-accent-cyan">Try it on this page</p>
+          <h2 id="homepage-experience-heading" className="text-2xl font-semibold text-text-primary">
+            One widget, four feedback experiences.
+          </h2>
+          <p className="mt-2 text-text-subtle">
+            Choose a complete feedback experience, then try the exact widget your users would see.
+          </p>
+        </div>
+        <fieldset className="mt-6 grid gap-3 sm:grid-cols-2" aria-label="Feedback experience">
+          <legend className="sr-only">Feedback experience</legend>
+          {homepageExperiences.map((experience) => (
+            <label
+              key={experience.id}
+              className="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-bg-surface/80 p-4 text-text-primary has-[:checked]:border-accent-cyan has-[:checked]:bg-accent-cyan/10"
+            >
+              <input
+                type="radio"
+                name="homepage-feedback-experience"
+                value={experience.id}
+                checked={state.selectedId === experience.id}
+                disabled={launchDisabled}
+                onChange={() => dispatch({ type: "select", id: experience.id })}
+                className="size-4 accent-accent-cyan"
+              />
+              <span>{homepageExperienceLabel(experience)}</span>
+            </label>
+          ))}
+        </fieldset>
+        <div className="mt-5 flex flex-wrap items-center gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-text-primary">{homepageExperienceLabel(selected)}</p>
+            <p className="mt-1 text-text-subtle">{selected.description}</p>
+          </div>
+          <button
+            type="button"
+            disabled={launchDisabled}
+            onClick={(event) => void launch(state.selectedId, event.currentTarget)}
+            data-homepage-widget-activate
+            aria-describedby="homepage-widget-status"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent-cyan px-5 py-3 font-semibold text-bg-deep shadow-[0_12px_32px_rgba(125,207,255,0.28)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(125,207,255,0.36)] disabled:cursor-wait disabled:opacity-75 max-sm:w-full max-sm:rounded-[10px] motion-reduce:transform-none motion-reduce:transition-none"
+          >
+            <span aria-hidden="true">🐛</span>
+            {state.runtimeState === "loading" ? "Loading Feedback…" : selected.launchLabel}
+          </button>
+        </div>
+        <p className="mt-5 text-sm text-text-subtle">
+          Demo submissions create a real public GitHub Issue in our test repository. Please do not
+          include sensitive information.
+        </p>
+        <Link href={BUILDING_BLOCKS_PATH} className="mt-3 inline-flex text-sm font-medium text-accent-cyan underline-offset-4 hover:underline">
+          Explore the building blocks
+        </Link>
+        {state.runtimeState === "error" && (
+          <p className="mt-3 text-sm text-red-300" role="alert">
+            The feedback experience could not load. Your selection is still saved; try again.
+          </p>
+        )}
+        <span id="homepage-widget-status" className="sr-only" aria-live="polite">
+          {state.announcement}
+        </span>
+      </section>
+    </>
+  );
+}
+
+export function HomepageWidget() {
+  return process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED === "true" ? (
+    <FlowHomepageWidget />
+  ) : (
+    <ClassicHomepageWidget />
   );
 }

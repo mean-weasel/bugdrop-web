@@ -24,6 +24,8 @@ export const DEMO_PATH = "/demo";
 
 export const DEMO_URL = "https://bugdrop-widget-test.vercel.app";
 
+export const BUILDING_BLOCKS_PATH = "/labs/variants";
+
 export const WIDGET_ORIGIN = "https://bugdrop.neonwatty.workers.dev";
 
 export const WIDGET_URL =

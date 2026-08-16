@@ -4,8 +4,36 @@ import { shouldLoadBugDropInPreview } from "@/components/integrations/vercel-pre
 import { resourceNav } from "@/lib/resource-nav";
 import { portableResourceText } from "@/lib/resources/portable-text";
 import { widgetScriptTag } from "@/lib/links";
+import { widgetCspSource } from "../next.config";
 
 describe("T012 integration and resource contracts", () => {
+  it("uses the external origin for an absolute widget runtime URL", () => {
+    expect(
+      widgetCspSource("https://bugdrop.neonwatty.workers.dev/widget.js"),
+    ).toBe("https://bugdrop.neonwatty.workers.dev");
+  });
+
+  it("allows a root-relative widget runtime as a same-origin CSP source", () => {
+    expect(
+      widgetCspSource(
+        "/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js",
+      ),
+    ).toBe("'self'");
+  });
+
+  it.each([
+    "//cdn.example.com/widget.js",
+    "vendor/bugdrop/widget.js",
+    "https://",
+    "javascript:alert(1)",
+    "file:///tmp/widget.js",
+    "https://user:password@example.com/widget.js",
+    "/\\\\cdn.example.com/widget.js",
+    " https://bugdrop.neonwatty.workers.dev/widget.js",
+  ])("rejects an unsafe widget runtime URL: %s", (value) => {
+    expect(() => widgetCspSource(value)).toThrow("Unsafe BugDrop widget URL");
+  });
+
   it("loads the Vercel integration only in preview", () => {
     expect(shouldLoadBugDropInPreview("preview")).toBe(true);
     expect(shouldLoadBugDropInPreview("production")).toBe(false);

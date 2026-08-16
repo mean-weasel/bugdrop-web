@@ -5,7 +5,51 @@ function origin(value: string) {
   return new URL(value).origin;
 }
 
-const widgetOrigin = origin(
+const unsafeWidgetUrl = () => {
+  throw new TypeError("Unsafe BugDrop widget URL");
+};
+
+export function widgetCspSource(value: string) {
+  if (value !== value.trim() || value.includes("\\")) {
+    return unsafeWidgetUrl();
+  }
+
+  if (value.startsWith("/") && !value.startsWith("//")) {
+    const sameOriginUrl = new URL(value, "https://bugdrop.invalid");
+    if (
+      sameOriginUrl.origin === "https://bugdrop.invalid" &&
+      sameOriginUrl.username === "" &&
+      sameOriginUrl.password === ""
+    ) {
+      return "'self'";
+    }
+
+    return unsafeWidgetUrl();
+  }
+
+  if (!/^https?:\/\//i.test(value)) {
+    return unsafeWidgetUrl();
+  }
+
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return unsafeWidgetUrl();
+  }
+
+  if (
+    (url.protocol !== "http:" && url.protocol !== "https:") ||
+    url.username !== "" ||
+    url.password !== ""
+  ) {
+    return unsafeWidgetUrl();
+  }
+
+  return url.origin;
+}
+
+const widgetOrigin = widgetCspSource(
   process.env.NEXT_PUBLIC_BUGDROP_WIDGET_URL ??
     "https://bugdrop.neonwatty.workers.dev/widget.js",
 );

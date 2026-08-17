@@ -6,6 +6,65 @@ import { portableResourceText } from "@/lib/resources/portable-text";
 import { widgetScriptTag } from "@/lib/links";
 import { widgetCspSource } from "../next.config";
 
+const homepageCiRuntime =
+  "/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js";
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function extractYamlBlock(source: string, header: RegExp, label: string) {
+  const lines = source.split(/\r?\n/);
+  const starts = lines.flatMap((line, index) => (header.test(line) ? [index] : []));
+  expect(starts, `expected exactly one ${label} block`).toHaveLength(1);
+  const start = starts[0];
+  const indentation = lines[start].match(/^ */)?.[0].length ?? 0;
+  let end = lines.length;
+
+  for (let index = start + 1; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line.trim() === "") continue;
+    const nextIndentation = line.match(/^ */)?.[0].length ?? 0;
+    if (nextIndentation <= indentation) {
+      end = index;
+      break;
+    }
+  }
+
+  return lines.slice(start, end).join("\n");
+}
+
+function assertHomepageCiContract(workflow: string) {
+  const triggers = extractYamlBlock(workflow, /^on:\s*$/, "workflow trigger");
+  expect(triggers).toMatch(/^  pull_request:\s*$/m);
+  expect(triggers).toMatch(/^  merge_group:\s*$/m);
+
+  const jobs = extractYamlBlock(workflow, /^jobs:\s*$/, "jobs");
+  const job = extractYamlBlock(
+    jobs,
+    /^  homepage-feedback-experiences:\s*$/,
+    "homepage-feedback-experiences job",
+  );
+  expect(job).toMatch(/^    needs:\s*check\s*$/m);
+  expect(job).toMatch(/^        run: npx playwright install --with-deps chromium\s*$/m);
+  expect(job).toMatch(/^          NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "true"\s*$/m);
+  expect(job).toMatch(
+    new RegExp(
+      `^          NEXT_PUBLIC_BUGDROP_WIDGET_URL: ${escapeRegExp(homepageCiRuntime)}\\s*$`,
+      "m",
+    ),
+  );
+  expect(job).toMatch(
+    /^          npx playwright test e2e\/homepage-flow-demo\.spec\.ts\s*$/m,
+  );
+  expect(job).toMatch(
+    /^          --project=desktop-chromium --project=mobile-chromium --retries=0\s*$/m,
+  );
+  expect(job).not.toMatch(
+    /\b(?:real[-_ ]?canary|canary(?:[_-]?(?:selector|mode|token))?|(?:github|gh|issue)[_-]?token)\b|\btoken\s*:|\bissues?\s*:\s*write\b|\b(?:create|update|delete|close)[-_ ]?issue\b|\bissue[_-]?(?:number|mutation|repo|title)\s*:/i,
+  );
+}
+
 describe("T012 integration and resource contracts", () => {
   it("uses the external origin for an absolute widget runtime URL", () => {
     expect(
@@ -69,18 +128,56 @@ describe("T012 integration and resource contracts", () => {
 
   it("keeps homepage feedback experiences as an additive, local-only browser gate", async () => {
     const workflow = await readFile(".github/workflows/ci.yml", "utf8");
+    assertHomepageCiContract(workflow);
+  });
 
-    expect(workflow).toContain("merge_group:");
-    expect(workflow).toMatch(/homepage-feedback-experiences:/);
-    expect(workflow).toMatch(/needs:\s*check/);
-    expect(workflow).toContain("npx playwright install --with-deps chromium");
-    expect(workflow).toContain("NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: \"true\"");
-    expect(workflow).toContain(
-      "NEXT_PUBLIC_BUGDROP_WIDGET_URL: /vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js",
-    );
-    expect(workflow).toContain("npx playwright test e2e/homepage-flow-demo.spec.ts");
-    expect(workflow).toContain("--project=desktop-chromium --project=mobile-chromium --retries=0");
-    expect(workflow).not.toMatch(/\b(?:canary|issue[_-]?token|github[_-]?token)\b/i);
+  it("rejects decoy or unsafe homepage feedback CI configurations", async () => {
+    const workflow = await readFile(".github/workflows/ci.yml", "utf8");
+    const moveRequiredLinesToDecoy = workflow
+      .replace("        run: npx playwright install --with-deps chromium", "        run: echo skipped")
+      .replace('          NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "true"', '          NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "false"')
+      .replace(
+        `          NEXT_PUBLIC_BUGDROP_WIDGET_URL: ${homepageCiRuntime}`,
+        "          NEXT_PUBLIC_BUGDROP_WIDGET_URL: /widget.js",
+      ) + `\n  decoy:\n    steps:\n      - run: npx playwright install --with-deps chromium\n      - env:\n          NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "true"\n          NEXT_PUBLIC_BUGDROP_WIDGET_URL: ${homepageCiRuntime}\n`;
+    const moveCommandToDecoy = workflow
+      .replace(
+        "          npx playwright test e2e/homepage-flow-demo.spec.ts\n          --project=desktop-chromium --project=mobile-chromium --retries=0",
+        "          echo skipped",
+      ) + "\n  decoy-command:\n    steps:\n      - run: >-\n          npx playwright test e2e/homepage-flow-demo.spec.ts\n          --project=desktop-chromium --project=mobile-chromium --retries=0\n";
+
+    const adversarialWorkflows = [
+      workflow.replace("  pull_request:\n", "  # pull_request:\n"),
+      workflow.replace("  merge_group:\n", "  # merge_group:\n"),
+      workflow.replace("    needs: check", "    needs: other"),
+      moveRequiredLinesToDecoy,
+      moveCommandToDecoy,
+      workflow.replace("e2e/homepage-flow-demo.spec.ts", "e2e/other.spec.ts"),
+      workflow.replace("--project=desktop-chromium", "--project=chromium"),
+      workflow.replace("--project=mobile-chromium", "--project=webkit"),
+      workflow.replace("--retries=0", "--retries=1"),
+      workflow.replace(homepageCiRuntime, "/vendor/bugdrop/latest/widget.js"),
+      workflow.replace(
+        'NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "true"',
+        'NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "false"',
+      ),
+      workflow.replace(
+        "      - name: Test homepage feedback experiences",
+        "      - name: Test homepage feedback experiences\n        env:\n          REAL_CANARY: true",
+      ),
+      workflow.replace(
+        "      - name: Test homepage feedback experiences",
+        "      - name: Test homepage feedback experiences\n        env:\n          GITHUB_TOKEN: secret",
+      ),
+      workflow.replace(
+        "      - name: Test homepage feedback experiences",
+        "      - name: Test homepage feedback experiences\n        permissions:\n          issues: write",
+      ),
+    ];
+
+    for (const adversarial of adversarialWorkflows) {
+      expect(() => assertHomepageCiContract(adversarial)).toThrow();
+    }
   });
 
   it("loads GA only after a tracked intent while preserving the queued page view", async () => {

@@ -67,6 +67,22 @@ describe("T012 integration and resource contracts", () => {
     expect(runtime).toContain('showIssueLink: "always"');
   });
 
+  it("keeps homepage feedback experiences as an additive, local-only browser gate", async () => {
+    const workflow = await readFile(".github/workflows/ci.yml", "utf8");
+
+    expect(workflow).toContain("merge_group:");
+    expect(workflow).toMatch(/homepage-feedback-experiences:/);
+    expect(workflow).toMatch(/needs:\s*check/);
+    expect(workflow).toContain("npx playwright install --with-deps chromium");
+    expect(workflow).toContain("NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: \"true\"");
+    expect(workflow).toContain(
+      "NEXT_PUBLIC_BUGDROP_WIDGET_URL: /vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js",
+    );
+    expect(workflow).toContain("npx playwright test e2e/homepage-flow-demo.spec.ts");
+    expect(workflow).toContain("--project=desktop-chromium --project=mobile-chromium --retries=0");
+    expect(workflow).not.toMatch(/\b(?:canary|issue[_-]?token|github[_-]?token)\b/i);
+  });
+
   it("loads GA only after a tracked intent while preserving the queued page view", async () => {
     const analytics = await readFile("src/components/analytics.tsx", "utf8");
     const journeyAudit = await readFile("scripts/analytics-journey-audit.mjs", "utf8");

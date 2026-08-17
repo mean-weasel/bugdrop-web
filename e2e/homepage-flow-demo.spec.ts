@@ -5,7 +5,7 @@ import {
   type Page,
 } from "@playwright/test";
 
-const origin = "http://bugdrop.localhost:3000";
+const origin = process.env.HOMEPAGE_E2E_ORIGIN ?? "http://bugdrop.localhost:3000";
 const runtimePath =
   "/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d";
 const repo = "mean-weasel/bugdrop-widget-test";
@@ -17,7 +17,7 @@ type Submission = Readonly<{
 
 function installLocalBugDropHarness(
   page: Page,
-  options: { failOnceForTitle?: string } = {},
+  options: { failOnceForTitle?: string; issueBase?: number } = {},
 ) {
   const submissions: Submission[] = [];
   const rejectedRequests: string[] = [];
@@ -59,7 +59,7 @@ function installLocalBugDropHarness(
         });
         return;
       }
-      const issueNumber = 9100 + submissions.length;
+      const issueNumber = (options.issueBase ?? 9100) + submissions.length;
       await route.fulfill({
         contentType: "application/json",
         body: JSON.stringify({
@@ -252,71 +252,95 @@ test("opens one selected Flow and restores the floating launcher focus", async (
   await expect(launcher).toBeFocused();
 });
 
-test("submits all three canonical Flow journeys only through exact local mocks", async ({ page }, testInfo) => {
+test("enforces evidence and submits Bug Report through its isolated mock", async ({ page }, testInfo) => {
   test.setTimeout(120_000);
   test.skip(testInfo.project.name !== "desktop-chromium");
   enabledOnly(testInfo);
   const harness = installLocalBugDropHarness(page, {
     failOnceForTitle: "Bug: Settings save is broken",
+    issueBase: 9200,
   });
   await page.goto("/");
 
-  const bugLauncher = await chooseInPage(page, "Bug Report");
+  const launcher = await chooseInPage(page, "Bug Report");
   const bug = page.locator('[data-bugdrop-flow="bug-report"]');
   await expect(bug.getByRole("dialog", { name: "Report a problem" })).toBeVisible();
   await bug.getByRole("button", { name: "Start report" }).click();
   await bug.getByLabel("Summary").fill("Settings save is broken");
   await bug.getByLabel("Steps to reproduce").fill("Open settings, change a value, then save.");
   await bug.getByRole("button", { name: "Add evidence" }).click();
-  await expect(bug.getByRole("button", { name: /Continue|Submit/ })).toBeVisible();
+
+  const evidenceAdvance = bug.getByRole("button", { name: /Continue|Submit/ });
+  await evidenceAdvance.click();
+  await expect(bug.getByText("Select at least one attachment.")).toBeVisible();
+  await expect(bug.getByRole("heading", { name: "Evidence and contact" })).toBeVisible();
+  expect(harness.submissions).toHaveLength(0);
+
   await bug.locator('input[type="file"]').setInputFiles({
     name: "settings-proof.png",
     mimeType: "image/png",
     buffer: Buffer.from("homepage attachment proof"),
   });
   await bug.getByLabel("Your name").fill("Homepage QA");
-  await bug.getByRole("button", { name: /Continue|Submit/ }).click();
+  await evidenceAdvance.click();
   await expect(bug.getByRole("heading", { name: "Show us the problem" })).toBeVisible();
   await bug.getByRole("button", { name: /Continue|Submit/ }).click();
 
   const capture = page.locator("#bugdrop-host .bd-overlay");
   await expect(capture.getByRole("heading", { name: "Capture Screenshot" })).toBeVisible();
+  await expect(capture.getByRole("button", { name: "Skip Screenshot" })).toHaveCount(0);
+  expect(harness.submissions).toHaveLength(0);
+  await capture.getByRole("button", { name: "×" }).click();
+  await expect(bug.getByRole("heading", { name: "Evidence and contact" })).toBeVisible();
+  await expect(bug.getByText("settings-proof.png")).toBeVisible();
+  expect(harness.submissions).toHaveLength(0);
+  await bug.getByRole("button", { name: /Continue|Submit/ }).click();
+  await expect(bug.getByRole("heading", { name: "Show us the problem" })).toBeVisible();
+  await bug.getByRole("button", { name: /Continue|Submit/ }).click();
   await capture.getByRole("button", { name: "Full Page" }).click();
   await expect(capture.getByRole("heading", { name: "Review Screenshot" })).toBeVisible({
     timeout: 30_000,
   });
   await capture.getByRole("button", { name: "Submit Feedback" }).click();
+
   await expect(bug.getByText("Intentional retry proof")).toBeVisible();
-  const firstBugAttempt = harness.submissions[0]?.body;
-  expect(firstBugAttempt).toMatchObject({
+  const firstAttempt = harness.submissions[0]?.body;
+  expect(firstAttempt).toMatchObject({
     repo,
     title: "Bug: Settings save is broken",
     description:
       "## Steps\n\n> Open settings, change a value, then save.\n\n## Surface\n\nsettings\n\n## Build\n\n`2026.08.15`",
     submitter: { name: "Homepage QA" },
   });
-  expect(firstBugAttempt.attachments).toEqual([
+  expect(firstAttempt.attachments).toEqual([
     expect.objectContaining({ name: "settings-proof.png", type: "image/png" }),
   ]);
-  expect(firstBugAttempt.screenshot).toEqual(expect.stringMatching(/^data:image\/png;base64,/));
+  expect(firstAttempt.screenshot).toEqual(expect.stringMatching(/^data:image\/png;base64,/));
   await bug.getByRole("button", { name: "Try Again" }).click();
   await expect(bug.getByRole("heading", { name: "Report received" })).toBeVisible();
+  await expect(bug.getByRole("link", { name: "View GitHub Issue" })).toHaveAttribute(
+    "href",
+    `https://github.com/${repo}/issues/9202`,
+  );
   expect(harness.submissions).toHaveLength(2);
   expect(harness.submissions[1]?.body).toMatchObject({
-    title: firstBugAttempt.title,
-    description: firstBugAttempt.description,
-    attachments: firstBugAttempt.attachments,
-    screenshot: firstBugAttempt.screenshot,
+    title: firstAttempt.title,
+    description: firstAttempt.description,
+    attachments: firstAttempt.attachments,
+    screenshot: firstAttempt.screenshot,
   });
   await bug.getByRole("button", { name: "Done" }).click();
-  await expect(bugLauncher).toBeFocused();
+  await expect(launcher).toBeFocused();
+  harness.assertClean();
+});
 
-  const floatingLauncher = page.getByRole("button", { name: "Try BugDrop experiences" });
-  await floatingLauncher.click();
-  await page
-    .getByRole("menu", { name: "Feedback experience" })
-    .getByRole("menuitemradio", { name: "Product Triage" })
-    .click();
+test("prunes hidden Product Triage answers in an isolated journey", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  enabledOnly(testInfo);
+  const harness = installLocalBugDropHarness(page, { issueBase: 9300 });
+  await page.goto("/");
+
+  const launcher = await chooseInPage(page, "Product Triage");
   const triage = page.locator('[data-bugdrop-flow="product-triage"]');
   await expect(triage.getByRole("dialog", { name: "Triage product feedback" })).toBeVisible();
   await triage.getByRole("button", { name: "Continue" }).click();
@@ -328,32 +352,44 @@ test("submits all three canonical Flow journeys only through exact local mocks",
   await triage.getByLabel("Chromium").click();
   await triage.getByRole("button", { name: "Continue" }).click();
   await triage.getByRole("button", { name: "Back" }).click();
-  await expect(triage.getByLabel("What happened?")).toHaveValue(
-    "hidden-diagnostics-sentinel",
-  );
+  await expect(triage.getByLabel("What happened?")).toHaveValue("hidden-diagnostics-sentinel");
   await triage.getByRole("button", { name: "Back" }).click();
   await triage.getByRole("radio", { name: "5 stars" }).click();
   await triage.getByLabel("Summary").fill("A high-signal product idea");
   await triage.getByRole("button", { name: "Continue" }).click();
   await expect(triage.getByLabel("What happened?")).toHaveCount(0);
-  const includeTriageScreenshot = triage.getByLabel("Include a screenshot", { exact: true });
-  await expect(includeTriageScreenshot).toBeChecked();
-  await includeTriageScreenshot.uncheck();
+  const includeScreenshot = triage.getByLabel("Include a screenshot", { exact: true });
+  await expect(includeScreenshot).toBeChecked();
+  await includeScreenshot.uncheck();
   await triage.getByRole("button", { name: "Submit" }).click();
+
   await expect(triage.getByRole("heading", { name: "Thanks for your feedback!" })).toBeVisible();
-  const triageBody = harness.submissions.at(-1)?.body;
-  expect(triageBody).toMatchObject({
+  await expect(triage.getByRole("link", { name: "View GitHub Issue" })).toHaveAttribute(
+    "href",
+    `https://github.com/${repo}/issues/9301`,
+  );
+  expect(harness.submissions).toHaveLength(1);
+  const body = harness.submissions[0]?.body;
+  expect(body).toMatchObject({
     repo,
     title: "Triage: A high-signal product idea",
     description: "## Type\n\nBug\n\n## Experience\n\n★★★★★ (5/5)",
     screenshot: null,
   });
-  expect(JSON.stringify(triageBody)).not.toContain("hidden-diagnostics-sentinel");
-  expect(JSON.stringify(triageBody)).not.toContain("Chromium");
+  expect(JSON.stringify(body)).not.toContain("hidden-diagnostics-sentinel");
+  expect(JSON.stringify(body)).not.toContain("Chromium");
   await triage.getByRole("button", { name: "Done" }).click();
-  await expect(floatingLauncher).toBeFocused();
+  await expect(launcher).toBeFocused();
+  harness.assertClean();
+});
 
-  const pulseLauncher = await chooseInPage(page, "Customer Pulse");
+test("submits Customer Pulse with cumulative rating behavior in isolation", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  enabledOnly(testInfo);
+  const harness = installLocalBugDropHarness(page, { issueBase: 9400 });
+  await page.goto("/");
+
+  const launcher = await chooseInPage(page, "Customer Pulse");
   const pulse = page.locator('[data-bugdrop-flow="customer-pulse"]');
   const rating = pulse.getByRole("radiogroup", { name: "Ease score" });
   await rating.getByRole("radio", { name: "7 stars" }).hover();
@@ -375,31 +411,22 @@ test("submits all three canonical Flow journeys only through exact local mocks",
   await pulse.getByLabel("Yes").click();
   await pulse.getByLabel("I consent to a product follow-up").check();
   await pulse.getByRole("button", { name: "Send pulse" }).click();
+
   await expect(pulse.getByRole("heading", { name: "Pulse recorded" })).toBeVisible();
-  const pulseBody = harness.submissions.at(-1)?.body;
-  expect(pulseBody).toMatchObject({
+  await expect(pulse.getByRole("link", { name: "View GitHub Issue" })).toHaveAttribute(
+    "href",
+    `https://github.com/${repo}/issues/9401`,
+  );
+  expect(harness.submissions).toHaveLength(1);
+  expect(harness.submissions[0]?.body).toMatchObject({
     repo,
     title: "Billing pulse 3/10",
     category: "question",
     description:
       "## Score\n\n3\n\n## Follow-up\n\nInvoice controls were hard to find.\n\n## Contact\n\nYes\n\n## Consent\n\ntrue",
   });
-  await expect(pulse.getByRole("link", { name: "View GitHub Issue" })).toHaveAttribute(
-    "href",
-    `https://github.com/${repo}/issues/9104`,
-  );
   await pulse.getByRole("button", { name: "Done" }).click();
-  await expect(pulseLauncher).toBeFocused();
-
-  expect(harness.submissions.map(({ body }) => body.title)).toEqual([
-    "Bug: Settings save is broken",
-    "Bug: Settings save is broken",
-    "Triage: A high-signal product idea",
-    "Billing pulse 3/10",
-  ]);
-  expect(new Set(harness.submissions.map(({ url }) => url))).toEqual(
-    new Set([`${origin}${runtimePath}/api/feedback`]),
-  );
+  await expect(launcher).toBeFocused();
   harness.assertClean();
 });
 

@@ -9,15 +9,19 @@
 - The feedback route delegates storage and request-size handling to the existing
   process-local inspector helpers. It returns a synthetic private Issue result;
   it has no external service path.
+- Review fix round 1 streams and counts the body before decoding it, cancels at
+  the first byte above 48 MiB, and treats `Content-Length` only as an early
+  rejection hint. Null, errored, and malformed UTF-8 bodies fail closed.
 - Added direct tests for successful preflight/submission, every host/origin/
   content-type/repository/environment guard, invalid JSON/object payloads, the
-  individual 48 MiB limit, and retrieval from the local inspector store.
+  individual 48 MiB limit (including chunked/forged-length streams and the exact
+  boundary), multibyte UTF-8, and retrieval from the local inspector store.
 
 ## Verification
 
 - `npm test -- --run test/homepage-local-flow-routes.test.ts test/public-flow-lab.test.ts`
-  — 14 tests passed.
-- `npm test` — 18 files / 150 tests passed.
+  — 19 tests passed.
+- `npm test` — 18 files / 155 tests passed.
 - `npm run lint` — passed with the pre-existing generated runtime warnings only
   (850 warnings, 0 errors).
 - `NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO=true npm run build` — passed; confirms both

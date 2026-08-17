@@ -155,6 +155,7 @@ test("keeps the Classic-only launcher when the feature flag is unset", async ({ 
 });
 
 test("submits the independent Classic journey through the local mock", async ({ page }, testInfo) => {
+  test.setTimeout(90_000);
   test.skip(testInfo.project.name !== "desktop-chromium");
   enabledOnly(testInfo);
   const harness = installLocalBugDropHarness(page);
@@ -194,11 +195,18 @@ test("submits the independent Classic journey through the local mock", async ({ 
   await classicHost.getByLabel("Description").fill("Classic details stay independent.");
   const includeScreenshot = classicHost.getByLabel(/Include a screenshot/);
   await expect(includeScreenshot).toBeChecked();
-  await includeScreenshot.uncheck();
   const classicSubmit = classicHost.getByRole("button", { name: "Continue" });
   expect(await classicSubmit.evaluate((button) => getComputedStyle(button).backgroundColor))
     .toBe("rgb(125, 207, 255)");
   await classicSubmit.click();
+
+  const classicCapture = page.locator("#bugdrop-host .bd-overlay");
+  await expect(classicCapture.getByRole("heading", { name: "Capture Screenshot" })).toBeVisible();
+  await classicCapture.getByRole("button", { name: "Full Page" }).click();
+  await expect(classicCapture.getByRole("heading", { name: "Review Screenshot" })).toBeVisible({
+    timeout: 30_000,
+  });
+  await classicCapture.getByRole("button", { name: "Submit Feedback" }).click();
 
   await expect(classicHost.getByRole("heading", { name: "Feedback Submitted!" })).toBeVisible();
   await expect(classicHost.getByRole("link", { name: "View on GitHub" })).toHaveAttribute(
@@ -212,7 +220,7 @@ test("submits the independent Classic journey through the local mock", async ({ 
       repo,
       title: "Classic homepage proof",
       description: "Classic details stay independent.",
-      screenshot: null,
+      screenshot: expect.stringMatching(/^data:image\/png;base64,/),
     },
   });
   await classicHost.getByRole("button", { name: "Done" }).click();
@@ -595,7 +603,20 @@ test("supports keyboard menu and mobile focus containment without overflow", asy
   const menu = page.getByRole("menu", { name: "Feedback experience" });
   await expect(menu).toBeVisible();
   await expect(menu.getByRole("menuitemradio")).toHaveCount(4);
+  const bugItem = menu.getByRole("menuitemradio", { name: "Bug Report" });
   await page.keyboard.press("ArrowDown");
+  await expect(bugItem).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(menu).toBeHidden();
+  await expect(page.getByRole("radio", { name: "Bug Report" })).toBeChecked();
+  const keyboardFlow = page.locator('[data-bugdrop-flow="bug-report"]');
+  await expect(keyboardFlow.getByRole("dialog", { name: "Report a problem" })).toBeVisible();
+  await keyboardFlow.getByRole("button", { name: "Close" }).click();
+  await expect(keyboardFlow).toHaveCount(0);
+  await expect(floating).toBeFocused();
+
+  await page.keyboard.press("Enter");
+  await expect(menu).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(menu).toBeHidden();
   await expect(floating).toBeFocused();

@@ -65,7 +65,12 @@ export function HomepageDemoLauncher({
                   onClick={() => onLaunch(experience.id)}
                   className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl px-3 py-3 text-left text-sm text-text-primary outline-none data-[highlighted]:bg-accent-cyan/15 data-[checked]:bg-accent-cyan/10 data-[disabled]:cursor-wait data-[disabled]:opacity-70"
                 >
-                  <span>{displayLabel(experience)}</span>
+                  <span className="min-w-0">
+                    <span className="block font-medium">{displayLabel(experience)}</span>
+                    <span className="mt-0.5 block text-xs leading-5 text-text-subtle">
+                      {experience.description}
+                    </span>
+                  </span>
                   <span aria-hidden="true" className="text-accent-cyan">
                     {experience.id === selectedId ? "✓" : ""}
                   </span>

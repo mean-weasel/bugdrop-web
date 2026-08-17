@@ -12,7 +12,7 @@ import {
 import {
   loadHomepageBugDrop,
   openHomepageExperience,
-  registerHomepageFlows,
+  registerHomepageFlow,
   type HomepageActiveExperience,
 } from "./homepage-demo-runtime";
 import { BUILDING_BLOCKS_PATH, SAMPLE_DEMO_REPO, WIDGET_URL } from "@/lib/links";
@@ -134,18 +134,19 @@ function waitForClassicClose(api: object, onClose: () => void): () => void {
   const maybeApi = api as { isOpen?: () => boolean };
   if (typeof maybeApi.isOpen !== "function") return () => undefined;
 
-  let sawOpen = false;
-  const interval = window.setInterval(() => {
-    if (maybeApi.isOpen?.()) {
-      sawOpen = true;
-      return;
-    }
-    if (sawOpen) {
-      window.clearInterval(interval);
-      onClose();
-    }
-  }, 150);
-  return () => window.clearInterval(interval);
+  let disposed = false;
+  const checkForClose = () => {
+    if (disposed || maybeApi.isOpen?.()) return;
+    disposed = true;
+    window.clearInterval(interval);
+    onClose();
+  };
+  const interval = window.setInterval(checkForClose, 150);
+  queueMicrotask(checkForClose);
+  return () => {
+    disposed = true;
+    window.clearInterval(interval);
+  };
 }
 
 function waitForFlowClose(flowId: string, onClose: () => void): () => void {
@@ -207,11 +208,11 @@ function FlowHomepageWidget() {
     try {
       const api = await loadHomepageBugDrop();
       if (!isCurrent()) return;
-      const handles = id === "classic" ? undefined : registerHomepageFlows(api);
+      const handle = id === "classic" ? undefined : registerHomepageFlow(api, id);
       if (!isCurrent()) return;
       const experience = openHomepageExperience(
         api,
-        handles ?? ({} as ReturnType<typeof registerHomepageFlows>),
+        handle,
         id,
       );
       if (!isCurrent()) {

@@ -48,6 +48,14 @@ function assertHomepageCiContract(workflow: string) {
     .split(/\r?\n/)
     .filter((line) => !line.trimStart().startsWith("#"))
     .join("\n");
+  expect(
+    activeWorkflow
+      .split(/\r?\n/)
+      .flatMap((line) => {
+        const match = line.match(/^([a-z][a-z0-9_-]*):(?:\s|$)/i);
+        return match ? [match[1]] : [];
+      }),
+  ).toEqual(["name", "on", "permissions", "jobs"]);
   expect(activeWorkflow).not.toMatch(
     /\bsecrets\.|\b[A-Z0-9_]*(?:TOKEN|SECRET|CANARY|ISSUE|REPOSITORY)[A-Z0-9_]*\s*:|\bgh\s+(?:api|issue|repo|release)\b|\bcurl\b[^\n]*(?:api\.github\.com|\/issues(?:\/|\s|$))|\bgit\s+push\b|\bnpm\s+publish\b|\b[a-z-]+\s*:\s*write\b/i,
   );
@@ -58,6 +66,29 @@ function assertHomepageCiContract(workflow: string) {
     /^  homepage-feedback-experiences:\s*$/,
     "homepage-feedback-experiences job",
   );
+  expect(job.trimEnd()).toBe(`  homepage-feedback-experiences:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Test homepage feedback experiences
+        env:
+          NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "true"
+          NEXT_PUBLIC_BUGDROP_WIDGET_URL: ${homepageCiRuntime}
+        run: >-
+          npx playwright test e2e/homepage-flow-demo.spec.ts
+          --project=desktop-chromium --project=mobile-chromium --retries=0`);
   expect(job).toMatch(/^    needs:\s*check\s*$/m);
   expect(job).not.toMatch(/^    if\s*:/m);
   expect(job).not.toMatch(/^    permissions\s*:/m);
@@ -264,6 +295,23 @@ describe("T012 integration and resource contracts", () => {
         "      - name: Test monitoring",
         "      - run: gh issue create --repo mean-weasel/bugdrop-widget-test\n\n      - name: Test monitoring",
       ),
+      workflow.replace(
+        "      - name: Install Chromium",
+        "      - run: node -e \"fetch('https://api.github.com/repos/mean-weasel/bugdrop-widget-test/issues',{method:'POST'})\"\n\n      - name: Install Chromium",
+      ),
+      workflow.replace(
+        "      - name: Install Chromium",
+        "      - run: wget --post-data='{}' https://api.github.com/repos/mean-weasel/bugdrop-widget-test/issues\n\n      - name: Install Chromium",
+      ),
+      workflow.replace(
+        "      - name: Install Chromium",
+        "      - uses: attacker/public-issue-writer@v1\n\n      - name: Install Chromium",
+      ),
+      workflow.replace(
+        "  homepage-feedback-experiences:\n",
+        "  homepage-feedback-experiences:\n    timeout-minutes: 120\n",
+      ),
+      workflow.replace("permissions:\n", "concurrency: homepage-demo\n\npermissions:\n"),
     ];
 
     for (const [index, adversarial] of adversarialWorkflows.entries()) {

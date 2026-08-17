@@ -33,8 +33,6 @@ export interface HomepageBugDropApi {
   registerFlow(config: unknown): HomepageFlowHandle;
 }
 
-export type HomepageFlowHandles = Readonly<Record<HomepageFlowRecipeId, HomepageFlowHandle>>;
-
 export type HomepageActiveExperience =
   | {
       readonly id: "classic";
@@ -47,7 +45,10 @@ export type HomepageActiveExperience =
     };
 
 let homepageLoadPromise: Promise<HomepageBugDropApi> | undefined;
-const flowHandleCache = new WeakMap<HomepageBugDropApi, HomepageFlowHandles>();
+const flowHandleCache = new WeakMap<
+  HomepageBugDropApi,
+  Map<HomepageFlowRecipeId, HomepageFlowHandle>
+>();
 
 export function homepageRuntimeAttributes(): Readonly<Record<string, string>> {
   return Object.freeze({
@@ -84,6 +85,37 @@ function homepageApiFromWindow(): HomepageBugDropApi | undefined {
   return candidate as HomepageBugDropApi;
 }
 
+function hasBugDropGlobal(): boolean {
+  return typeof window !== "undefined" &&
+    (window as Window & { BugDrop?: unknown }).BugDrop !== undefined;
+}
+
+function homepageScriptFromDocument(): HTMLScriptElement | undefined {
+  if (typeof document === "undefined") return undefined;
+  const candidate = document.getElementById(SCRIPT_ID);
+  return candidate instanceof HTMLScriptElement ? candidate : undefined;
+}
+
+function absoluteRuntimeUrl(value: string): string {
+  const base = typeof window !== "undefined" && window.location?.href
+    ? window.location.href
+    : "http://bugdrop.localhost:3000/";
+  return new URL(value, base).href;
+}
+
+function isExactHomepageScript(script: HTMLScriptElement): boolean {
+  if (absoluteRuntimeUrl(script.src) !== absoluteRuntimeUrl(WIDGET_URL)) return false;
+  return Object.entries(homepageRuntimeAttributes()).every(
+    ([name, value]) => script.dataset[name] === value,
+  );
+}
+
+function foreignRuntimeError(): Error {
+  return new Error(
+    "A different BugDrop runtime is already active. Reload this page to try the homepage demo.",
+  );
+}
+
 function configureHomepageScript(script: HTMLScriptElement) {
   script.id = SCRIPT_ID;
   script.src = WIDGET_URL;
@@ -94,18 +126,27 @@ function configureHomepageScript(script: HTMLScriptElement) {
 }
 
 export function loadHomepageBugDrop(): Promise<HomepageBugDropApi> {
-  const readyApi = homepageApiFromWindow();
-  if (readyApi) return Promise.resolve(readyApi);
-  if (homepageLoadPromise) return homepageLoadPromise;
   if (typeof document === "undefined") {
     return Promise.reject(new Error("The homepage BugDrop runtime requires a browser."));
   }
 
+  const existing = homepageScriptFromDocument();
+  const readyApi = homepageApiFromWindow();
+  if (readyApi) {
+    return existing && isExactHomepageScript(existing)
+      ? Promise.resolve(readyApi)
+      : Promise.reject(foreignRuntimeError());
+  }
+  if (hasBugDropGlobal() && (!existing || !isExactHomepageScript(existing))) {
+    return Promise.reject(foreignRuntimeError());
+  }
+  if (existing && !isExactHomepageScript(existing)) {
+    return Promise.reject(foreignRuntimeError());
+  }
+  if (homepageLoadPromise) return homepageLoadPromise;
+
   homepageLoadPromise = new Promise<HomepageBugDropApi>((resolve, reject) => {
-    const existing = document.getElementById(SCRIPT_ID);
-    const script = existing instanceof HTMLScriptElement
-      ? existing
-      : document.createElement("script");
+    const script = existing ?? document.createElement("script");
     let settled = false;
 
     const cleanupListeners = () => {
@@ -118,6 +159,9 @@ export function loadHomepageBugDrop(): Promise<HomepageBugDropApi> {
       if (settled) return;
       settled = true;
       cleanupListeners();
+      if (!homepageApiFromWindow() && hasBugDropGlobal()) {
+        delete (window as Window & { BugDrop?: unknown }).BugDrop;
+      }
       script.remove();
       homepageLoadPromise = undefined;
       reject(new Error("The homepage BugDrop runtime did not initialize."));
@@ -148,27 +192,31 @@ export function loadHomepageBugDrop(): Promise<HomepageBugDropApi> {
   return homepageLoadPromise;
 }
 
-export function registerHomepageFlows(api: HomepageBugDropApi): HomepageFlowHandles {
-  const cached = flowHandleCache.get(api);
+export function registerHomepageFlow(
+  api: HomepageBugDropApi,
+  id: HomepageFlowRecipeId,
+): HomepageFlowHandle {
+  let handles = flowHandleCache.get(api);
+  if (!handles) {
+    handles = new Map();
+    flowHandleCache.set(api, handles);
+  }
+  const cached = handles.get(id);
   if (cached) return cached;
 
-  const handles = {} as Record<HomepageFlowRecipeId, HomepageFlowHandle>;
-  for (const recipe of homepageFlowRecipeList) {
-    const handle = api.registerFlow(recipe.config);
-    if (handle.id !== recipe.id) {
-      throw new Error(`BugDrop returned unexpected Flow handle ID: ${handle.id}`);
-    }
-    handles[recipe.id] = handle;
+  const recipe = homepageFlowRecipeList.find((candidate) => candidate.id === id);
+  if (!recipe) throw new Error(`Unknown homepage Flow recipe: ${id}`);
+  const handle = api.registerFlow(recipe.config);
+  if (handle.id !== recipe.id) {
+    throw new Error(`BugDrop returned unexpected Flow handle ID: ${handle.id}`);
   }
-
-  const frozenHandles = Object.freeze(handles);
-  flowHandleCache.set(api, frozenHandles);
-  return frozenHandles;
+  handles.set(id, handle);
+  return handle;
 }
 
 export function openHomepageExperience(
   api: HomepageBugDropApi,
-  handles: HomepageFlowHandles,
+  handle: HomepageFlowHandle | undefined,
   id: HomepageExperienceId,
 ): HomepageActiveExperience {
   if (id === "classic") {
@@ -176,7 +224,10 @@ export function openHomepageExperience(
     return Object.freeze({ id, close: () => api.close() });
   }
 
-  const opened = handles[id].open(
+  if (!handle || handle.id !== id) {
+    throw new Error(`Missing homepage Flow handle: ${id}`);
+  }
+  const opened = handle.open(
     homepageFlowRecipes[id].openOptions as HomepageFlowOpenOptions | undefined,
   );
   return Object.freeze({

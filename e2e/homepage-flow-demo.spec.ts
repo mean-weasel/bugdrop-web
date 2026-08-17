@@ -129,12 +129,55 @@ test("exposes the homepage feedback experience picker", async ({ page }, testInf
 
   const menu = page.getByRole("menu", { name: "Feedback experience" });
   await expect(menu.getByRole("menuitemradio")).toHaveCount(4);
+  await expect(menu).toContainText("The familiar screenshot-first feedback widget.");
+  await expect(menu).toContainText("Capture a reproducible problem with evidence.");
+  await expect(menu).toContainText("Route product signals with conditional follow-up.");
+  await expect(menu).toContainText("Ask a focused customer satisfaction question.");
   await expect(
     menu.getByRole("menuitemradio", { name: /General Feedback.*Classic/ }),
   ).toHaveAttribute("aria-checked", "true");
   await expect(
     page.getByRole("link", { name: "Explore the building blocks" }),
   ).toHaveAttribute("href", "/labs/variants");
+});
+
+test("fails visibly after a client navigation leaves a foreign runtime active", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  test.skip(process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED !== "true");
+
+  await page.goto("/labs/variants");
+  await expect(page.getByRole("button", { name: "Run default-shaped flow" })).toBeEnabled();
+  await page.getByRole("link", { name: "BugDrop", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/`);
+
+  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await expect(
+    page.getByRole("alert").filter({ hasText: "The feedback experience" }),
+  ).toContainText("could not load");
+  await expect(page.getByRole("button", { name: "Open General Feedback" })).toBeEnabled();
+  await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(0);
+});
+
+test("settles Classic when the runtime opens and closes before the first poll", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  test.skip(process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED !== "true");
+
+  await page.route(`**${runtimePath}/widget.js`, (route) =>
+    route.fulfill({
+      contentType: "application/javascript",
+      body: `window.BugDrop={open(){},close(){},isOpen(){return false},registerFlow(config){return{id:config.id,open(){throw new Error('not used')}}}};`,
+    }),
+  );
+  await page.goto("/");
+
+  const launch = page.getByRole("button", { name: "Open General Feedback" });
+  await launch.click();
+  await expect(launch).toBeEnabled();
+  await expect(launch).toBeFocused();
 });
 
 test("keeps the Classic-only launcher when the feature flag is unset", async ({ page }, testInfo) => {

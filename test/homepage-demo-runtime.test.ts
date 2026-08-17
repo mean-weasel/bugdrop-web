@@ -123,7 +123,21 @@ describe("homepage demo runtime", () => {
     expect(script.removed).toBe(true);
   });
 
-  it("registers exactly the canonical flows once and validates their returned IDs", () => {
+  it("fails closed when another page left a foreign BugDrop runtime behind", async () => {
+    const { document, runtimeWindow } = installBrowser();
+    runtimeWindow.BugDrop = {
+      open: vi.fn(),
+      close: vi.fn(),
+      registerFlow: vi.fn(),
+    };
+
+    await expect(runtime.loadHomepageBugDrop()).rejects.toThrow("different BugDrop runtime");
+    expect(document.scripts).toHaveLength(0);
+
+    await expect(runtime.loadHomepageBugDrop()).rejects.toThrow("different BugDrop runtime");
+  });
+
+  it("registers a selected canonical flow once and validates its returned ID", () => {
     const api = {
       open: vi.fn(),
       close: vi.fn(),
@@ -133,17 +147,39 @@ describe("homepage demo runtime", () => {
       })),
     };
 
-    const handles = runtime.registerHomepageFlows(api);
-    expect(api.registerFlow).toHaveBeenCalledTimes(3);
-    expect(api.registerFlow).toHaveBeenNthCalledWith(1, homepageFlowRecipeList[0].config);
-    expect(runtime.registerHomepageFlows(api)).toBe(handles);
-    expect(api.registerFlow).toHaveBeenCalledTimes(3);
+    const handle = runtime.registerHomepageFlow(api, "bug-report");
+    expect(api.registerFlow).toHaveBeenCalledOnce();
+    expect(api.registerFlow).toHaveBeenCalledWith(homepageFlowRecipeList[0].config);
+    expect(runtime.registerHomepageFlow(api, "bug-report")).toBe(handle);
+    expect(api.registerFlow).toHaveBeenCalledOnce();
 
     const badApi = {
       ...api,
       registerFlow: vi.fn(() => ({ id: "unexpected", open: vi.fn() })),
     };
-    expect(() => runtime.registerHomepageFlows(badApi)).toThrow("returned unexpected");
+    expect(() => runtime.registerHomepageFlow(badApi, "bug-report")).toThrow("returned unexpected");
+  });
+
+  it("preserves successful selected handles when another registration fails and retries", () => {
+    let productAttempts = 0;
+    const api = {
+      open: vi.fn(),
+      close: vi.fn(),
+      registerFlow: vi.fn((config: { id: string }) => {
+        if (config.id === "product-triage" && productAttempts++ === 0) {
+          throw new Error("one-time registration failure");
+        }
+        return { id: config.id, open: vi.fn() };
+      }),
+    };
+
+    const bugReport = runtime.registerHomepageFlow(api, "bug-report");
+    expect(() => runtime.registerHomepageFlow(api, "product-triage")).toThrow(
+      "one-time registration failure",
+    );
+    expect(runtime.registerHomepageFlow(api, "bug-report")).toBe(bugReport);
+    expect(runtime.registerHomepageFlow(api, "product-triage").id).toBe("product-triage");
+    expect(api.registerFlow).toHaveBeenCalledTimes(3);
   });
 
   it("opens Classic without a Flow and exposes separate cleanup for Classic and Flow", async () => {
@@ -157,16 +193,16 @@ describe("homepage demo runtime", () => {
       close: vi.fn(),
       registerFlow: vi.fn((config: { id: string }) => ({ id: config.id, open: flowOpen })),
     };
-    const handles = runtime.registerHomepageFlows(api);
+    const handle = runtime.registerHomepageFlow(api, "bug-report");
 
-    const classic = runtime.openHomepageExperience(api, handles, "classic");
+    const classic = runtime.openHomepageExperience(api, undefined, "classic");
     expect(api.open).toHaveBeenCalledOnce();
     expect(flowOpen).not.toHaveBeenCalled();
     expect(classic).not.toHaveProperty("result");
     classic.close();
     expect(api.close).toHaveBeenCalledOnce();
 
-    const flow = runtime.openHomepageExperience(api, handles, "bug-report");
+    const flow = runtime.openHomepageExperience(api, handle, "bug-report");
     expect(flowOpen).toHaveBeenCalledWith(homepageFlowRecipeList[0].openOptions);
     if (flow.id === "classic") throw new Error("Expected the Bug Report Flow session.");
     await expect(flow.result).resolves.toEqual({ status: "closed" });

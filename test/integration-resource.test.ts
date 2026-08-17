@@ -41,6 +41,16 @@ function assertHomepageCiContract(workflow: string) {
 
   const permissions = extractYamlBlock(workflow, /^permissions:\s*$/, "workflow permissions");
   expect(permissions.trim()).toBe("permissions:\n  contents: read");
+  expect(workflow).not.toMatch(/^env\s*:/m);
+  expect(workflow).not.toMatch(/^defaults\s*:/m);
+
+  const activeWorkflow = workflow
+    .split(/\r?\n/)
+    .filter((line) => !line.trimStart().startsWith("#"))
+    .join("\n");
+  expect(activeWorkflow).not.toMatch(
+    /\bsecrets\.|\b[A-Z0-9_]*(?:TOKEN|SECRET|CANARY|ISSUE|REPOSITORY)[A-Z0-9_]*\s*:|\bgh\s+(?:api|issue|repo|release)\b|\bcurl\b[^\n]*(?:api\.github\.com|\/issues(?:\/|\s|$))|\bgit\s+push\b|\bnpm\s+publish\b|\b[a-z-]+\s*:\s*write\b/i,
+  );
 
   const jobs = extractYamlBlock(workflow, /^jobs:\s*$/, "jobs");
   const job = extractYamlBlock(
@@ -238,6 +248,22 @@ describe("T012 integration and resource contracts", () => {
         "  homepage-feedback-experiences:\n",
         "  homepage-feedback-experiences:\n    permissions:\n      contents: write\n",
       ),
+      workflow.replace(
+        "permissions:\n  contents: read\n",
+        "permissions:\n  contents: read\n\nenv:\n  GITHUB_TOKEN: ${{ secrets.REAL_CANARY_TOKEN }}\n",
+      ),
+      workflow.replace(
+        "permissions:\n  contents: read\n",
+        "permissions:\n  contents: read\n\nenv:\n  ISSUE_MUTATION: enabled\n",
+      ),
+      workflow.replace(
+        "permissions:\n  contents: read\n",
+        "permissions:\n  contents: read\n\ndefaults:\n  run:\n    shell: bash -c 'gh issue create'\n",
+      ),
+      workflow.replace(
+        "      - name: Test monitoring",
+        "      - run: gh issue create --repo mean-weasel/bugdrop-widget-test\n\n      - name: Test monitoring",
+      ),
     ];
 
     for (const [index, adversarial] of adversarialWorkflows.entries()) {
@@ -246,6 +272,11 @@ describe("T012 integration and resource contracts", () => {
         `adversarial workflow ${index + 1} unexpectedly passed`,
       ).toThrow();
     }
+
+    const commentedDecoys = workflow
+      + "\n# env:\n#   GITHUB_TOKEN: ${{ secrets.REAL_CANARY_TOKEN }}\n"
+      + "# defaults:\n#   run:\n#     shell: gh issue create\n";
+    expect(() => assertHomepageCiContract(commentedDecoys)).not.toThrow();
   });
 
   it("loads GA only after a tracked intent while preserving the queued page view", async () => {

@@ -160,6 +160,54 @@ test("fails visibly after a client navigation leaves a foreign runtime active", 
   await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(0);
 });
 
+test("keeps the pinned homepage API across homepage to lab to homepage navigation", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  test.skip(process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED !== "true");
+
+  const checkPaths: string[] = [];
+  await page.route("**/api/check/**", async (route) => {
+    checkPaths.push(new URL(route.request().url()).pathname);
+    await route.fulfill({
+      contentType: "application/json",
+      body: '{"installed":true,"appName":"BugDrop"}',
+    });
+  });
+  await page.route("**/api/feedback", (route) => route.abort());
+  await page.goto("/");
+
+  const openClassic = page.getByRole("button", { name: "Open General Feedback" });
+  await openClassic.click();
+  const classicHost = page.locator("#bugdrop-host").first();
+  await expect(classicHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await classicHost.getByRole("button", { name: "Cancel" }).click();
+
+  await page.getByRole("link", { name: "Explore the building blocks" }).click();
+  await expect(page.getByRole("button", { name: "Run default-shaped flow" })).toBeEnabled();
+  await page.getByRole("link", { name: "BugDrop", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/`);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const script = document.querySelector<HTMLScriptElement>("#bugdrop-homepage-demo");
+        const bound = script &&
+          (script as HTMLScriptElement & { [key: symbol]: unknown })[
+            Symbol.for("bugdrop.homepage-demo.exact-api")
+          ];
+        return Boolean(bound && bound !== window.BugDrop);
+      }),
+    )
+    .toBe(true);
+
+  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await expect(classicHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  expect(checkPaths).toEqual([
+    `${runtimePath}/api/check/${repo}`,
+    `${runtimePath}/api/check/${repo}`,
+  ]);
+});
+
 test("settles Classic when the runtime opens and closes before the first poll", async ({
   page,
 }, testInfo) => {
@@ -562,6 +610,43 @@ test("does not open an orphan Flow after navigation during a delayed runtime loa
     .toEqual(initialOverflow);
   expect(checkRequests).toBe(0);
   expect(feedbackRequests).toBe(0);
+});
+
+test("does not resume a cancelled Classic modal after delayed preflight navigation", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  test.skip(process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED !== "true");
+
+  let releaseCheck!: () => void;
+  let noteCheckStarted!: () => void;
+  const checkStarted = new Promise<void>((resolve) => {
+    noteCheckStarted = resolve;
+  });
+  await page.route(`**${runtimePath}/api/check/${repo}`, async (route) => {
+    noteCheckStarted();
+    await new Promise<void>((resolve) => {
+      releaseCheck = resolve;
+    });
+    await route.fulfill({
+      contentType: "application/json",
+      body: '{"installed":true,"appName":"BugDrop"}',
+    });
+  });
+  await page.goto("/");
+  const initialOverflow = await page.evaluate(() => document.body.style.overflow);
+
+  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await checkStarted;
+  await page.getByRole("navigation").getByRole("link", { name: "Docs", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/docs`);
+  releaseCheck();
+
+  await expect(page.getByRole("heading", { name: "Getting Started" })).toBeVisible();
+  await expect(page.locator("#bugdrop-host").getByRole("heading", { name: "Send Feedback" }))
+    .toHaveCount(0);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe(initialOverflow);
 });
 
 test("keeps one active owner and tears capture down on client navigation", async ({ page }, testInfo) => {

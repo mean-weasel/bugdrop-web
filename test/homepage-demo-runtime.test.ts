@@ -36,7 +36,7 @@ class FakeDocument extends EventTarget {
 
 function installBrowser() {
   const document = new FakeDocument();
-  const runtimeWindow: { BugDrop?: unknown } = {};
+  const runtimeWindow: { BugDrop?: unknown; fetch?: typeof fetch } = {};
   Object.assign(globalThis, { document, window: runtimeWindow, HTMLScriptElement: FakeScript });
   return { document, runtimeWindow };
 }
@@ -92,6 +92,27 @@ describe("homepage demo runtime", () => {
     document.scripts[0].dispatchEvent(new Event("load"));
 
     await expect(first).resolves.toBe(api);
+  });
+
+  it("keeps using the exact pinned API after another runtime overwrites the window global", async () => {
+    const { document, runtimeWindow } = installBrowser();
+    const pending = runtime.loadHomepageBugDrop();
+    const exactApi = {
+      open: vi.fn(),
+      close: vi.fn(),
+      registerFlow: vi.fn(),
+    };
+    runtimeWindow.BugDrop = exactApi;
+    document.scripts[0].dispatchEvent(new Event("load"));
+    await expect(pending).resolves.toBe(exactApi);
+
+    runtimeWindow.BugDrop = {
+      open: vi.fn(),
+      close: vi.fn(),
+      registerFlow: vi.fn(),
+    };
+
+    await expect(runtime.loadHomepageBugDrop()).resolves.toBe(exactApi);
   });
 
   it("cleans up a partial API and lets a later intent retry", async () => {
@@ -208,5 +229,33 @@ describe("homepage demo runtime", () => {
     await expect(flow.result).resolves.toEqual({ status: "closed" });
     flow.close();
     expect(flowOpen.mock.results[0].value.close).toHaveBeenCalledOnce();
+  });
+
+  it("keeps a cancelled Classic preflight from resuming after navigation", async () => {
+    const { runtimeWindow } = installBrowser();
+    let releaseCheck!: (response: Response) => void;
+    const check = new Promise<Response>((resolve) => {
+      releaseCheck = resolve;
+    });
+    runtimeWindow.fetch = vi.fn(() => check);
+    const lateOpen = vi.fn();
+    const api = {
+      open: vi.fn(() => {
+        void runtimeWindow.fetch?.(
+          "/vendor/bugdrop/exact/api/check/mean-weasel/bugdrop-widget-test",
+        ).then(lateOpen);
+      }),
+      close: vi.fn(),
+      registerFlow: vi.fn(),
+    };
+
+    const classic = runtime.openHomepageExperience(api, undefined, "classic");
+    classic.close();
+    releaseCheck(new Response('{"installed":true}', { status: 200 }));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(api.close).toHaveBeenCalledOnce();
+    expect(lateOpen).not.toHaveBeenCalled();
   });
 });

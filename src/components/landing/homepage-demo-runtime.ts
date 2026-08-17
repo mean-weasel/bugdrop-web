@@ -8,6 +8,7 @@ import type { HomepageExperienceId } from "./homepage-demo-model";
 import { SAMPLE_DEMO_REPO, WIDGET_URL } from "@/lib/links";
 
 const SCRIPT_ID = "bugdrop-homepage-demo";
+const API_BINDING = Symbol.for("bugdrop.homepage-demo.exact-api");
 const WELCOME =
   "This is the BugDrop landing page demo. Send a test report to see what your users would experience.";
 
@@ -45,6 +46,7 @@ export type HomepageActiveExperience =
     };
 
 let homepageLoadPromise: Promise<HomepageBugDropApi> | undefined;
+let homepageExactApi: HomepageBugDropApi | undefined;
 const flowHandleCache = new WeakMap<
   HomepageBugDropApi,
   Map<HomepageFlowRecipeId, HomepageFlowHandle>
@@ -96,6 +98,19 @@ function homepageScriptFromDocument(): HTMLScriptElement | undefined {
   return candidate instanceof HTMLScriptElement ? candidate : undefined;
 }
 
+type HomepageScript = HTMLScriptElement & {
+  [API_BINDING]?: HomepageBugDropApi;
+};
+
+function boundHomepageApi(script: HTMLScriptElement): HomepageBugDropApi | undefined {
+  return (script as HomepageScript)[API_BINDING];
+}
+
+function bindHomepageApi(script: HTMLScriptElement, api: HomepageBugDropApi) {
+  (script as HomepageScript)[API_BINDING] = api;
+  homepageExactApi = api;
+}
+
 function absoluteRuntimeUrl(value: string): string {
   const base = typeof window !== "undefined" && window.location?.href
     ? window.location.href
@@ -131,6 +146,13 @@ export function loadHomepageBugDrop(): Promise<HomepageBugDropApi> {
   }
 
   const existing = homepageScriptFromDocument();
+  if (existing && isExactHomepageScript(existing)) {
+    const boundApi = homepageExactApi ?? boundHomepageApi(existing);
+    if (boundApi) {
+      homepageExactApi = boundApi;
+      return Promise.resolve(boundApi);
+    }
+  }
   const readyApi = homepageApiFromWindow();
   if (readyApi) {
     return existing && isExactHomepageScript(existing)
@@ -152,7 +174,6 @@ export function loadHomepageBugDrop(): Promise<HomepageBugDropApi> {
     const cleanupListeners = () => {
       script.removeEventListener("load", resolveWhenReady);
       script.removeEventListener("error", rejectLoad);
-      document.removeEventListener("bugdrop:ready", resolveWhenReady);
     };
 
     const rejectLoad = () => {
@@ -176,12 +197,12 @@ export function loadHomepageBugDrop(): Promise<HomepageBugDropApi> {
       }
       settled = true;
       cleanupListeners();
+      bindHomepageApi(script, api);
       resolve(api);
     };
 
     script.addEventListener("load", resolveWhenReady, { once: true });
     script.addEventListener("error", rejectLoad, { once: true });
-    document.addEventListener("bugdrop:ready", resolveWhenReady, { once: true });
 
     if (!existing) {
       configureHomepageScript(script);
@@ -190,6 +211,63 @@ export function loadHomepageBugDrop(): Promise<HomepageBugDropApi> {
   });
 
   return homepageLoadPromise;
+}
+
+function isHomepageCheckRequest(input: RequestInfo | URL): boolean {
+  const value = input instanceof Request ? input.url : String(input);
+  try {
+    const url = new URL(value, window.location?.href ?? "http://bugdrop.localhost:3000/");
+    return url.pathname.endsWith(`/api/check/${SAMPLE_DEMO_REPO}`);
+  } catch {
+    return false;
+  }
+}
+
+function openCancellableClassic(api: HomepageBugDropApi): HomepageActiveExperience {
+  if (typeof window === "undefined" || typeof window.fetch !== "function") {
+    api.open();
+    return Object.freeze({ id: "classic" as const, close: () => api.close() });
+  }
+
+  let cancelled = false;
+  const originalFetch = window.fetch;
+  let intercepting = true;
+  const restoreFetch = () => {
+    if (!intercepting) return;
+    intercepting = false;
+    if (window.fetch === guardedFetch) window.fetch = originalFetch;
+  };
+  const guardedFetch: typeof window.fetch = (input, init) => {
+    if (!isHomepageCheckRequest(input)) return originalFetch.call(window, input, init);
+    restoreFetch();
+    const request = originalFetch.call(window, input, init);
+    return new Promise<Response>((resolve, reject) => {
+      void request.then(
+        (response) => {
+          if (!cancelled) resolve(response);
+        },
+        (error: unknown) => {
+          if (!cancelled) reject(error);
+        },
+      );
+    });
+  };
+
+  window.fetch = guardedFetch;
+  try {
+    api.open();
+  } catch (error) {
+    restoreFetch();
+    throw error;
+  }
+
+  return Object.freeze({
+    id: "classic" as const,
+    close: () => {
+      cancelled = true;
+      api.close();
+    },
+  });
 }
 
 export function registerHomepageFlow(
@@ -220,8 +298,7 @@ export function openHomepageExperience(
   id: HomepageExperienceId,
 ): HomepageActiveExperience {
   if (id === "classic") {
-    api.open();
-    return Object.freeze({ id, close: () => api.close() });
+    return openCancellableClassic(api);
   }
 
   if (!handle || handle.id !== id) {

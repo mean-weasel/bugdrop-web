@@ -39,6 +39,9 @@ function assertHomepageCiContract(workflow: string) {
   expect(triggers).toMatch(/^  pull_request:\s*$/m);
   expect(triggers).toMatch(/^  merge_group:\s*$/m);
 
+  const permissions = extractYamlBlock(workflow, /^permissions:\s*$/, "workflow permissions");
+  expect(permissions.trim()).toBe("permissions:\n  contents: read");
+
   const jobs = extractYamlBlock(workflow, /^jobs:\s*$/, "jobs");
   const job = extractYamlBlock(
     jobs,
@@ -46,6 +49,29 @@ function assertHomepageCiContract(workflow: string) {
     "homepage-feedback-experiences job",
   );
   expect(job).toMatch(/^    needs:\s*check\s*$/m);
+  expect(job).not.toMatch(/^    if\s*:/m);
+  expect(job).not.toMatch(/^    permissions\s*:/m);
+
+  const checkout = extractYamlBlock(
+    job,
+    /^      - uses: actions\/checkout@v4\s*$/,
+    "homepage checkout step",
+  );
+  expect(checkout.trim()).toBe("- uses: actions/checkout@v4");
+  const setupNode = extractYamlBlock(
+    job,
+    /^      - uses: actions\/setup-node@v4\s*$/,
+    "homepage setup-node step",
+  );
+  expect(setupNode).toMatch(/^        with:\s*$/m);
+  expect(setupNode).toMatch(/^          node-version:\s*24\s*$/m);
+  expect(setupNode).toMatch(/^          cache:\s*npm\s*$/m);
+  expect(setupNode.match(/^          (?:node-version|cache):/gm)).toHaveLength(2);
+
+  const npmCi = "      - run: npm ci";
+  const installChromium = "        run: npx playwright install --with-deps chromium";
+  const testCommand = "          npx playwright test e2e/homepage-flow-demo.spec.ts";
+  expect(job.match(/^      - run: npm ci\s*$/gm)).toHaveLength(1);
   expect(job).toMatch(/^        run: npx playwright install --with-deps chromium\s*$/m);
   expect(job).toMatch(/^          NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "true"\s*$/m);
   expect(job).toMatch(
@@ -60,8 +86,12 @@ function assertHomepageCiContract(workflow: string) {
   expect(job).toMatch(
     /^          --project=desktop-chromium --project=mobile-chromium --retries=0\s*$/m,
   );
+  expect(job.indexOf(checkout)).toBeLessThan(job.indexOf(setupNode));
+  expect(job.indexOf(setupNode)).toBeLessThan(job.indexOf(npmCi));
+  expect(job.indexOf(npmCi)).toBeLessThan(job.indexOf(installChromium));
+  expect(job.indexOf(installChromium)).toBeLessThan(job.indexOf(testCommand));
   expect(job).not.toMatch(
-    /\b(?:real[-_ ]?canary|canary(?:[_-]?(?:selector|mode|token))?|(?:github|gh|issue)[_-]?token)\b|\btoken\s*:|\bissues?\s*:\s*write\b|\b(?:create|update|delete|close)[-_ ]?issue\b|\bissue[_-]?(?:number|mutation|repo|title)\s*:/i,
+    /\b(?:real[-_ ]?canary|canary(?:[_-]?(?:selector|mode|token))?|(?:github|gh|issue)[_-]?token)\b|\btoken\s*:|\bpermissions\s*:\s*inherit\b|\b[a-z-]+\s*:\s*write\b|\b(?:create|update|delete|close)[-_ ]?issue\b|\bissue[_-]?(?:number|mutation|repo|title)\s*:/i,
   );
 }
 
@@ -145,11 +175,33 @@ describe("T012 integration and resource contracts", () => {
         "          npx playwright test e2e/homepage-flow-demo.spec.ts\n          --project=desktop-chromium --project=mobile-chromium --retries=0",
         "          echo skipped",
       ) + "\n  decoy-command:\n    steps:\n      - run: >-\n          npx playwright test e2e/homepage-flow-demo.spec.ts\n          --project=desktop-chromium --project=mobile-chromium --retries=0\n";
+    const moveSetupToDecoy = workflow
+      .replaceAll(
+        "      - uses: actions/setup-node@v4\n        with:\n          node-version: 24\n          cache: npm",
+        "      - run: echo setup skipped",
+      ) + "\n  decoy-setup:\n    steps:\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 24\n          cache: npm\n";
+    const moveCheckoutToDecoy = workflow
+      .replaceAll("      - uses: actions/checkout@v4", "      - run: echo checkout skipped")
+      + "\n  decoy-checkout:\n    steps:\n      - uses: actions/checkout@v4\n";
+    const moveNpmCiToDecoy = workflow
+      .replaceAll("      - run: npm ci", "      - run: echo npm ci")
+      + "\n  decoy-install:\n    steps:\n      - run: npm ci\n";
 
     const adversarialWorkflows = [
       workflow.replace("  pull_request:\n", "  # pull_request:\n"),
       workflow.replace("  merge_group:\n", "  # merge_group:\n"),
       workflow.replace("    needs: check", "    needs: other"),
+      workflow.replace(
+        "  homepage-feedback-experiences:\n",
+        "  homepage-feedback-experiences:\n    if: github.event_name == 'pull_request'\n",
+      ),
+      moveCheckoutToDecoy,
+      workflow.replaceAll("actions/checkout@v4", "actions/checkout@v3"),
+      moveSetupToDecoy,
+      workflow.replaceAll("node-version: 24", "node-version: 22"),
+      workflow.replaceAll("cache: npm", "cache: yarn"),
+      moveNpmCiToDecoy,
+      workflow.replaceAll("      - run: npm ci", "      - run: echo npm ci"),
       moveRequiredLinesToDecoy,
       moveCommandToDecoy,
       workflow.replace("e2e/homepage-flow-demo.spec.ts", "e2e/other.spec.ts"),
@@ -173,10 +225,26 @@ describe("T012 integration and resource contracts", () => {
         "      - name: Test homepage feedback experiences",
         "      - name: Test homepage feedback experiences\n        permissions:\n          issues: write",
       ),
+      workflow.replace("permissions:\n  contents: read", "permissions:\n  contents: write"),
+      workflow.replace(
+        "permissions:\n  contents: read",
+        "permissions:\n  contents: read\n  issues: write",
+      ),
+      workflow.replace(
+        "  homepage-feedback-experiences:\n",
+        "  homepage-feedback-experiences:\n    permissions: inherit\n",
+      ),
+      workflow.replace(
+        "  homepage-feedback-experiences:\n",
+        "  homepage-feedback-experiences:\n    permissions:\n      contents: write\n",
+      ),
     ];
 
-    for (const adversarial of adversarialWorkflows) {
-      expect(() => assertHomepageCiContract(adversarial)).toThrow();
+    for (const [index, adversarial] of adversarialWorkflows.entries()) {
+      expect(
+        () => assertHomepageCiContract(adversarial),
+        `adversarial workflow ${index + 1} unexpectedly passed`,
+      ).toThrow();
     }
   });
 

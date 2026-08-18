@@ -12,7 +12,7 @@ A screenshot is a data artifact, not just a picture. It can contain credentials,
 - [ ] Name the intended destination and audience before capture.
 - [ ] Use a synthetic account and test data where possible.
 - [ ] Identify the smallest useful page, component, area, tab, or window.
-- [ ] Record the applicable data classification, access rule, and retention owner.
+- [ ] Decide who can access the image, how it should be handled, and how long it should be kept.
 
 This checklist reduces avoidable exposure; it cannot discover every sensitive fact or establish legal compliance. Adapt it to your organization’s threat model, contracts, policies, and applicable law.
 
@@ -32,7 +32,7 @@ Browser screen-capture controls help establish user intent, but they are not a c
 - [ ] Open the exported image at full size. Do not approve only the live page or a reduced capture preview.
 - [ ] Crop unnecessary surroundings while retaining enough orientation to understand the evidence.
 - [ ] Apply opaque redaction before upload. Do not rely on blur, light pixelation, or a promise to delete later.
-- [ ] Inspect every edge of each covered region and confirm the final flattened file contains the coverage.
+- [ ] Inspect every edge of each covered region and confirm the redaction is permanently applied to the exported file.
 - [ ] Check content revealed by scrolling, sticky elements, reflow, animation, overlays, and responsive changes.
 - [ ] Check images, canvas, video, SVG, iframes, Shadow DOM, and native capture fallbacks separately; a DOM-aware tool may not inspect their internal pixels.
 - [ ] Confirm arrows, labels, and annotations do not repeat or reconstruct the hidden value.
@@ -48,7 +48,7 @@ Browser screen-capture controls help establish user intent, but they are not a c
 - [ ] Keep credentials, unpublished exploit details, and security vulnerabilities out of ordinary public issues.
 - [ ] Put no secret in the description as a substitute for removing it from the image.
 - [ ] Add only the environment context needed to reproduce the report.
-- [ ] Name the person responsible for triage and removal if the artifact is later found unsafe.
+- [ ] Know who will remove the image and lead follow-up if it is found to be unsafe.
 
 [GitHub documents that files uploaded to public repositories can be accessed without authentication](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files); files attached in private and internal repositories are limited to people with repository access. Repository access is therefore part of the screenshot review, not an assumption to make after upload.
 
@@ -78,7 +78,7 @@ Masking is visual coverage, not secret discovery or data-loss prevention. BugDro
 
 ## Quick decision test
 
-Before selecting **Submit**, answer these four questions aloud:
+Before selecting **Submit**, answer these four questions:
 
 1. Does this exact final image prove something the written report cannot?
 2. Have I inspected every visible region at full size?

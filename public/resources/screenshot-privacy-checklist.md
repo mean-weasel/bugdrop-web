@@ -9,7 +9,7 @@ Use this before capture, before sharing, and when reviewing retention. Adapt it 
 - [ ] Name the intended destination and audience before capture.
 - [ ] Use a synthetic account and test data where possible.
 - [ ] Identify the smallest useful page, component, area, tab, or window.
-- [ ] Record the applicable data classification, access rule, and retention owner.
+- [ ] Decide who can access the image, how it should be handled, and how long it should be kept.
 
 ## 1. Prepare the capture surface
 - [ ] Close or hide unrelated tabs, notifications, password managers, developer tools, chat, email, and system UI.
@@ -23,7 +23,7 @@ Use this before capture, before sharing, and when reviewing retention. Adapt it 
 - [ ] Open the exported image at full size. Do not approve only the live page or a reduced capture preview.
 - [ ] Crop unnecessary surroundings while retaining enough orientation to understand the evidence.
 - [ ] Apply opaque redaction before upload. Do not rely on blur, light pixelation, or a promise to delete later.
-- [ ] Inspect every edge of each covered region and confirm the final flattened file contains the coverage.
+- [ ] Inspect every edge of each covered region and confirm the redaction is permanently applied to the exported file.
 - [ ] Check content revealed by scrolling, sticky elements, reflow, animation, overlays, and responsive changes.
 - [ ] Check images, canvas, video, SVG, iframes, Shadow DOM, and native capture fallbacks separately; a DOM-aware tool may not inspect their internal pixels.
 - [ ] Confirm arrows, labels, and annotations do not repeat or reconstruct the hidden value.
@@ -36,7 +36,7 @@ Use this before capture, before sharing, and when reviewing retention. Adapt it 
 - [ ] Keep credentials, unpublished exploit details, and security vulnerabilities out of ordinary public issues.
 - [ ] Put no secret in the description as a substitute for removing it from the image.
 - [ ] Add only the environment context needed to reproduce the report.
-- [ ] Name the person responsible for triage and removal if the artifact is later found unsafe.
+- [ ] Know who will remove the image and lead follow-up if it is found to be unsafe.
 
 ## 4. Store and retire deliberately
 - [ ] Identify where the original and edited copies live, including downloads, clipboard history, chat, issue storage, repository branches, and backups.

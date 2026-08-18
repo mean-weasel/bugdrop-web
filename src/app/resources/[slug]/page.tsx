@@ -32,7 +32,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
   const secondary = resource.slug === "client-website-qa-checklist"
     ? { href: "/sandbox", event: "resource_sandbox_click", label: "Inspect the reporting sandbox" }
     : resource.slug === "screenshot-privacy-checklist"
-      ? { href: "/demo", event: "privacy_checklist_demo_click", label: "Practice a privacy-reviewed report" }
+      ? { href: "/demo", event: "privacy_checklist_demo_click", label: "Try the privacy-aware reporting flow" }
       : { href: "/demo", event: "resource_demo_click", label: "Try visual reporting in the demo" };
   const related = resource.slug === "visual-bug-report-template"
     ? [

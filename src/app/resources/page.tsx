@@ -39,7 +39,7 @@ export default function ResourcesPage() {
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-accent-cyan">Portable · free · no account</p>
         <h1>{hub.title}</h1>
         <p className="mt-4 max-w-3xl text-lg text-text-subtle">
-          Copy, download, or print practical assets for safer screenshots, reproducible visual reports, and bounded client QA. Every resource works without installing BugDrop, signing in, purchasing, or enabling JavaScript.
+          Copy, download, or print practical tools for safer screenshots, clearer visual bug reports, and structured client QA. Use them with or without BugDrop—no account or purchase required.
         </p>
       </header>
 
@@ -68,7 +68,7 @@ export default function ResourcesPage() {
       <section className="my-10 rounded-xl border border-accent-cyan/30 bg-accent-cyan/5 p-6" aria-labelledby="resource-workflow">
         <h2 id="resource-workflow" className="text-2xl font-semibold text-text-primary">From checklist to a live report</h2>
         <p className="mt-3 max-w-3xl text-text-subtle">
-          Keep the assets in any workflow. If in-page screenshot reporting fits your privacy boundary, practice the reporter experience before installation.
+          Keep these resources in the workflow you already use. If in-page screenshots fit your privacy requirements, try the reporting flow before installing BugDrop.
         </p>
         <Link
           href="/demo"

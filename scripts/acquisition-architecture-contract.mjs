@@ -22,17 +22,18 @@ const expectedPaths = [
   "/compare", "/compare/userback", "/compare/marker-io", "/compare/bugherd",
   "/compare/usersnap", "/compare/canny", "/compare/sentry-user-feedback",
   "/compare/open-source-feedback-tools", "/compare/markup-io", "/compare/jam-dev",
-  "/resources/visual-bug-report-template", "/resources/client-website-qa-checklist",
+  "/resources", "/resources/visual-bug-report-template", "/resources/client-website-qa-checklist",
+  "/resources/screenshot-privacy-checklist",
 ];
 
 const expectedEdges = {
-  "/": ["/use-cases", "/compare", "/use-cases/website-feedback-widget", "/use-cases/github-issues-feedback", "/use-cases/screenshot-feedback-widget", "/use-cases/free-website-feedback-widget", "/resources/visual-bug-report-template", "/resources/client-website-qa-checklist"],
+  "/": ["/use-cases", "/compare", "/use-cases/website-feedback-widget", "/use-cases/github-issues-feedback", "/use-cases/screenshot-feedback-widget", "/use-cases/free-website-feedback-widget", "/resources", "/resources/visual-bug-report-template", "/resources/client-website-qa-checklist", "/resources/screenshot-privacy-checklist"],
   "/use-cases/website-feedback-widget": ["/use-cases/github-issues-feedback", "/use-cases/screenshot-feedback-widget", "/use-cases/free-website-feedback-widget", "/compare"],
-  "/use-cases/screenshot-feedback-widget": ["/use-cases/visual-bug-reporting", "/demo"],
-  "/use-cases/visual-bug-reporting": ["/use-cases/screenshot-feedback-widget", "/use-cases/client-projects", "/use-cases/internal-tools"],
+  "/use-cases/screenshot-feedback-widget": ["/use-cases/visual-bug-reporting", "/demo", "/resources/screenshot-privacy-checklist"],
+  "/use-cases/visual-bug-reporting": ["/use-cases/screenshot-feedback-widget", "/use-cases/client-projects", "/use-cases/internal-tools", "/resources/screenshot-privacy-checklist"],
   "/use-cases/open-source": ["/use-cases/open-source-feedback-widget", "/use-cases/github-issues-feedback"],
   "/use-cases/open-source-feedback-widget": ["/use-cases/open-source", "/compare/open-source-feedback-tools", "/docs/self-hosting"],
-  "/use-cases/client-projects": ["/use-cases/client-website-feedback-tool", "/use-cases/screenshot-feedback-widget", "/compare/bugherd"],
+  "/use-cases/client-projects": ["/use-cases/client-website-feedback-tool", "/use-cases/screenshot-feedback-widget", "/compare/bugherd", "/resources/screenshot-privacy-checklist"],
   "/use-cases/client-website-feedback-tool": ["/use-cases/client-projects", "/use-cases/website-feedback-widget", "/compare/userback", "/compare/marker-io"],
   "/use-cases/internal-tools": ["/use-cases/website-feedback-widget", "/use-cases/visual-bug-reporting", "/use-cases/github-issues-feedback"],
   "/use-cases/nextjs-feedback-widget": ["/use-cases/website-feedback-widget", "/use-cases/github-issues-feedback", "/docs/installation", "/docs/ci-testing", "/use-cases/vercel-preview-feedback"],
@@ -49,10 +50,10 @@ const expectedEdges = {
 };
 
 const pages = architecture.pages;
-assert.equal(pages.length, 26, "Ownership map must contain exactly 26 approved acquisition pages");
+assert.equal(pages.length, 28, "Ownership map must contain exactly 28 approved acquisition pages");
 assert.deepEqual([...pages.map((page) => page.path)].sort(), [...expectedPaths].sort(), "Acquisition path inventory changed");
 assert(pages.every((page) => page.primaryQuery?.trim()), "Every page must declare a primary query");
-assert.equal(new Set(pages.map((page) => page.primaryQuery.toLowerCase())).size, 26, "Primary queries must be unique");
+assert.equal(new Set(pages.map((page) => page.primaryQuery.toLowerCase())).size, 28, "Primary queries must be unique");
 assert.equal(pages.find((page) => page.path === "/compare/markup-io")?.primaryQuery, "MarkUp.io alternative", "MarkUp.io must own its distinct alternative query");
 assert.equal(pages.find((page) => page.path === "/compare/jam-dev")?.primaryQuery, "Jam.dev alternative", "Jam.dev must own its distinct alternative query");
 
@@ -116,23 +117,37 @@ for (const page of resourceLeaves) {
   }
 }
 
-for (const [hubPath, leaves] of [["/use-cases", useCaseLeaves], ["/compare", compareLeaves]]) {
+for (const [hubPath, leaves, attribute] of [["/use-cases", useCaseLeaves, "data-acquisition-hub-link"], ["/compare", compareLeaves, "data-acquisition-hub-link"], ["/resources", resourceLeaves, "data-resource-hub-link"]]) {
   const html = rendered.get(hubPath);
   for (const leaf of leaves) {
-    assert(html.includes(`data-acquisition-hub-link="${leaf.path}"`), `${hubPath} must render a link to ${leaf.path}`);
+    assert(html.includes(`${attribute}="${leaf.path}"`), `${hubPath} must render a link to ${leaf.path}`);
   }
 }
 
 const internalPaths = new Set();
-for (const html of rendered.values()) {
-  for (const match of html.matchAll(/href=["']([^"'#?]+)["']/g)) {
-    const url = new URL(match[1], baseUrl);
-    if (url.origin === baseUrl.origin) internalPaths.add(url.pathname);
+const internalFragments = [];
+for (const [sourcePath, html] of rendered) {
+  for (const match of html.matchAll(/href=["']([^"']+)["']/g)) {
+    const url = new URL(match[1], new URL(sourcePath, baseUrl));
+    if (url.origin !== baseUrl.origin) continue;
+    internalPaths.add(url.pathname);
+    if (url.hash) internalFragments.push({ path: url.pathname, fragment: decodeURIComponent(url.hash.slice(1)) });
   }
 }
 for (const path of internalPaths) {
   const response = await fetch(new URL(path, baseUrl), { redirect: "manual" });
   assert(response.status < 400, `Broken internal link from acquisition pages: ${path} (${response.status})`);
+}
+
+const fragmentPages = new Map(rendered);
+for (const { path, fragment } of internalFragments) {
+  if (!fragmentPages.has(path)) {
+    const response = await fetch(new URL(path, baseUrl), { redirect: "manual" });
+    assert.equal(response.status, 200, `Internal fragment page must return 200: ${path} (${response.status})`);
+    fragmentPages.set(path, await response.text());
+  }
+  const ids = new Set([...fragmentPages.get(path).matchAll(/\bid=(?:"([^"]+)"|'([^']+)')/gi)].map((match) => match[1] ?? match[2]));
+  assert(ids.has(fragment), `Missing internal fragment target: ${path}#${fragment}`);
 }
 
 console.log(JSON.stringify({
@@ -143,5 +158,6 @@ console.log(JSON.stringify({
   comparisonLeaves: compareLeaves.length,
   resourceLeaves: resourceLeaves.length,
   checkedInternalPaths: internalPaths.size,
-  assertions: ["exact inventory", "unique owners", "approved edges", "200/no redirects", "self-canonical", "indexable", "sitemap-listed", "hub coverage", "contextual links", "zero broken internal links"],
+  checkedInternalFragments: internalFragments.length,
+  assertions: ["exact inventory", "unique owners", "approved edges", "200/no redirects", "self-canonical", "indexable", "sitemap-listed", "hub coverage", "contextual links", "zero broken internal links", "all internal fragments resolve"],
 }, null, 2));

@@ -29,19 +29,30 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
   if (!resource) notFound();
   const Content = (await import(`@/content/resources/${slug}.mdx`)).default;
   const copyText = portableResourceText[resource.slug];
-  const secondary = resource.slug === "visual-bug-report-template"
-    ? { href: "/demo", event: "resource_demo_click", label: "Try visual reporting in the demo" }
-    : { href: "/sandbox", event: "resource_sandbox_click", label: "Inspect the reporting sandbox" };
+  const secondary = resource.slug === "client-website-qa-checklist"
+    ? { href: "/sandbox", event: "resource_sandbox_click", label: "Inspect the reporting sandbox" }
+    : resource.slug === "screenshot-privacy-checklist"
+      ? { href: "/demo", event: "privacy_checklist_demo_click", label: "Try the privacy-aware reporting flow" }
+      : { href: "/demo", event: "resource_demo_click", label: "Try visual reporting in the demo" };
   const related = resource.slug === "visual-bug-report-template"
     ? [
+        ["/resources", "Browse all website feedback resources"],
         ["/use-cases/visual-bug-reporting", "Plan visual bug reporting"],
         ["/use-cases/screenshot-feedback-widget", "Capture screenshot feedback"],
         ["/resources/client-website-qa-checklist", "Run the client website QA checklist"],
       ]
-    : [
+    : resource.slug === "client-website-qa-checklist"
+      ? [
+        ["/resources", "Browse all website feedback resources"],
         ["/use-cases/client-projects", "Plan client review"],
         ["/use-cases/vercel-preview-feedback", "Collect feedback on Vercel previews"],
         ["/resources/visual-bug-report-template", "Write a visual bug report"],
+      ]
+      : [
+        ["/resources", "Browse all website feedback resources"],
+        ["/use-cases/screenshot-feedback-widget", "Choose a screenshot capture path"],
+        ["/docs/security", "Review BugDrop masking limits"],
+        ["/resources/visual-bug-report-template", "Write a privacy-reviewed visual report"],
       ];
 
   const schema = resource.schemaType === "HowTo"
@@ -60,7 +71,10 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
         description: resource.description,
         url: absoluteUrl(`/resources/${slug}`),
         numberOfItems: 4,
-        itemListElement: ["Review contract", "Responsive and visual QA", "Content and interaction QA", "Privacy and handoff"].map((name, index) => ({ "@type": "ListItem", position: index + 1, name })),
+        itemListElement: (resource.slug === "screenshot-privacy-checklist"
+          ? ["Prepare the capture surface", "Inspect the final image", "Verify the destination", "Store and retire deliberately"]
+          : ["Review contract", "Responsive and visual QA", "Content and interaction QA", "Privacy and handoff"]
+        ).map((name, index) => ({ "@type": "ListItem", position: index + 1, name })),
       };
 
   return (
@@ -93,14 +107,19 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
         </p>
       </noscript>
       <aside className="mt-8 rounded-xl border border-border bg-bg-surface p-5 text-sm text-text-subtle" data-resource-provenance>
-        <p>Source reviewed {resource.reviewed}: <a href={resource.sourceUrl}>{resource.sourceLabel}</a>.</p>
+        <p>Sources reviewed {resource.reviewed}: {resource.sourceLabel}.</p>
+        <ul className="mt-2 list-disc pl-5">
+          {resource.sources.map((source) => <li key={source.url}><a href={source.url}>{source.label}</a></li>)}
+        </ul>
         <p className="mt-2">Adapt this asset to your risk model; it is a review aid, not a completeness or compliance guarantee.</p>
       </aside>
       <nav className="mt-10 flex flex-wrap gap-4 border-t border-border pt-6">
         {related.map(([href, label]) => (
           <Link data-resource-related-link={href} href={href} key={href}>{label}</Link>
         ))}
-        <Link data-resource-related-link href="/docs/security">Review screenshot privacy</Link>
+        {resource.slug !== "screenshot-privacy-checklist" && (
+          <Link data-resource-related-link href="/docs/security">Review screenshot privacy</Link>
+        )}
       </nav>
     </main>
   );

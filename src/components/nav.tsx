@@ -14,12 +14,6 @@ export function Nav() {
         <Link href="/use-cases" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Use Cases
         </Link>
-        <Link href="/compare" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
-          Compare
-        </Link>
-        <Link href="/resources" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
-          Resources
-        </Link>
         <Link href="/status" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Status
         </Link>

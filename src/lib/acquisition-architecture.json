@@ -7,16 +7,7 @@
       "title": "BugDrop — Website Feedback to GitHub Issues",
       "description": "BugDrop turns website feedback, screenshots, annotations, and browser context into GitHub Issues from one lightweight widget.",
       "related": [
-        { "path": "/use-cases", "anchor": "Explore website feedback use cases", "rationale": "Find the BugDrop workflow that matches your team." },
-        { "path": "/compare", "anchor": "Compare website feedback tools", "rationale": "Evaluate BugDrop alongside other feedback workflows." },
-        { "path": "/use-cases/website-feedback-widget", "anchor": "Understand the website feedback widget", "rationale": "See how the broad feedback-to-GitHub workflow works." },
-        { "path": "/use-cases/github-issues-feedback", "anchor": "Send website feedback to GitHub Issues", "rationale": "Keep reports in the developer triage workflow." },
-        { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Capture screenshot feedback", "rationale": "Explore annotations, redaction, and visual context." },
-        { "path": "/use-cases/free-website-feedback-widget", "anchor": "Choose a free website feedback widget", "rationale": "Learn when a focused free tool is sufficient." },
-        { "path": "/resources/visual-bug-report-template", "anchor": "Use the visual bug report template", "rationale": "Give reporters a portable structure before installing a tool." },
-        { "path": "/resources/client-website-qa-checklist", "anchor": "Run the client website QA checklist", "rationale": "Use a printable review asset for launch and handoff." },
-        { "path": "/resources/screenshot-privacy-checklist", "anchor": "Review screenshots before sharing", "rationale": "Use a portable privacy check before capture, upload, and retention." },
-        { "path": "/resources", "anchor": "Browse website feedback resources", "rationale": "Discover all portable reporting and QA assets." }
+        { "path": "/use-cases", "anchor": "Explore website feedback use cases", "rationale": "Find the BugDrop workflow that matches your team." }
       ]
     },
     {

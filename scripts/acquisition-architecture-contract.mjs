@@ -27,7 +27,7 @@ const expectedPaths = [
 ];
 
 const expectedEdges = {
-  "/": ["/use-cases", "/compare", "/use-cases/website-feedback-widget", "/use-cases/github-issues-feedback", "/use-cases/screenshot-feedback-widget", "/use-cases/free-website-feedback-widget", "/resources", "/resources/visual-bug-report-template", "/resources/client-website-qa-checklist", "/resources/screenshot-privacy-checklist"],
+  "/": ["/use-cases"],
   "/use-cases/website-feedback-widget": ["/use-cases/github-issues-feedback", "/use-cases/screenshot-feedback-widget", "/use-cases/free-website-feedback-widget", "/compare"],
   "/use-cases/screenshot-feedback-widget": ["/use-cases/visual-bug-reporting", "/demo", "/resources/screenshot-privacy-checklist"],
   "/use-cases/visual-bug-reporting": ["/use-cases/screenshot-feedback-widget", "/use-cases/client-projects", "/use-cases/internal-tools", "/resources/screenshot-privacy-checklist"],

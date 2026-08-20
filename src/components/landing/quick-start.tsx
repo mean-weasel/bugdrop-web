@@ -15,22 +15,22 @@ export function QuickStart() {
   }
 
   return (
-    <section className="bg-bg-surface border border-border rounded-3xl p-12 mb-20 animate-fade-up max-md:p-6" style={{ animationDelay: "0.4s" }}>
-      <h3 className="text-2xl font-semibold mb-2 text-text-primary">Quick Start</h3>
-      <p className="text-text-subtle mb-8">Get up and running in under a minute.</p>
-      <div className="flex flex-col gap-6">
-        <div className="flex gap-4 items-start max-sm:flex-col">
-          <div className="w-7 h-7 rounded-full bg-bg-elevated border border-border text-accent-warm font-semibold text-sm flex items-center justify-center shrink-0">1</div>
-          <div className="min-w-0">
-            <p className="text-text-subtle mb-3"><strong className="text-text-primary">Install from GitHub Marketplace</strong> on your repository:</p>
-            <p><a href={MARKETPLACE_URL} target="_blank" rel="noopener noreferrer" className="break-words text-accent-cyan no-underline hover:underline">{MARKETPLACE_URL}</a></p>
-          </div>
-        </div>
-        <div className="flex gap-4 items-start max-sm:flex-col">
-          <div className="w-7 h-7 rounded-full bg-bg-elevated border border-border text-accent-warm font-semibold text-sm flex items-center justify-center shrink-0">2</div>
-          <div className="min-w-0 w-full max-w-full flex-1 overflow-hidden">
-            <p className="text-text-subtle mb-3 break-words"><strong className="text-text-primary">Add the script</strong> to your website (replace <code className="bg-bg-deep px-1.5 py-0.5 rounded font-mono text-xs text-accent-cyan">owner/repo</code> with your repo):</p>
-            <div className="font-mono text-sm bg-bg-deep border border-border rounded-lg p-4 pr-12 overflow-x-auto relative max-w-full">
+    <div className="min-w-0 rounded-3xl border border-border bg-bg-surface p-8 max-md:p-6">
+      <h3 className="text-2xl font-semibold text-text-primary">Install in under a minute.</h3>
+      <p className="mt-2 text-text-subtle">Connect your repository, then add one script tag.</p>
+      <a
+        href={MARKETPLACE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-6 inline-flex items-center justify-center rounded-[10px] bg-gradient-to-br from-accent-warm to-accent-rose px-5 py-3 text-sm font-semibold text-bg-deep no-underline transition-transform hover:-translate-y-0.5 max-sm:w-full"
+      >
+        Install from GitHub Marketplace
+      </a>
+      <div className="mt-6 min-w-0 w-full max-w-full overflow-hidden">
+        <p className="mb-3 break-words text-sm text-text-subtle">
+          Replace <code className="rounded bg-bg-deep px-1.5 py-0.5 font-mono text-xs text-accent-cyan">owner/repo</code> with your repository:
+        </p>
+            <div className="relative max-w-full overflow-x-auto rounded-lg border border-border bg-bg-deep p-4 pr-12 font-mono text-sm max-sm:text-xs">
               <button onClick={handleCopy} className="absolute top-3 right-3 bg-bg-elevated border border-border text-text-subtle px-3 py-1.5 rounded-md text-xs cursor-pointer hover:bg-border hover:text-text-primary transition-all">{copied ? "Copied!" : "Copy"}</button>
               <code className="text-text-subtle">
                 <span className="text-accent-rose">&lt;script</span>
@@ -43,21 +43,15 @@ export function QuickStart() {
                 <span className="text-accent-rose">&gt;&lt;/script&gt;</span>
               </code>
             </div>
-          </div>
-        </div>
-        <div className="flex gap-4 items-start max-sm:flex-col">
-          <div className="w-7 h-7 rounded-full bg-bg-elevated border border-border text-accent-warm font-semibold text-sm flex items-center justify-center shrink-0">3</div>
-          <div><p className="text-text-subtle"><strong className="text-text-primary">That&apos;s it!</strong> Users can now submit feedback that becomes GitHub issues.</p></div>
-        </div>
       </div>
-      <div className="mt-8 border-t border-border/70 pt-6 text-center">
+      <div className="mt-6 border-t border-border/70 pt-5">
         <Link
-          href="/resources"
+          href="/docs/installation"
           className="inline-flex text-sm font-medium text-accent-cyan no-underline transition-colors hover:text-text-primary"
         >
-          Browse portable review resources&nbsp;→
+          Read the complete setup guide&nbsp;→
         </Link>
       </div>
-    </section>
+    </div>
   );
 }

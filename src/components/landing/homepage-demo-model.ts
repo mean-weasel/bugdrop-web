@@ -22,7 +22,7 @@ export interface HomepageDemoState {
 
 export type HomepageDemoAction =
   | { readonly type: "select"; readonly id: HomepageExperienceId }
-  | { readonly type: "launch" }
+  | { readonly type: "launch"; readonly id: HomepageExperienceId }
   | { readonly type: "runtime-loading" }
   | { readonly type: "runtime-ready" }
   | { readonly type: "runtime-error" }
@@ -47,29 +47,33 @@ const flowCopy: Readonly<
   "bug-report": Object.freeze({
     icon: "🐛",
     description: "Reproduce a bug and attach proof.",
-    launchLabel: "Open Bug Report",
+    launchLabel: "Try Bug Report",
   }),
   "quick-rating": Object.freeze({
     icon: "⭐",
     description: "Share a 1–5 star rating in one step.",
-    launchLabel: "Open Quick Rating",
+    launchLabel: "Try Quick Rating",
   }),
   "feature-request": Object.freeze({
     icon: "💡",
     description: "Shape and prioritize a product idea.",
-    launchLabel: "Open Feature Request",
+    launchLabel: "Try Feature Request",
   }),
 });
 
-export const homepageExperiences: readonly HomepageExperience[] = Object.freeze([
-  classicExperience,
-  ...homepageFlowDemoRecipeList.map(({ id, label }) =>
+export const homepageFlowExperiences: readonly HomepageExperience[] = Object.freeze(
+  homepageFlowDemoRecipeList.map(({ id, label }) =>
     Object.freeze({ id, label, ...flowCopy[id] }),
   ),
+);
+
+export const homepageExperiences: readonly HomepageExperience[] = Object.freeze([
+  classicExperience,
+  ...homepageFlowExperiences,
 ]);
 
 export const initialHomepageDemoState: HomepageDemoState = Object.freeze({
-  selectedId: "classic",
+  selectedId: homepageFlowExperiences[0].id,
   activeId: null,
   runtimeState: "idle",
   announcement: "",
@@ -102,8 +106,8 @@ export function reduceHomepageDemo(
       return state.activeId === null
         ? {
             ...state,
-            activeId: state.selectedId,
-            announcement: `Opening ${experienceLabel(state.selectedId)}.`,
+            activeId: action.id,
+            announcement: `Opening ${experienceLabel(action.id)}.`,
           }
         : state;
     case "runtime-loading":

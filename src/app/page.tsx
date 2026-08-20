@@ -3,10 +3,8 @@ import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { HomepageWidget } from "@/components/landing/homepage-widget";
 import { DemoVideo } from "@/components/landing/demo-video";
-import { Features } from "@/components/landing/features";
 import { QuickStart } from "@/components/landing/quick-start";
-import { ShowcaseCta } from "@/components/landing/showcase-cta";
-import { TryCallout } from "@/components/landing/try-callout";
+import { LandingChapter } from "@/components/landing/landing-chapter";
 import { JsonLd } from "@/components/json-ld";
 import {
   organizationSchema,
@@ -45,18 +43,25 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main>
+    <main className="-my-16 max-sm:-my-8" data-landing-page>
       <JsonLd data={softwareApplicationSchema()} />
       <JsonLd data={organizationSchema()} />
       <JsonLd data={websiteSchema()} />
-      <Hero />
-      <DemoVideo />
-      <HomepageWidget />
-      <HowItWorks />
-      <Features />
-      <ShowcaseCta />
-      <QuickStart />
-      <TryCallout />
+      <LandingChapter id="overview">
+        <Hero />
+      </LandingChapter>
+      <LandingChapter id="demo" labelledBy="demo-heading">
+        <DemoVideo />
+      </LandingChapter>
+      <LandingChapter id="flows" labelledBy="flows-heading">
+        <HomepageWidget />
+      </LandingChapter>
+      <LandingChapter id="get-started" labelledBy="get-started-heading">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] items-center gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-12">
+          <HowItWorks />
+          <QuickStart />
+        </div>
+      </LandingChapter>
     </main>
   );
 }

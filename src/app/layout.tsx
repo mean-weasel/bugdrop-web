@@ -53,7 +53,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+    >
       <body>
         <Analytics />
         <div className="bg-atmosphere" />

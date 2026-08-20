@@ -1,0 +1,45 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T002",
+    "board_path": "docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "changed_files": [
+      ".github/workflows/ci.yml",
+      "docs/homepage-flow-demo-operations.md",
+      "e2e/homepage-flow-demo.spec.ts",
+      "public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/PROVENANCE.json",
+      "public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js",
+      "public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/PROVENANCE.json",
+      "public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js",
+      "scripts/vendor-homepage-flow-recipes.mjs",
+      "src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/check/[...repo]/route.ts",
+      "src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/feedback/route.ts",
+      "src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/check/[...repo]/route.ts",
+      "src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/feedback/route.ts",
+      "src/components/landing/homepage-flow-recipes.generated.ts",
+      "test/homepage-flow-recipes.test.ts",
+      "test/homepage-local-flow-routes.test.ts",
+      "test/integration-resource.test.ts"
+    ],
+    "commands": [
+      {"cmd": "Exact v1.56.3 widget SHA-256 and 238591-byte size check", "status": "pass"},
+      {"cmd": "node scripts/vendor-homepage-flow-recipes.mjs --check --source src/components/landing/flow-recipes-source/a100e69976ce0a5912df8f07af1b2e53029663b2/flow-recipes.ts.txt --source-sha a100e69976ce0a5912df8f07af1b2e53029663b2", "status": "pass"},
+      {"cmd": "npx vitest run test/homepage-flow-recipes.test.ts test/homepage-local-flow-routes.test.ts test/homepage-demo-runtime.test.ts test/integration-resource.test.ts", "status": "pass"},
+      {"cmd": "Focused ESLint for repin scope", "status": "pass"},
+      {"cmd": "npm run build", "status": "pass"},
+      {"cmd": "Feature-enabled desktop/mobile homepage E2E against exact v1.56.3", "status": "pass"},
+      {"cmd": "Unset homepage flag Classic-only E2E", "status": "pass"},
+      {"cmd": "False homepage flag Classic-only E2E", "status": "pass"},
+      {"cmd": "Old 81293491 homepage namespace absence", "status": "pass"},
+      {"cmd": "git diff --check", "status": "pass"},
+      {"cmd": "Temporary stale-generated-identity probe", "status": "pass"}
+    ],
+    "summary": "Repinned the hidden homepage dogfood to authenticated v1.56.3 bytes and immutable provenance, moved SHA-scoped local routes, regenerated runtime identity, updated CI/E2E/tests/docs, and removed the old homepage namespace. Exact hash/size, 43 focused tests, ESLint, production build, enabled desktop/mobile E2E, false/unset Classic controls, namespace absence, stale-identity rejection, and nonlocal-request rejection passed.",
+    "deviations": [
+      "The first build read stale generated .next/dev route types; the cache was moved to /tmp and the clean production build passed.",
+      "The first namespace-absence check found only empty old route directories; they were removed and the exact check passed."
+    ],
+    "remaining_blockers": [],
+    "verification_attempts": 2
+  }
+}

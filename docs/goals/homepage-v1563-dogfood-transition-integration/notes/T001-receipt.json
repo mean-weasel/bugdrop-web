@@ -1,0 +1,42 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T001",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "decision": "approved",
+    "full_outcome_complete": false,
+    "rationale": "The preserved sequence is sound: isolate the immutable runtime repin before UX changes, audit it, then integrate transition/copy, complete browser QA, review, corrections, and handoff. T002 is one coherent vertical repin covering released bytes, provenance, exact routes, generated identity, CI/browser bindings, focused tests, and operations documentation. Classic, recipes, flag behavior, and runtime ownership code remain outside the write allowlist.",
+    "worker_package": {
+      "objective": "Repin the hidden homepage dogfood end-to-end from v1.56.2 to the exact released v1.56.3 asset and prove wrong/stale identity fails closed without changing recipes, Classic, or false/unset flag behavior.",
+      "allowed_files": [
+        ".github/workflows/ci.yml",
+        "docs/homepage-flow-demo-operations.md",
+        "e2e/homepage-flow-demo.spec.ts",
+        "public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/PROVENANCE.json",
+        "public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js",
+        "public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/PROVENANCE.json",
+        "public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js",
+        "scripts/vendor-homepage-flow-recipes.mjs",
+        "src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/check/[...repo]/route.ts",
+        "src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/feedback/route.ts",
+        "src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/check/[...repo]/route.ts",
+        "src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/feedback/route.ts",
+        "src/components/landing/homepage-flow-recipes.generated.ts",
+        "test/homepage-flow-recipes.test.ts",
+        "test/homepage-local-flow-routes.test.ts",
+        "test/integration-resource.test.ts"
+      ],
+      "verify": ["Exact hash/size, generator check, focused Vitest, focused ESLint, production build, enabled desktop/mobile E2E, false/unset Classic controls, and absence of old namespace."],
+      "stop_if": ["Identity drift, overlapping user changes, out-of-scope runtime/Classic/recipe edits, nonlocal requests, false/unset exposure, or verification still failing after two corrections."]
+    },
+    "evidence": [
+      "GitHub release v1.56.3 resolves to target 47a392d1e7b1a8d8adeff1692f6bbbd84696280d, widget SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e, and 238591 bytes.",
+      "Current bindings consistently identify v1.56.2 across generator, generated manifest, local routes, CI, E2E, tests, and operations documentation.",
+      "origin/main is an ancestor of HEAD; tracked worktree was clean before GoalBuddy controls.",
+      "No local server listens on 3000 or 8787; stale build output must not be treated as proof."
+    ],
+    "blocked_tasks": [],
+    "missing_evidence": ["No v1.56.3 implementation or fresh browser proof exists yet."],
+    "required_board_updates": ["Record T001 done, activate T002 as sole writer, and keep downstream work queued."]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "kind": "canonical-sdk-flow-recipes",
+  "sourceRepository": "mean-weasel/bugdrop",
+  "sourceCommit": "a100e69976ce0a5912df8f07af1b2e53029663b2",
+  "sourcePath": "test/fixtures/flow-recipes.ts",
+  "byteLength": 8537,
+  "sha256": "ca205013c47e14cb37cc6f763439922a448d5d06c569940a8b08fc4364b0372d"
+}

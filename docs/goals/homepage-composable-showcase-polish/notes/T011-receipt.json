@@ -1,0 +1,23 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T011",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "changed_files": ["src/lib/links.ts","src/components/landing/homepage-widget.tsx","test/homepage-demo-runtime.test.ts","e2e/homepage-flow-demo.spec.ts","docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"],
+    "commands": [
+      {"cmd":"npm test","status":"pass"},
+      {"cmd":"npm run lint","status":"pass","details":"Only existing vendored warnings."},
+      {"cmd":"feature-enabled exact-v1.56.3 build","status":"pass"},
+      {"cmd":"feature-enabled desktop/mobile Playwright retries=0","status":"pass"},
+      {"cmd":"absolute same-origin local Classic truthfulness Playwright","status":"pass"},
+      {"cmd":"stale executable plan phrase audit","status":"pass"},
+      {"cmd":"exact runtime size/hash","status":"pass"},
+      {"cmd":"git diff --check","status":"pass"}
+    ],
+    "summary": "Both exact local runtime URL forms now select deterministic private disclosure without server/client disagreement; genuinely public runtimes retain the warning. Focused unit and browser proof covers URL classification, hidden private GitHub presentation, synthetic issueUrl/isPublic:false wire shape, and public links. The plan now specifies singular selected-flow lazy registration and the truthful private wire/presentation contract. All tests, lint, build, browser suites, runtime identity, stale-phrase audit, and diff checks passed.",
+    "deviations": [],
+    "remaining_blockers": [],
+    "verification_attempts": 1,
+    "stopped_because": null
+  }
+}

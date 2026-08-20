@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 describe("site navigation and footer", () => {
   it("keeps discovery pages out of the primary navigation", async () => {
     const nav = await readFile("src/components/nav.tsx", "utf8");
-
     expect(nav).not.toContain('href="/compare"');
     expect(nav).not.toContain('href="/resources"');
     expect(nav).toContain('href="/docs"');
@@ -13,7 +12,6 @@ describe("site navigation and footer", () => {
 
   it("organizes footer links into standard destination groups", async () => {
     const footer = await readFile("src/components/footer.tsx", "utf8");
-
     for (const heading of ["Explore", "Developers", "Trust"]) {
       expect(footer).toContain(`title: "${heading}"`);
     }
@@ -26,11 +24,27 @@ describe("site navigation and footer", () => {
 
   it("keeps workflow discovery concise on the landing page", async () => {
     const features = await readFile("src/components/landing/features.tsx", "utf8");
-
     expect(features).not.toContain("Choose Your Feedback Workflow");
     expect(features).not.toContain("home.related.map");
     expect(features).toContain('href="/use-cases"');
     expect(features).toContain("Explore all feedback workflows");
+  });
+
+  it("keeps flow-design calls to action truthful when the showcase is off", async () => {
+    const hero = await readFile("src/components/landing/hero.tsx", "utf8");
+    const nav = await readFile("src/components/nav.tsx", "utf8");
+
+    for (const source of [hero, nav]) {
+      expect(source).toContain(
+        'process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED === "true"',
+      );
+      expect(source).toContain('"Design your flow"');
+    }
+    expect(hero).toContain('"Try it on this page"');
+    expect(nav).toContain('"Try Widget"');
+    expect(nav).toContain('"nav_design_flow_click"');
+    expect(nav).toContain('"nav_try_widget_click"');
+    expect(nav).toContain("data-analytics-event={demoCtaEvent}");
   });
 
   it("links to resources without rendering a resource directory", async () => {
@@ -39,7 +53,6 @@ describe("site navigation and footer", () => {
       "src/components/landing/quick-start.tsx",
       "utf8",
     );
-
     expect(page).not.toContain("Portable review resources");
     expect(page).not.toContain("/resources/visual-bug-report-template");
     expect(quickStart).toContain('href="/resources"');

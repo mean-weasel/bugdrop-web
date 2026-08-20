@@ -23,6 +23,10 @@
   --animate-bounce-x: bounce-x 1s ease-in-out infinite;
 }
 
+[data-site-footer] a {
+  text-decoration-line: none;
+}
+
 body {
   font-family: var(--font-sans);
   color: var(--color-text-primary);

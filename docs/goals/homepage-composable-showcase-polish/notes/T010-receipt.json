@@ -1,0 +1,27 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T010",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "decision": "not_complete",
+    "full_outcome_complete": false,
+    "rationale": "Closure review found three validated defects: absolute same-origin local runtime URLs select a false public-Issue disclosure; the plan retains stale plural/eager registration; and it incorrectly requires private results to omit their intentional synthetic issueUrl.",
+    "worker_package": {
+      "objective": "Correct local disclosure truthfulness for root-relative and absolute same-origin vendored-runtime URLs, preserve genuinely public warnings, add regression proof, and reconcile the plan with singular lazy registration and the private synthetic-issueUrl contract.",
+      "allowed_files": ["src/lib/links.ts","src/components/landing/homepage-widget.tsx","test/homepage-demo-runtime.test.ts","e2e/homepage-flow-demo.spec.ts","docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"],
+      "verify_commands": ["npm test","npm run lint","feature-enabled exact-v1.56.3 build","feature-enabled desktop/mobile Playwright","absolute same-origin local Classic truthfulness Playwright","stale plan phrase audit","exact runtime size/hash","git diff --check"],
+      "stop_if": ["Route schema, vendored bytes, SDK, or generated recipes must change.","A public runtime loses warning/link.","Either local URL form still displays a public-Issue claim.","Server/client rendering disagrees or public flag must be enabled.","Plan expands into external infrastructure or release changes.","Verification stays red after two bounded attempts."]
+    },
+    "evidence": [
+      {"kind":"validated_finding","id":"COR-ABSOLUTE-LOCAL-DISCLOSURE","confidence":0.98,"location":"src/components/landing/homepage-widget.tsx:29"},
+      {"kind":"validated_finding","id":"PLAN-REGISTRATION-STALE","confidence":0.99,"location":"docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md:210"},
+      {"kind":"validated_finding","id":"PLAN-PRIVATE-ISSUEURL","confidence":0.96,"location":"docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md:342"},
+      {"kind":"prior_browser_evidence","result":"authenticated","details":"T008 full desktop/mobile, false/unset controls, request safety, and exact runtime identity remain applicable after docs-only T009."}
+    ],
+    "subgoal_contract": null,
+    "parallel_safety": {"safe":false,"reason":"One coherent truthfulness contract."},
+    "blocked_tasks": ["T999"],
+    "missing_evidence": ["Corrections and corrected-head closure remain.","T999 remains pending."],
+    "required_board_updates": ["Create one Worker correction then rerun closure before T999."]
+  }
+}

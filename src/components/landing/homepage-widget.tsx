@@ -1,7 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { SAMPLE_DEMO_REPO, WIDGET_URL } from "@/lib/links";
+import { useEffect, useReducer, useRef, useState } from "react";
+import Link from "next/link";
+import { HomepageDemoLauncher, homepageExperienceLabel } from "./homepage-demo-launcher";
+import {
+  homepageExperiences,
+  initialHomepageDemoState,
+  reduceHomepageDemo,
+  type HomepageExperienceId,
+} from "./homepage-demo-model";
+import {
+  loadHomepageBugDrop,
+  openHomepageExperience,
+  registerHomepageFlow,
+  type HomepageActiveExperience,
+} from "./homepage-demo-runtime";
+import {
+  BUILDING_BLOCKS_PATH,
+  isLocalHomepageDogfoodRuntime,
+  SAMPLE_DEMO_REPO,
+  WIDGET_URL,
+} from "@/lib/links";
 
 declare global {
   interface Window {
@@ -12,6 +31,7 @@ declare global {
 }
 
 const SCRIPT_ID = "bugdrop-homepage-demo";
+const IS_LOCAL_DOGFOOD_RUNTIME = isLocalHomepageDogfoodRuntime();
 const WELCOME =
   "This is the BugDrop landing page demo. Send a test report to see what your users would experience.";
 
@@ -36,7 +56,7 @@ function configureScript(script: HTMLScriptElement) {
   script.dataset.welcome = WELCOME;
 }
 
-export function HomepageWidget() {
+export function ClassicHomepageWidget() {
   const [loadState, setLoadState] = useState<LoadState>("idle");
 
   const openDemo = () => {
@@ -113,5 +133,265 @@ export function HomepageWidget() {
         </div>
       </div>
     </section>
+  );
+}
+
+function waitForClassicClose(api: object, onClose: () => void): () => void {
+  const maybeApi = api as { isOpen?: () => boolean };
+  if (typeof maybeApi.isOpen !== "function") return () => undefined;
+
+  let disposed = false;
+  const checkForClose = () => {
+    if (disposed || maybeApi.isOpen?.()) return;
+    disposed = true;
+    window.clearInterval(interval);
+    onClose();
+  };
+  const interval = window.setInterval(checkForClose, 150);
+  queueMicrotask(checkForClose);
+  return () => {
+    disposed = true;
+    window.clearInterval(interval);
+  };
+}
+
+function waitForFlowClose(flowId: string, onClose: () => void): () => void {
+  const selector = `[data-bugdrop-flow="${CSS.escape(flowId)}"]`;
+  let disposed = false;
+  const observer = new MutationObserver(() => {
+    if (disposed || document.querySelector(selector)) return;
+    disposed = true;
+    observer.disconnect();
+    onClose();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  queueMicrotask(() => {
+    if (!disposed && !document.querySelector(selector)) {
+      disposed = true;
+      observer.disconnect();
+      onClose();
+    }
+  });
+  return () => {
+    disposed = true;
+    observer.disconnect();
+  };
+}
+
+function FlowHomepageWidget() {
+  const [state, dispatch] = useReducer(reduceHomepageDemo, initialHomepageDemoState);
+  const [inPageChooserVisible, setInPageChooserVisible] = useState(false);
+  const chooserSectionRef = useRef<HTMLElement | null>(null);
+  const activeExperience = useRef<HomepageActiveExperience | null>(null);
+  const activeLaunchRef = useRef<HTMLElement | null>(null);
+  const launchInFlight = useRef(false);
+  const classicCloseCleanup = useRef<(() => void) | null>(null);
+  const flowCloseCleanup = useRef<(() => void) | null>(null);
+  const restoreFocusPending = useRef(false);
+  const mounted = useRef(false);
+  const launchGeneration = useRef(0);
+
+  const settle = (generation: number) => {
+    if (!mounted.current || generation !== launchGeneration.current) return;
+    classicCloseCleanup.current?.();
+    classicCloseCleanup.current = null;
+    flowCloseCleanup.current?.();
+    flowCloseCleanup.current = null;
+    activeExperience.current = null;
+    launchInFlight.current = false;
+    restoreFocusPending.current = true;
+    dispatch({ type: "settled" });
+  };
+
+  const launch = async (id: HomepageExperienceId, initiator: HTMLElement | null) => {
+    if (launchInFlight.current || activeExperience.current) return;
+    const generation = ++launchGeneration.current;
+    const isCurrent = () => mounted.current && generation === launchGeneration.current;
+    launchInFlight.current = true;
+    activeLaunchRef.current = initiator;
+    dispatch({ type: "select", id });
+    dispatch({ type: "launch" });
+    dispatch({ type: "runtime-loading" });
+
+    try {
+      const api = await loadHomepageBugDrop();
+      if (!isCurrent()) return;
+      const handle = id === "classic" ? undefined : registerHomepageFlow(api, id);
+      if (!isCurrent()) return;
+      const experience = openHomepageExperience(
+        api,
+        handle,
+        id,
+      );
+      if (!isCurrent()) {
+        experience.close();
+        return;
+      }
+      activeExperience.current = experience;
+      dispatch({ type: "runtime-ready" });
+
+      if (experience.id === "classic") {
+        classicCloseCleanup.current = waitForClassicClose(api, () => settle(generation));
+      } else {
+        const waitForClosedHost = () => {
+          if (!isCurrent()) return;
+          flowCloseCleanup.current?.();
+          flowCloseCleanup.current = waitForFlowClose(experience.id, () => settle(generation));
+        };
+        void experience.result.then(waitForClosedHost, waitForClosedHost);
+      }
+    } catch {
+      if (!isCurrent()) return;
+      activeExperience.current = null;
+      launchInFlight.current = false;
+      dispatch({ type: "runtime-error" });
+    }
+  };
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      launchGeneration.current += 1;
+      classicCloseCleanup.current?.();
+      flowCloseCleanup.current?.();
+      activeExperience.current?.close();
+      activeExperience.current = null;
+      launchInFlight.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!restoreFocusPending.current || state.activeId !== null) return;
+    restoreFocusPending.current = false;
+    activeLaunchRef.current?.focus();
+  }, [state.activeId]);
+
+  useEffect(() => {
+    const section = chooserSectionRef.current;
+    const narrowViewport = window.matchMedia("(max-width: 767px)");
+    if (!section) return;
+
+    let sectionVisible = false;
+    const updateVisibility = () => {
+      setInPageChooserVisible(sectionVisible && narrowViewport.matches);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        sectionVisible = entry.isIntersecting;
+        updateVisibility();
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(section);
+    narrowViewport.addEventListener("change", updateVisibility);
+    return () => {
+      observer.disconnect();
+      narrowViewport.removeEventListener("change", updateVisibility);
+    };
+  }, []);
+
+  const selected = homepageExperiences.find(({ id }) => id === state.selectedId)!;
+  const launchDisabled = state.runtimeState === "loading" || state.activeId !== null;
+
+  return (
+    <>
+      <HomepageDemoLauncher
+        disabled={launchDisabled}
+        inPageChooserVisible={inPageChooserVisible}
+        onLaunch={(trigger) => void launch("classic", trigger)}
+      />
+      <section
+        ref={chooserSectionRef}
+        id="try-bugdrop"
+        className="mb-20 rounded-2xl border border-accent-cyan/25 bg-accent-cyan/10 px-8 py-7"
+        aria-labelledby="homepage-experience-heading"
+      >
+        <div className="max-w-3xl">
+          <p className="mb-2 text-sm font-medium text-accent-cyan">Use BugDrop your way</p>
+          <h2 id="homepage-experience-heading" className="text-2xl font-semibold text-text-primary">
+            One widget for every feedback moment.
+          </h2>
+          <p className="mt-2 text-text-subtle">
+            Place and customize BugDrop wherever and whenever you need feedback throughout your app.
+          </p>
+        </div>
+        <fieldset className="mt-6 grid gap-3 sm:grid-cols-2" aria-label="Feedback experience">
+          <legend className="sr-only">Feedback experience</legend>
+          {homepageExperiences.map((experience) => (
+            <label
+              key={experience.id}
+              className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-bg-surface/80 p-4 text-text-primary has-[:checked]:border-accent-cyan has-[:checked]:bg-accent-cyan/10"
+            >
+              <input
+                type="radio"
+                name="homepage-feedback-experience"
+                value={experience.id}
+                checked={state.selectedId === experience.id}
+                disabled={launchDisabled}
+                aria-label={homepageExperienceLabel(experience)}
+                aria-describedby={`homepage-experience-${experience.id}-description`}
+                onChange={() => dispatch({ type: "select", id: experience.id })}
+                className="mt-1 size-4 shrink-0 accent-accent-cyan"
+              />
+              <span aria-hidden="true" className="text-xl leading-6">
+                {experience.icon}
+              </span>
+              <span className="min-w-0">
+                <span className="block font-medium">{homepageExperienceLabel(experience)}</span>
+                <span
+                  id={`homepage-experience-${experience.id}-description`}
+                  className="mt-1 block text-sm leading-5 text-text-subtle"
+                >
+                  {experience.description}
+                </span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+        <div className="mt-5 flex flex-wrap items-center gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-text-primary">{homepageExperienceLabel(selected)}</p>
+            <p className="mt-1 text-text-subtle">{selected.description}</p>
+          </div>
+          <button
+            type="button"
+            disabled={launchDisabled}
+            onClick={(event) => void launch(state.selectedId, event.currentTarget)}
+            data-homepage-widget-activate
+            aria-describedby="homepage-widget-status"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent-cyan px-5 py-3 font-semibold text-bg-deep shadow-[0_12px_32px_rgba(125,207,255,0.28)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(125,207,255,0.36)] disabled:cursor-wait disabled:opacity-75 max-sm:w-full max-sm:rounded-[10px] motion-reduce:transform-none motion-reduce:transition-none"
+          >
+            <span aria-hidden="true">{selected.icon}</span>
+            {state.runtimeState === "loading" ? "Loading Feedback…" : selected.launchLabel}
+          </button>
+        </div>
+        <p className="mt-5 text-sm text-text-subtle">
+          {IS_LOCAL_DOGFOOD_RUNTIME
+            ? "Local dogfood submissions stay in this development process; they do not create a public GitHub Issue. Please do not include sensitive information."
+            : "Demo submissions create a real public GitHub Issue in our test repository. Please do not include sensitive information."}
+        </p>
+        <Link href={BUILDING_BLOCKS_PATH} className="mt-3 inline-flex text-sm font-medium text-accent-cyan underline-offset-4 hover:underline">
+          Explore the building blocks
+        </Link>
+        {state.runtimeState === "error" && (
+          <p className="mt-3 text-sm text-red-300" role="alert">
+            The feedback experience could not load. Your selection is still saved; try again.
+          </p>
+        )}
+        <span id="homepage-widget-status" className="sr-only" aria-live="polite">
+          {state.announcement}
+        </span>
+      </section>
+    </>
+  );
+}
+
+export function HomepageWidget() {
+  return process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED === "true" ? (
+    <FlowHomepageWidget />
+  ) : (
+    <ClassicHomepageWidget />
   );
 }

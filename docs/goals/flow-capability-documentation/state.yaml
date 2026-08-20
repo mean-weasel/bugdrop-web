@@ -1,0 +1,1989 @@
+version: 2
+
+goal:
+  title: "Living Flow Capability Documentation"
+  slug: "flow-capability-documentation"
+  kind: specific
+  tranche: "Complete the released flow capability reference, curated live examples, and automated drift/browser proof without building a visual editor or enabling production."
+  status: done
+  oracle:
+    signal: "Exact released-type inventory matches navigable docs and working component, motion, and styling examples on desktop/mobile with no external mutation."
+    cadence: "after each Worker package and at final audit"
+    final_proof: "Machine inventory parity, focused tests, production build, accessible desktop/mobile browser walkthrough, reduced-motion proof, no-external-request ledger, and final Judge mapping to the owner outcome."
+  intake:
+    original_request: "Plan how to keep website documentation current for available flow components, animations, and styling, with docs plus live examples."
+    interpreted_outcome: "bugdrop.dev becomes a living, accurate, visually useful guide to the default feedback flow and the released custom-flow SDK."
+    input_shape: specific
+    audience: "Developers evaluating or implementing BugDrop and product visitors exploring customization"
+    authority: requested
+    proof_type: demo
+    completion_proof: "A verified local documentation experience plus CI drift gates covers the exact released SDK surface and retains the default flow as the primary entry point."
+    likely_misfire: "Ship attractive but incomplete docs, expose lab-only capabilities, or create a second source of truth that drifts from the SDK."
+    blind_spots_considered:
+      - "Flow versus Variant capability differences"
+      - "Reduced motion and keyboard/accessibility behavior"
+      - "Shadow DOM styling boundaries"
+      - "Exact release provenance and future drift"
+      - "Local examples accidentally creating public Issues"
+    existing_plan_facts:
+      - "Preserve the default feedback flow as the primary starting point."
+      - "Add authoritative docs plus curated live examples, not a full visual editor."
+      - "Cover components, screens, branching, motion, styling, API lifecycle, evidence, and output."
+      - "Use CI to detect capability/documentation drift."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  missing_input_or_credentials_do_not_stop_goal: true
+  exact_human_approval_can_terminal_wait: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/flow-capability-documentation/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.4.3/skills/goal-prep/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal docs/goals/flow-capability-documentation"
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: low
+    objective: "Audit the exact released SDK capability surface, current website documentation, examples, navigation, and verification gaps."
+    inputs:
+      - "Authenticated v1.56.3 public Flow and Variant type declarations"
+      - "Current docs navigation and MDX content"
+      - "Current homepage examples and labs"
+      - "Current unit, browser, and CI contracts"
+    constraints:
+      - "Read-only."
+      - "Include the complete intended dirty worktree and preserve unrelated edits."
+      - "Separate released Flow capabilities from Variant-only and lab-only concepts."
+    expected_output:
+      - "Exact capability inventory with source evidence"
+      - "Documentation and example gap map"
+      - "Current verification commands and known pre-existing noise"
+      - "Recommended information architecture and safe file ownership boundaries"
+    receipt:
+      result: done
+      summary: "Authenticated v1.56.3 types expose six Flow fields, three screens, composable conditions, modal/layout/appearance controls, five built-in/immediate transition choices plus custom motion, issue/evidence mapping, and open/result lifecycle. Current docs cover the default widget and Variants but omit registerFlow and authoritative Flow references. Homepage/lab examples exercise useful subsets; the simulator separately advertises unreleased multiSelect. Existing focused tests pass, while CI/browser contracts do not prove exhaustive type/docs parity, every motion/style option, or reduced-motion accessibility. Recommended IA: preserve Getting Started; add Custom Flows and Flow Reference, then extend JavaScript API and Styling. Prefer new manifest/example/test files and clean docs files; coordinate carefully around already-dirty homepage, CI, integration, and e2e files."
+      evidence:
+        - source: "GitHub API, mean-weasel/bugdrop@47a392d1e7b1a8d8adeff1692f6bbbd84696280d: src/widget/flows/public-types.d.ts"
+          proves: "Exact authenticated FlowConfig, field/screen/condition/transition/issue/evidence/open/outcome discriminators."
+        - source: "GitHub API, same commit: src/widget/variants/public-types.d.ts"
+          proves: "Exact Variant field primitives and Variant-only inline, feedback classification, mount, and headless submit capabilities."
+        - source: "GitHub API, same commit: README.md and screen-transition-config.ts/screen-transition.ts"
+          proves: "Immediate default; slide-horizontal, slide-vertical, fade, scale-fade and custom motion; 100–1000ms validation; defaults 500/500/350/450ms; direction reversal and reduced-motion replacement."
+        - source: public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/PROVENANCE.json
+          proves: "Vendored runtime is release v1.56.3, exact target commit, byte length 238591 and SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+        - source: "src/lib/docs-nav.ts and src/content/docs/{configuration,styling,javascript-api}.mdx"
+          proves: "No Flow navigation/page; API documents registerVariant but not registerFlow; styling documents script attributes/Shadow DOM but not Flow appearance/presentation."
+        - source: "src/components/landing/homepage-flow-recipes.generated.ts and homepage-flow-demo-recipes.ts"
+          proves: "Current exact-runtime examples cover all six fields and three screens plus selected conditions, layouts, appearance, issue/evidence mappings, but all homepage demos force the same 500ms horizontal transition."
+        - source: "src/components/variants-lab/model.ts versus public-flow-configs.ts"
+          proves: "Simulator model advertises multiSelect, while exact-runtime lab configs use released fields; these concepts are currently mixed under one lab route."
+        - source: ".github/workflows/ci.yml, test/integration-resource.test.ts, e2e/homepage-flow-demo.spec.ts, e2e/public-flow-lab.spec.ts"
+          proves: "Desktop/mobile and local no-external-mutation checks exist, but there is no exhaustive capability-manifest parity gate or every-transition/style/reduced-motion docs journey."
+        - source: "git status --short"
+          proves: "Dirty baseline includes CI, homepage implementation/tests/docs, deleted old runtime routes/assets, and untracked v1.56.3 runtime/routes/goals; public docs MDX and docs navigation are currently clean."
+        - source: "Focused Vitest run"
+          proves: "49 tests across five homepage/integration suites passed on current dirty head."
+        - source: "Focused ESLint attempt"
+          proves: "Command failed because the directory argument src/content/docs is ignored by ESLint; MDX must be verified by build/content tests rather than passing that directory to ESLint."
+      facts:
+        - capability_inventory: "[object Object]"
+        - variant_only_not_flow: "presentation.kind=inline,classification=feedback,handle.mount,handle.submit headlessly,VariantContent requirement"
+        - lab_only_unreleased: "multiSelect simulator field"
+        - documentation_gap_map: "No Custom Flows or Flow Reference navigation,No registerFlow API contract or lifecycle examples,No complete field/screen/condition/layout/evidence/output reference,No built-in/custom transition catalog, bounds, defaults, direction, or reduced-motion explanation,No Flow appearance/presentation styling guidance or clear Shadow DOM boundary,No release provenance/version badge on public capability reference,Homepage building-block link lands on a mixed simulator/exact-runtime lab rather than authoritative docs"
+        - recommended_information_architecture: "Keep Getting Started/default feedback first,Add Custom Flows guide after Configuration,Add Flow Reference immediately after Custom Flows, driven by one versioned manifest,Extend JavaScript API with registerFlow/open/result/close/context/initialAnswers,Extend Styling with Flow appearance/presentation and explicit no-arbitrary-CSS claim,Provide curated local exact-runtime examples inside docs/reference, not a visual builder; link homepage examples to them"
+        - safe_ownership_boundaries: "[object Object]"
+        - verification_commands: "npm test -- --run test/homepage-flow-demo-recipes.test.ts test/homepage-flow-recipes.test.ts test/homepage-demo-runtime.test.ts test/homepage-demo-model.test.ts test/integration-resource.test.ts,npm run build,npm run lint -- <changed .ts/.tsx files only>,npx playwright test <new docs-flow spec> --project=desktop-chromium --project=mobile-chromium --retries=0,git diff --check"
+      contradictions:
+        - claim_or_risk: "The public lab can serve as the authoritative component reference."
+          evidence: "src/components/variants-lab/model.ts contains multiSelect, absent from authenticated FlowField; the same route also hosts separate exact-runtime flows."
+        - claim_or_risk: "Current documentation covers the released composable SDK."
+          evidence: "docs navigation has no Flow page and javascript-api.mdx contains registerVariant but no registerFlow."
+        - claim_or_risk: "Current examples demonstrate available animation variety."
+          evidence: "Homepage demo tests require every Flow to use the same 500ms horizontal slide; other built-ins/custom/reduced-motion are not presented there."
+        - claim_or_risk: "Existing CI proves capability documentation cannot drift."
+          evidence: "Current contracts pin runtime/resources and journeys but do not compare every authenticated public-type discriminator/value against documented inventory."
+      ambiguity_requiring_judge:
+        - question: "Should one manifest manually encode the authenticated v1.56.3 contract with an exact checked-in provenance digest, or should a vendoring script extract it from a checked-in authenticated declaration snapshot?"
+          impact: "Determines whether drift proof is truly executable without network/credentials and whether generated docs can share the source safely."
+        - question: "Should curated examples live directly on Custom Flows/Flow Reference pages or on a dedicated docs Examples page?"
+          impact: "Affects navigation breadth, MDX/client-component architecture, and browser-test ownership."
+        - question: "May T007 modify the already-dirty CI/integration/e2e files, or must it add isolated files only?"
+          impact: "Needed to avoid overwriting the cumulative homepage dogfood work while still enforcing the new gate in CI."
+      commands:
+        - "git rev-parse --show-toplevel; scoped instruction/board discovery"
+        - "read AGENTS.md, CLAUDE.md, goal.md, state.yaml"
+        - "git status/branch/HEAD; scoped file and dependency inventory"
+        - "GitHub API Flow/Variant declaration fetch (first unquoted attempt failed in zsh)"
+        - "GitHub API Flow/Variant declaration fetch with quoted endpoints"
+        - "targeted docs/navigation/homepage/lab search"
+        - "package scripts, CI, unit/browser contract inspection"
+        - "focused Vitest, ESLint, diff-check chain"
+        - "example discriminator and docs route inspection"
+        - "docs renderer/sidebar, provenance, exact-runtime lab, Playwright config inspection"
+        - "GitHub release tree/README transition inspection"
+        - "GitHub transition validation/runtime/config inspection"
+      note_needed: false
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Validate the capability audit and choose the exact information architecture, canonical manifest design, example strategy, and bounded Worker packages."
+    inputs:
+      - "T001 receipt"
+      - "Goal oracle and non-negotiable constraints"
+      - "Existing dirty-worktree ownership map"
+    constraints:
+      - "Read-only."
+      - "Keep the default feedback flow as the primary entry point."
+      - "Choose docs plus curated examples, not a full visual builder."
+      - "Require one authoritative versioned inventory rather than duplicated hand-maintained lists."
+    expected_output:
+      - "Approved information architecture and terminology"
+      - "Canonical capability manifest and drift-check design"
+      - "Exact T003/T005/T006/T007 allowed_files, verify, and stop_if packages"
+      - "Deferred and explicitly excluded capabilities"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "T001 is sufficiently evidenced to approve a sequential implementation. Keep default-flow docs first; add Custom Flows and Flow Reference after Configuration; extend existing Styling and JavaScript API pages. Use one checked-in versioned manifest rendered by docs/examples and prove it against hashed immutable v1.56.3 declaration snapshots plus vendored-runtime provenance. Embed a curated exact-runtime gallery in the guide/reference rather than adding a builder or separate lab. T003 is the largest safe first slice because every later claim and selector must depend on its reviewed inventory. Dirty homepage files remain untouched; the already-dirty CI workflow is reserved for a cumulative T007 patch."
+      architecture_decision:
+        information_architecture:
+          - "Preserve Getting Started, Installation, Configuration, and the default feedback flow as the primary path."
+          - "Add Custom Flows immediately after Configuration as the task-oriented guide."
+          - "Add Flow Reference immediately after Custom Flows as the exhaustive manifest-driven reference."
+          - "Extend the existing Styling page with default script styling, Flow appearance/presentation controls, and Shadow DOM boundaries."
+          - "Extend the existing JavaScript API page with registerFlow, open context/initialAnswers, result, close, and outcomes."
+        terminology:
+          preferred:
+            - "default feedback flow"
+            - "custom flow"
+            - "flow components"
+            - "screen transitions"
+            - appearance
+            - presentation
+          restricted:
+            - "Use Classic only where existing historical/version context requires it."
+            - "Do not call the default flow legacy or deprecated."
+            - "Keep Variant-only capabilities explicitly separate from Flow capabilities."
+        canonical_manifest:
+          authority: src/lib/flow-capabilities.ts
+          version_key: "v1.56.3@47a392d1e7b1a8d8adeff1692f6bbbd84696280d"
+          contents:
+            - "release and runtime provenance"
+            - "all Flow field and option discriminators"
+            - "all screen, condition, presentation, appearance, transition, easing, issue, evidence, lifecycle, and outcome values"
+            - "numeric bounds, built-in defaults, direction behavior, and reduced-motion behavior"
+            - "explicit Variant-only and unreleased exclusions"
+          proof_inputs: "Immutable Flow and Variant public declaration snapshots plus a provenance file containing source URLs, commit, GitHub blob/content hashes, and local SHA-256 hashes."
+          drift_contract: "A TypeScript-AST parity helper extracts the released discriminators, literal values, and numeric/runtime constraints from the snapshots and deep-compares them with the manifest; it also checks the manifest commit/version/runtime digest against the vendored runtime provenance. Documentation tables and example selectors import the manifest and may not repeat complete hand-maintained capability arrays."
+        example_strategy:
+          - "Embed one curated exact-runtime gallery in Custom Flows, with reference-page deep links rather than a separate public lab."
+          - "Cover all six fields and three screens through a small set of coherent example flows, including branching, layout, issue formatting, evidence, and lifecycle."
+          - "Provide a motion selector for none, four built-ins, and custom motion, including Back direction, duration/easing, and reduced-motion replacement."
+          - "Provide styling presets covering theme, accent, density, modal size, columns, and spans while explaining default-flow script styling and Shadow DOM limits."
+          - "Use only the pinned local runtime and local feedback route; record requests and fail if any external domain or real Issue mutation is attempted."
+      worker_package:
+        task_id: T003
+        objective: "Implement the single canonical v1.56.3 Flow capability manifest, immutable authenticated declaration snapshots, and executable parity/provenance drift contract on which documentation and examples will depend."
+        allowed_files:
+          - src/lib/flow-capabilities.ts
+          - test/fixtures/flow-capabilities/v1.56.3/flows-public-types.d.ts
+          - test/fixtures/flow-capabilities/v1.56.3/variants-public-types.d.ts
+          - test/fixtures/flow-capabilities/v1.56.3/PROVENANCE.json
+          - test/helpers/flow-capability-parity.ts
+          - test/flow-capabilities.test.ts
+        verify:
+          - "npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts"
+          - "npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts"
+          - "npm run build"
+          - "git diff --check"
+        stop_if:
+          - "The declaration snapshots cannot be authenticated to v1.56.3 commit 47a392d1e7b1a8d8adeff1692f6bbbd84696280d or disagree with T001."
+          - "Parity relies only on labels/counts instead of extracting exact discriminators, literal values, bounds, defaults, or provenance."
+          - "A second hand-maintained complete capability list is introduced."
+          - "An SDK behavior change, unreleased capability, Variant-only Flow claim, or file outside the allowlist is required."
+          - "Verification fails twice after bounded corrections."
+      evidence:
+        - source: "T001 receipt: authenticated Flow and Variant declarations at v1.56.3 commit 47a392d1e7b1a8d8adeff1692f6bbbd84696280d"
+          proves: "The exact released inventory and Flow-versus-Variant exclusions are known."
+        - source: "T001 receipt: README and transition implementation"
+          proves: "Transition families, defaults, bounds, direction reversal, and reduced-motion behavior are evidenced."
+        - source: "T001 receipt: docs navigation and current MDX"
+          proves: "Custom Flow navigation, registerFlow, exhaustive reference, motion, and Flow styling coverage are absent."
+        - source: "T001 receipt: variants lab comparison"
+          proves: "multiSelect is lab-only and the mixed lab cannot be the authoritative reference."
+        - source: "Current git status"
+          proves: "Homepage, integration, e2e, and CI files already contain intended dirty work; clean docs/new files are safer initial ownership."
+        - source: .github/workflows/ci.yml
+          proves: "Vitest/build/lint run broadly, but Playwright currently names only the homepage spec, so T007 must cumulatively add the docs journey."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "T005 and T006 must consume the T003 manifest after T004 approval; T006 then provides the surface T007 hardens. T005/T006 overlap MDX files, and T007 must preserve an already-dirty CI hunk. Execute sequentially with one writer."
+      blocked_tasks:
+        - "T005 until T004 approves T003 parity"
+        - "T006 until T005 establishes the public docs surface"
+        - "T007 until T006 provides working exact-runtime examples"
+      deferred_or_excluded:
+        deferred:
+          - "Future SDK components and animations"
+          - "Version switching across multiple historical SDK releases"
+          - "A visual/no-code flow builder"
+          - "Automatic network refresh of declarations during ordinary CI"
+        excluded:
+          - multiSelect
+          - "Variant-only inline mounting, feedback classification, headless submit, and VariantContent requirements as Flow features"
+          - "arbitrary CSS injection through Shadow DOM"
+          - "new SDK behavior"
+          - "public homepage enablement"
+          - "real GitHub Issue creation"
+          - "push, PR, merge, release, deployment, or production mutation"
+      missing_evidence:
+        - "Fresh T003 parity/provenance results"
+        - "T004 inventory approval"
+        - "Built and navigable documentation"
+        - "Working exact-runtime component, motion, and styling examples"
+        - "Desktop/mobile keyboard, focus, accessibility, reduced-motion, and no-external-mutation browser proof"
+        - "Final review and oracle mapping"
+      required_board_updates:
+        - task_id: T003
+          allowed_files: "src/lib/flow-capabilities.ts,test/fixtures/flow-capabilities/v1.56.3/flows-public-types.d.ts,test/fixtures/flow-capabilities/v1.56.3/variants-public-types.d.ts,test/fixtures/flow-capabilities/v1.56.3/PROVENANCE.json,test/helpers/flow-capability-parity.ts,test/flow-capabilities.test.ts"
+          verify: "npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts,npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts,npm run build,git diff --check"
+          stop_if: "Authenticated declarations disagree with T001.,Parity is count/label-only or creates a second hand-maintained list.,Need SDK behavior, unreleased capabilities, or files outside the allowlist.,Verification fails twice after bounded corrections."
+        - task_id: T005
+          allowed_files: "src/lib/docs-nav.ts,src/content/docs/custom-flows.mdx,src/content/docs/flow-reference.mdx,src/content/docs/javascript-api.mdx,src/content/docs/styling.mdx,src/components/docs/flow-capability-reference.tsx,test/flow-docs-content.test.ts"
+          verify: "npm test -- --run test/flow-docs-content.test.ts test/flow-capabilities.test.ts,npm run lint -- src/lib/docs-nav.ts src/components/docs/flow-capability-reference.tsx test/flow-docs-content.test.ts,npm run build,git diff --check"
+          stop_if: "Default feedback documentation is displaced or described as legacy/deprecated.,A complete capability list is duplicated outside the canonical manifest.,A claim lacks released-runtime evidence or advertises multiSelect/Variant-only behavior.,Need files outside the allowlist.,Verification fails twice after bounded corrections."
+        - task_id: T006
+          allowed_files: "src/components/docs/flow-capability-example-configs.ts,src/components/docs/flow-capability-examples.tsx,src/components/docs/flow-capability-examples.module.css,src/content/docs/custom-flows.mdx,src/content/docs/flow-reference.mdx,src/content/docs/styling.mdx,test/flow-capability-example-configs.test.ts,test/flow-capability-examples.test.tsx,e2e/flow-capability-docs.spec.ts"
+          verify: "npm test -- --run test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-capabilities.test.ts,npm run lint -- src/components/docs/flow-capability-example-configs.ts src/components/docs/flow-capability-examples.tsx test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx e2e/flow-capability-docs.spec.ts,npm run build,npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0,git diff --check"
+          stop_if: "An example needs an external mutation, real Issue, arbitrary CSS injection, unreleased capability, or non-pinned runtime.,The public registerFlow/open path cannot power the example through the existing local route.,A complete selector list is duplicated instead of deriving from the manifest.,Need files outside the allowlist.,Verification fails twice after bounded corrections."
+        - task_id: T007
+          allowed_files: ".github/workflows/ci.yml,test/flow-capabilities.test.ts,test/flow-capability-docs-contract.test.ts,e2e/flow-capability-docs.spec.ts"
+          verify: "npm test,npm run lint,npm run build,npx playwright test e2e/homepage-flow-demo.spec.ts e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0,Run missing-capability, extra-capability, provenance-drift, and banned-capability mutation cases in test/flow-capabilities.test.ts,git diff --check"
+          stop_if: "The pre-task .github/workflows/ci.yml diff cannot be preserved exactly while adding the docs spec.,CI would need credentials, production access, external Issue creation, or a non-.localhost browser origin.,Coverage checks only text/counts without exercising manifest-driven docs and the public runtime path.,Need files outside the allowlist.,Verification fails twice after bounded corrections."
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Correct the canonical v1.56.3 inventory so every public property/discriminator/value/default and every runtime-only motion fact is authenticated and source-derived, without a duplicate runtime contract."
+    allowed_files:
+      - "src/lib/flow-capabilities.ts"
+      - "test/fixtures/flow-capabilities/v1.56.3/screen-transition-config.ts.txt"
+      - "test/fixtures/flow-capabilities/v1.56.3/screen-transition.ts.txt"
+      - "test/fixtures/flow-capabilities/v1.56.3/PROVENANCE.json"
+      - "test/helpers/flow-capability-parity.ts"
+      - "test/flow-capabilities.test.ts"
+    verify:
+      - "npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts"
+      - "npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts"
+      - "npm run build"
+      - "git diff --check"
+    stop_if:
+      - "Runtime snapshots do not byte-match exact commit 47a392d1e7b1a8d8adeff1692f6bbbd84696280d and their recorded Git blob/SHA-256 values."
+      - "Any bound/default/behavior remains proved only by a duplicated hand-maintained provenance object rather than authenticated source."
+      - "Any released FlowConfig, component option, condition, transition branch, lifecycle/registration property, literal domain, or requiredness remains outside executable parity."
+      - "The correction requires SDK behavior changes, unreleased capabilities, or files outside this allowlist."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/lib/flow-capabilities.ts
+        - test/fixtures/flow-capabilities/v1.56.3/screen-transition-config.ts.txt
+        - test/fixtures/flow-capabilities/v1.56.3/screen-transition.ts.txt
+        - test/fixtures/flow-capabilities/v1.56.3/PROVENANCE.json
+        - test/helpers/flow-capability-parity.ts
+        - test/flow-capabilities.test.ts
+      commands:
+        - cmd: "npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts"
+          status: pass
+        - cmd: "npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "Runtime snapshot SHA-256/Git blob audit and duplicate-contract search"
+          status: pass
+      summary: "Corrected T003 with authenticated runtime-source snapshots matching the exact release commit, removed the duplicated provenance runtime contract, and source-derived motion bounds, defaults, directions, immediate cases, and easing behavior. Expanded AST parity to exact required/optional contracts, nested options, conditions, transitions, registration, lifecycle, outcomes, and all literal domains. Added negative mutation proof for missing/extra properties, runtime drift, and provenance drift. All required verification passed."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T004
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit the canonical inventory and drift contract before public documentation and examples depend on it."
+    inputs:
+      - "T001-T003 receipts"
+      - "Current diff and focused verification"
+    constraints:
+      - "Read-only."
+      - "Reject proxy coverage that does not prove exact released discriminators and supported values."
+      - "Reject a second independent hand-maintained capability list."
+    expected_output:
+      - "approved | correction_required"
+      - "Inventory parity evidence"
+      - "Exact bounded correction package when required"
+    receipt:
+      result: done
+      decision: rejected
+      full_outcome_complete: false
+      rationale: "Required commands pass and declaration hashes match, but the drift contract does not authenticate runtime facts. Both recorded runtime-source SHA-256 values are wrong; the helper never reads those sources and only compares the manifest with a duplicated runtimeContract in provenance. It also omits exact FlowConfig, presentation, issue, condition, transition-branch, registration, and required/optional property contracts, plus immediate-default and custom-easing defaults. Source or option drift can therefore pass while documentation becomes stale. Replace the proxy contract with authenticated runtime snapshots and source-derived parity before documentation depends on it."
+      evidence:
+        - "Fresh focused verification passed: 24 Vitest tests, focused ESLint, production build, and git diff --check."
+        - "Exact-commit raw declaration snapshots match recorded SHA-256 and Git blob SHAs."
+        - "Exact-commit screen-transition-config.ts hashes to SHA-256 c50100c0cc713c947c8d5e617d32fca4ec17bf9ff565887391e9a157486614f8, not recorded 786cb0a16405329a92f3f79b3b76a8f71109ecd72b0276ddbe4ee38f06c0babd."
+        - "Exact-commit screen-transition.ts hashes to SHA-256 b74a94dcfc1913c0d1e5f83603ac49376a5ad9238facaf63d9d0d74be66272a1, not recorded 9fbfbd0a8c81544460ba8aeff0f408a1a1b541dcc78dc6b94e83f8512bf0a06a."
+        - "test/helpers/flow-capability-parity.ts reads only declarations and provenance; runtimeSources are neither typed, read, hashed, nor parsed. Lines 295-305 merely deep-compare two hand-maintained runtimeContract copies."
+        - "The parity helper queries selected FlowConfig members but never exact-compares FlowConfig, presentation, or issue property sets; presentation.screenTransition and BugDropPublicAPI.registerFlow are absent from the manifest."
+        - "Condition coverage extracts only each branch's first member, so equals/recursive-array shape drift is undetected. Transition coverage extracts kinds/easing but not exact branch properties or requiredness."
+        - "The released implementation proves omitted/none transitions and first render replace immediately, while custom easing defaults to standard; neither default is represented or source-derived in the manifest."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "T005 documentation and all later example/CI work depend on the canonical inventory. Proceeding would harden incomplete and unauthenticated claims."
+      blocked_tasks:
+        - "T005 until corrected T003 receives a fresh T004 approval"
+        - "T006 until T005 completes"
+        - "T007 until T006 completes"
+      missing_evidence:
+        - "Authenticated checked-in runtime-source snapshots with locally verified SHA-256 and Git blob SHAs"
+        - "Source-derived proof for transition bounds, duration/frame/easing defaults, direction, initial/immediate behavior, and reduced motion"
+        - "Exact parity for complete FlowConfig/presentation/issue/condition/transition branch property sets and requiredness"
+        - "Canonical registrationMethod/registerFlow and single-choice option-shape coverage"
+        - "Negative mutation proof that added/removed properties, changed runtime values, and provenance drift fail"
+      required_board_updates:
+        - task_id: T003
+          status: queued
+          objective: "Correct the canonical v1.56.3 inventory so every public property/discriminator/value/default and every runtime-only motion fact is authenticated and source-derived, without a duplicate runtime contract."
+          allowed_files: "src/lib/flow-capabilities.ts,test/fixtures/flow-capabilities/v1.56.3/screen-transition-config.ts.txt,test/fixtures/flow-capabilities/v1.56.3/screen-transition.ts.txt,test/fixtures/flow-capabilities/v1.56.3/PROVENANCE.json,test/helpers/flow-capability-parity.ts,test/flow-capabilities.test.ts"
+          verify: "npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts,npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts,npm run build,git diff --check"
+          stop_if: "Runtime snapshots do not byte-match exact commit 47a392d1e7b1a8d8adeff1692f6bbbd84696280d and their recorded Git blob/SHA-256 values.,Any bound/default/behavior remains proved only by a duplicated hand-maintained provenance object rather than authenticated source.,Any released FlowConfig, component option, condition, transition branch, lifecycle/registration property, literal domain, or requiredness remains outside executable parity.,The correction requires SDK behavior changes, unreleased capabilities, or files outside this allowlist.,Verification fails twice after bounded corrections."
+        - task_id: T004
+          status: queued
+          note: "Re-audit corrected T003 before unblocking T005."
+  - id: T011
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Freshly re-audit the corrected canonical inventory and source-derived drift contract before unblocking public documentation."
+    inputs:
+      - "T001-T004 receipts"
+      - "T003 correction receipt"
+      - "Corrected complete inventory diff and verification"
+    constraints:
+      - "Read-only."
+      - "Reject proxy or duplicated runtime coverage."
+      - "Require authenticated sources and exact public property/value/requiredness parity."
+    expected_output:
+      - "approved | correction_required"
+      - "Fresh inventory parity evidence"
+      - "Exact bounded correction package when required"
+    receipt:
+      result: done
+      decision: rejected
+      full_outcome_complete: false
+      rationale: "Authenticated snapshots now byte-match the pinned commit, runtime facts are source-derived, the duplicated provenance runtime contract is gone, and focused verification passes. However, exact drift parity remains asymmetric: condition, issue-section, and outcome checks iterate only source branches, so removed branches can leave stale manifest entries undetected; built-in transition shape is checked only through fade; and public value types are not represented or compared. Negative tests cover one optional-property list, one runtime bound, and the commit only. Documentation must not depend on this contract until branch removal, type drift, requiredness, literal, source-tamper, and banned-capability mutations are proved."
+      worker_package:
+        task_id: T003
+        objective: "Complete exact bidirectional public-contract parity and adversarial mutation proof for the authenticated v1.56.3 Flow inventory without changing the authenticated snapshots or duplicating runtime facts."
+        allowed_files:
+          - src/lib/flow-capabilities.ts
+          - test/helpers/flow-capability-parity.ts
+          - test/flow-capabilities.test.ts
+        verify:
+          - "npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts"
+          - "npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts"
+          - "npm run build"
+          - "git diff --check"
+        stop_if:
+          - "Any public Flow property value type, literal domain, requiredness, or union branch cannot be represented canonically and compared bidirectionally."
+          - "Any condition, issue-section, outcome, or transition-kind branch can be removed or reshaped without parity failing."
+          - "Negative mutation proof cannot demonstrate failures for branch removal, requiredness/type/literal drift, authenticated-source tampering, and banned capabilities."
+          - "Runtime facts are duplicated instead of extracted from authenticated source snapshots."
+          - "Authenticated fixtures need alteration, SDK behavior changes are required, or a file outside the allowlist is needed."
+          - "Verification fails twice after bounded corrections."
+      evidence:
+        - "Fresh remote comparison proved both declaration snapshots and both runtime-source snapshots byte-identical to mean-weasel/bugdrop commit 47a392d1e7b1a8d8adeff1692f6bbbd84696280d."
+        - "Fresh SHA-256 and Git-blob calculations match every recorded declaration/runtime source digest."
+        - "Fresh focused verification passed 26 tests across flow-capabilities and integration-resource suites."
+        - "PROVENANCE.json contains authenticated source metadata and no duplicated runtimeContract."
+        - "test/helpers/flow-capability-parity.ts derives duration bounds, frame bounds/defaults, built-in/custom duration defaults, easing default, direction behavior, immediate replacement, and reduced-motion facts from authenticated runtime snapshots."
+        - "Condition parity at lines 434-454 iterates source branches without comparing their complete branch-key set to capabilities.conditions.branches; removal of answer or context is therefore not rejected."
+        - "Issue-section parity at lines 508-518 and outcome parity at lines 545-548 likewise lack bidirectional exact branch-set comparison."
+        - "Built-in transition requiredness is compared only with transitionBranches.get('fade') at line 484; a per-kind slide or scale-fade shape divergence is not examined."
+        - "Property contracts compare names and optionality, but value types such as FlowForm.fields, AttachmentsField.maxFiles, evidence mappings, choice-option values, and outcome result references are absent from the canonical inventory and executable comparison."
+        - "test/flow-capabilities.test.ts has negative mutations only for shortText optional properties, duration maximum, and targetCommit; it does not prove branch removal, requiredness, literal/type drift, source tampering, or banned-capability rejection."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "T005 and later documentation/examples would consume this incomplete canonical contract. Correct and re-audit T003 before any dependent writer proceeds."
+      blocked_tasks:
+        - "T005 until corrected T003 receives fresh Judge approval"
+        - "T006 until T005 completes"
+        - "T007 until T006 completes"
+      missing_evidence:
+        - "Bidirectional exact branch-set parity for conditions, issue sections, outcomes, and every transition kind"
+        - "Canonical and executable value-type/reference/array parity for public Flow properties"
+        - "Negative proof for branch removal, requiredness, literal/type drift, authenticated-source tampering, and banned capabilities"
+        - "Fresh passing verification after the bounded correction"
+      required_board_updates:
+        - task_id: T003
+          status: queued
+          objective: "Complete exact bidirectional public-contract parity and adversarial mutation proof for the authenticated v1.56.3 Flow inventory without changing authenticated snapshots or duplicating runtime facts."
+        - task_id: T011
+          status: done
+          decision: rejected
+        - task_id: T005
+          status: queued
+          note: "Remain blocked pending fresh approval of corrected T003."
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Build the public custom-flow information architecture and authoritative written/API reference while preserving the default-flow documentation path."
+    allowed_files:
+      - "src/lib/docs-nav.ts"
+      - "src/content/docs/custom-flows.mdx"
+      - "src/content/docs/flow-reference.mdx"
+      - "src/content/docs/javascript-api.mdx"
+      - "src/content/docs/styling.mdx"
+      - "src/components/docs/flow-capability-reference.tsx"
+      - "test/flow-docs-content.test.ts"
+    verify:
+      - "npm test -- --run test/flow-docs-content.test.ts test/flow-capabilities.test.ts"
+      - "npm run lint -- src/lib/docs-nav.ts src/components/docs/flow-capability-reference.tsx test/flow-docs-content.test.ts"
+      - "npm run build"
+      - "git diff --check"
+    stop_if:
+      - "Default feedback documentation is displaced or described as legacy/deprecated."
+      - "A complete capability list is duplicated outside the canonical manifest."
+      - "A claim lacks released-runtime evidence or advertises multiSelect/Variant-only behavior."
+      - "Need files outside the allowlist."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/lib/docs-nav.ts
+        - src/content/docs/custom-flows.mdx
+        - src/content/docs/flow-reference.mdx
+        - src/content/docs/javascript-api.mdx
+        - src/content/docs/styling.mdx
+        - src/components/docs/flow-capability-reference.tsx
+        - test/flow-docs-content.test.ts
+      commands:
+        - cmd: "npm test -- --run test/flow-docs-content.test.ts test/flow-capabilities.test.ts"
+          status: pass
+          evidence: "14 tests passed; manifest-driven content checks cover all released discriminator and option groups."
+        - cmd: "npm run lint -- src/lib/docs-nav.ts src/components/docs/flow-capability-reference.tsx test/flow-docs-content.test.ts"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+          evidence: "Production build generated /docs/custom-flows and /docs/flow-reference."
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Added Custom Flows and Flow Reference immediately after Configuration while retaining Getting Started and the default feedback flow as the primary path. Built an exhaustive server-rendered reference from FLOW_CAPABILITIES, task-oriented custom-flow guidance, registerFlow lifecycle/API coverage, and supported styling boundaries. Added drift-sensitive content tests. Disproof checks confirmed banned terminology appears only in test assertions, exclusions are labeled rather than advertised, and complete capability values derive from the canonical manifest. All exact verification commands pass after two bounded corrections."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T006
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Add curated live examples for released components, transitions, and styling that visually demonstrate how BugDrop can match an app."
+    allowed_files:
+      - "src/components/docs/flow-capability-example-configs.ts"
+      - "src/components/docs/flow-capability-examples.tsx"
+      - "src/components/docs/flow-capability-examples.module.css"
+      - "src/content/docs/custom-flows.mdx"
+      - "src/content/docs/flow-reference.mdx"
+      - "src/content/docs/styling.mdx"
+      - "test/flow-capability-example-configs.test.ts"
+      - "test/flow-capability-examples.test.tsx"
+      - "e2e/flow-capability-docs.spec.ts"
+    verify:
+      - "npm test -- --run test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-capabilities.test.ts"
+      - "npm run lint -- src/components/docs/flow-capability-example-configs.ts src/components/docs/flow-capability-examples.tsx test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx e2e/flow-capability-docs.spec.ts"
+      - "npm run build"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "An example needs an external mutation, real Issue, arbitrary CSS injection, unreleased capability, or non-pinned runtime."
+      - "The public registerFlow/open path cannot power the example through the existing local route."
+      - "A complete selector list is duplicated instead of deriving from the manifest."
+      - "Need files outside the allowlist."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/docs/flow-capability-example-configs.ts
+        - src/components/docs/flow-capability-examples.tsx
+        - src/components/docs/flow-capability-examples.module.css
+        - src/content/docs/custom-flows.mdx
+        - src/content/docs/flow-reference.mdx
+        - src/content/docs/styling.mdx
+        - test/flow-capability-example-configs.test.ts
+        - test/flow-capability-examples.test.tsx
+        - e2e/flow-capability-docs.spec.ts
+      commands:
+        - cmd: "npm test -- --run test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-capabilities.test.ts"
+          status: pass
+          evidence: "14 tests passed."
+        - cmd: "npm run lint -- src/components/docs/flow-capability-example-configs.ts src/components/docs/flow-capability-examples.tsx test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx e2e/flow-capability-docs.spec.ts"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+          evidence: "Production build generated /docs/custom-flows."
+        - cmd: "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+          status: pass
+          evidence: "After the T015 bounded correction, T016 freshly verified all 4 desktop/mobile gallery and reduced-motion tests, including the unchanged focus assertion."
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Implemented the pinned-runtime live gallery with three curated released flows covering all fields/screens, a manifest-derived six-choice transition selector, reduced-motion behavior, three supported app-matching presets, local-only registerFlow/open execution, responsive styling, documentation integration, and focused tests. T015 corrected launcher focus restoration within the approved one-file boundary, and T016 freshly approved the full desktop/mobile, reduced-motion, responsive, exact-runtime, and no-mutation contract."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+      resolution: "T015 replaced timer-coupled focus with closed-only commit-coupled restoration; T016 freshly approved the unchanged desktop/mobile focus assertion, reduced motion, exact runtime, responsive layout, and no-mutation ledger."
+  - id: T007
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Harden CI and browser coverage so released capability, documentation, examples, accessibility, and responsive behavior cannot silently drift."
+    allowed_files:
+      - ".github/workflows/ci.yml"
+      - "test/flow-capabilities.test.ts"
+      - "test/flow-capability-docs-contract.test.ts"
+      - "e2e/flow-capability-docs.spec.ts"
+    verify:
+      - "npm test"
+      - "npm run lint"
+      - "npm run build"
+      - "npx playwright test e2e/homepage-flow-demo.spec.ts e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "Run missing-capability, extra-capability, provenance-drift, and banned-capability mutation cases in test/flow-capabilities.test.ts"
+      - "git diff --check"
+    stop_if:
+      - "The pre-task .github/workflows/ci.yml diff cannot be preserved exactly while adding the docs spec."
+      - "CI would need credentials, production access, external Issue creation, or a non-.localhost browser origin."
+      - "Coverage checks only text/counts without exercising manifest-driven docs and the public runtime path."
+      - "Need files outside the allowlist."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - .github/workflows/ci.yml
+        - test/flow-capabilities.test.ts
+        - test/flow-capability-docs-contract.test.ts
+        - e2e/flow-capability-docs.spec.ts
+      commands:
+        - cmd: "npm test"
+          status: pass
+          evidence: "196 tests passed after preserving the exact existing homepage CI job and adding a separate docs browser job."
+        - cmd: "npm run lint"
+          status: pass
+          evidence: "0 errors; 862 pre-existing vendored-runtime warnings."
+        - cmd: "npm run build"
+          status: pass
+          evidence: "Production build generated the custom-flow documentation routes."
+        - cmd: "npx playwright test e2e/homepage-flow-demo.spec.ts e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+          status: pass
+          evidence: "After T018, T019 freshly verified all 7 applicable desktop/mobile docs tests plus the enabled homepage CI-equivalent suite with axe unchanged."
+        - cmd: "npm test -- --run test/flow-capabilities.test.ts -t \"rejects a missing-capability mutation|rejects an extra-capability mutation|rejects a provenance-drift mutation|rejects a banned-capability mutation\""
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Added separate CI browser enforcement while preserving the complete pre-task homepage CI diff, exact manifest-rendering contracts, individually runnable missing/extra/provenance/banned mutation cases, runtime byte/SHA proof, accessibility, responsive, reduced-motion, focus, and zero-external/zero-feedback-mutation browser ledgers. T018 corrected the two mobile overflow hosts, and T019 freshly approved the full CI, accessibility, exact-runtime, mutation, and homepage-preservation contract."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+      resolution: "T018 added keyboard focusability only to the two affected overflow hosts; T019 freshly approved the complete corrected CI/browser milestone."
+  - id: T008
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run the repository-required PR Review Toolkit against the complete intended diff and independently validate every actionable candidate."
+    inputs:
+      - "T001-T007 receipts"
+      - "Complete tracked and intended untracked worktree diff"
+      - "Exact merge base and verification evidence"
+    constraints:
+      - "Read-only."
+      - "Use codex-pr-review-toolkit:review-pull-request against the exact base."
+      - "Do not mistake intended untracked additions for omissions."
+      - "Require independent validation before accepting a finding."
+    expected_output:
+      - "complete | correction_required"
+      - "Validated findings with exact locations"
+      - "Smallest bounded T009 correction package when required"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "Correction required. Independent validation accepted four merge-blocking defects: the docs runtime survives client navigation and breaks both Classic homepage modes; Customer pulse uses an identifier rejected by v1.56.3; the mandatory enablement checklist requires a removed Onboarding flow; and the exhaustive reference omits public value types and required transition branches. Native review's untracked-file finding and the proposed live-runtime overwrite path were rejected."
+      evidence:
+        - finding: "P1 docs runtime ownership"
+          location: "src/components/docs/flow-capability-examples.tsx:142-150"
+          confidence: 0.99
+        - finding: "P1 invalid Customer pulse context key"
+          location: "src/components/docs/flow-capability-example-configs.ts:194"
+          confidence: 0.99
+        - finding: "P1 impossible enablement checklist"
+          location: "docs/homepage-flow-demo-operations.md:47-50"
+          confidence: 0.99
+        - finding: "P1 incomplete exhaustive reference"
+          location: "src/content/docs/flow-reference.mdx:5"
+          confidence: 0.97
+        - rejected: native-untracked
+          confidence: 0.99
+        - rejected: "silent-failures-001 and comments-docs-002"
+          confidence: 0.98
+        - verification: "Focused tests passed 86/86; full suite passed 196/196; git diff --check passed."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "One coherent correction package."
+      blocked_tasks:
+        - "T010 until T009 completes"
+        - "T999 until T009 and T010 complete"
+      missing_evidence:
+        - "Corrected runtime ownership, recipe, reference, checklist, and fresh corrected-head review."
+      required_board_updates:
+        - task_id: T008
+          status: done
+          decision: not_complete
+        - task_id: T009
+          status: active
+  - id: T009
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Apply only the validated bounded corrections from T008, or record an explicit no-change receipt when none are accepted."
+    allowed_files:
+      - "docs/homepage-flow-demo-operations.md"
+      - "src/components/docs/flow-capability-example-configs.ts"
+      - "src/components/docs/flow-capability-examples.tsx"
+      - "src/components/docs/flow-capability-reference.tsx"
+      - "src/content/docs/flow-reference.mdx"
+      - "test/flow-capability-example-configs.test.ts"
+      - "test/flow-capability-examples.test.tsx"
+      - "test/flow-capability-docs-contract.test.ts"
+      - "test/flow-docs-content.test.ts"
+      - "e2e/flow-capability-docs.spec.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+    verify:
+      - "npm test -- --run test/flow-capabilities.test.ts test/flow-capability-docs-contract.test.ts test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-docs-content.test.ts test/homepage-demo-runtime.test.ts"
+      - "npm run lint -- src/components/docs/flow-capability-example-configs.ts src/components/docs/flow-capability-examples.tsx src/components/docs/flow-capability-reference.tsx test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-capability-docs-contract.test.ts test/flow-docs-content.test.ts e2e/flow-capability-docs.spec.ts e2e/homepage-flow-demo.spec.ts"
+      - "npm run build"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "A correction requires changing the SDK, authenticated runtime bytes, canonical manifest, or authenticated declaration/source snapshots."
+      - "Runtime ownership cannot prove docs-to-home and home-to-docs navigation without stale globals, duplicate hosts, external requests, or feedback mutations."
+      - "The exhaustive reference cannot render public value types and required transition branches from the existing canonical manifest without creating a second independently maintained contract."
+      - "Any accepted finding requires a file outside this allowlist."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - docs/homepage-flow-demo-operations.md
+        - src/components/docs/flow-capability-example-configs.ts
+        - src/components/docs/flow-capability-examples.tsx
+        - src/components/docs/flow-capability-reference.tsx
+        - src/content/docs/flow-reference.mdx
+        - test/flow-capability-example-configs.test.ts
+        - test/flow-capability-examples.test.tsx
+        - test/flow-capability-docs-contract.test.ts
+        - test/flow-docs-content.test.ts
+        - e2e/flow-capability-docs.spec.ts
+        - e2e/homepage-flow-demo.spec.ts
+      commands:
+        - cmd: "focused T009 tests"
+          status: pass
+          evidence: "42/42 passed"
+        - cmd: "T009 exact lint"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "docs Playwright desktop/mobile"
+          status: pass
+          evidence: "7 passed, 1 expected skip"
+        - cmd: "enabled homepage Playwright desktop/mobile"
+          status: pass
+          evidence: "18 passed, 24 expected skips"
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Implemented all four bounded corrections. T020-T023 resolved the React effect and Strict Mode duplicate-host findings; every original T009 gate now passes."
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+      resolution: "T020-T023 deferred the complete ownership transaction behind one cancellable microtask and added exact runtime identity proof."
+  - id: T010
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Perform corrected-head review and the final desktop/mobile visual, accessibility, reduced-motion, and no-mutation browser oracle."
+    inputs:
+      - "All prior receipts"
+      - "Corrected complete diff"
+      - "Fresh full and browser verification"
+    constraints:
+      - "Read-only."
+      - "Inspect the default-flow path and every new custom-flow documentation/example surface."
+      - "Reject completion for stale capability claims, inaccessible examples, responsive overflow, or unproved no-mutation behavior."
+    expected_output:
+      - "complete | correction_required"
+      - "Fresh corrected-head review receipt"
+      - "Desktop/mobile and reduced-motion oracle evidence"
+      - "Exact follow-up Worker package if required"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "Correction required for a delayed-script ownership race and a mobile axe failure on the JavaScript API lifecycle table."
+      evidence:
+        - finding: inflight-docs-runtime-cleanup
+          confidence: 0.99
+          location: "src/components/docs/flow-capability-examples.tsx:201-213"
+        - finding: "mobile scrollable-region-focusable"
+          location: "src/content/docs/javascript-api.mdx:202-209"
+        - verification: "198 tests, lint, enabled build, ordinary docs and homepage browser gates otherwise pass"
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "One coherent runtime/accessibility correction."
+      blocked_tasks:
+        - "T999 until T024 and T025"
+      missing_evidence:
+        - "Delayed-response ownership and mobile axe correction proof"
+      required_board_updates:
+        - task_id: T010
+          status: done
+          decision: not_complete
+        - task_id: T024
+          status: active
+        - task_id: T025
+          status: queued
+  - id: T012
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Complete exact bidirectional public-contract parity and adversarial mutation proof for the authenticated v1.56.3 Flow inventory without changing authenticated snapshots or duplicating runtime facts."
+    allowed_files:
+      - "src/lib/flow-capabilities.ts"
+      - "test/helpers/flow-capability-parity.ts"
+      - "test/flow-capabilities.test.ts"
+    verify:
+      - "npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts"
+      - "npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts"
+      - "npm run build"
+      - "git diff --check"
+    stop_if:
+      - "Any public Flow property value type, literal domain, requiredness, or union branch cannot be represented canonically and compared bidirectionally."
+      - "Any condition, issue-section, outcome, or transition-kind branch can be removed or reshaped without parity failing."
+      - "Negative mutation proof cannot demonstrate failures for branch removal, requiredness/type/literal drift, authenticated-source tampering, and banned capabilities."
+      - "Runtime facts are duplicated instead of extracted from authenticated source snapshots."
+      - "Authenticated fixtures need alteration, SDK behavior changes are required, or a file outside the allowlist is needed."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/lib/flow-capabilities.ts
+        - test/helpers/flow-capability-parity.ts
+        - test/flow-capabilities.test.ts
+      commands:
+        - cmd: "npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts"
+          status: pass
+        - cmd: "npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Added a canonical normalized public value-type contract covering all Flow declarations, their transitive Variant dependencies, and registerFlow. Parity now compares contract keys and signatures bidirectionally, checks complete condition/issue/outcome branch sets, and validates every built-in transition shape. Adversarial tests prove failures for all branch-family removals, requiredness, value-type, literal, runtime, provenance, authenticated-source tampering, and banned multiSelect drift. Runtime facts remain source-derived from authenticated snapshots. All required verification passed after one bounded correction."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T013
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Freshly audit the final canonical inventory correction and unblock public documentation only on exact bidirectional parity proof."
+    inputs:
+      - "T001-T004 and T011 receipts"
+      - "T012 receipt"
+      - "Final inventory diff and mutation proof"
+    constraints:
+      - "Read-only."
+      - "Require authenticated source-derived runtime facts."
+      - "Require bidirectional union/property/type/requiredness parity and adversarial proof."
+    expected_output:
+      - "approved | correction_required"
+      - "Fresh exact parity evidence"
+      - "Exact next package when rejected"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The corrected inventory now proves exact released parity. A normalized canonical contract covers every Flow declaration, all transitive Variant dependencies, and registerFlow; exact comparison catches value-type, literal, requiredness, modifier, and branch drift. Separate bidirectional checks cover complete condition, issue, outcome, field, screen, and transition sets, including every built-in transition shape. Runtime facts are extracted from byte-authenticated release-source snapshots, not duplicated provenance. Fresh remote authentication, adversarial tests, focused tests, lint, build, and diff checks all passed. T005 documentation may now consume this manifest."
+      evidence:
+        - "GitHub’s annotated v1.56.3 tag resolves to commit 47a392d1e7b1a8d8adeff1692f6bbbd84696280d."
+        - "Fresh GitHub API reads for both declarations and both transition sources exactly matched recorded SHA-256 and Git blob hashes."
+        - "The vendored runtime is 238591 bytes and hashes to 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e, matching both provenance records."
+        - "extractPublicContract starts from every Flow declaration, recursively includes referenced Variant declarations, includes BugDropPublicAPI.registerFlow, and deep-compares the complete normalized map bidirectionally."
+        - "Exact-set checks cover field, screen, condition, issue-section, outcome, transition-kind, built-in-transition, literal-domain, property, and requiredness contracts."
+        - "Runtime bounds, defaults, easing, direction, immediate replacement, and reduced-motion behavior are parsed from authenticated screen-transition source snapshots."
+        - "Adversarial tests reject missing/extra properties, branch-family removal, requiredness drift, value-type drift, literal drift, runtime drift, provenance drift, runtime-source tampering, and banned multiSelect drift."
+        - "Fresh verification passed: 29 focused Vitest tests, focused ESLint, production build, and git diff --check."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "Approval unblocks the sequential T005 documentation slice; T006 and T007 still depend on completion of their predecessors and should not run concurrently with overlapping files."
+      blocked_tasks:
+        - "T006 until T005 completes"
+        - "T007 until T006 completes"
+      missing_evidence: []
+      required_board_updates:
+        - task_id: T013
+          status: done
+          decision: approved
+        - task_id: T005
+          status: active
+          note: "Canonical v1.56.3 inventory is approved for documentation consumption."
+  - id: T014
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Diagnose the live-gallery launcher focus-restoration failure and decide the smallest safe correction without weakening the browser contract."
+    inputs:
+      - "T006 blocked receipt"
+      - "Current complete gallery diff"
+      - "Desktop and mobile Playwright failure evidence"
+    constraints:
+      - "Read-only."
+      - "Preserve exact launcher focus restoration as an accessibility requirement."
+      - "Do not weaken assertions, change the SDK/runtime, or broaden beyond the T006 gallery surface."
+    expected_output:
+      - "approved correction package | external blocker"
+      - "Root cause with direct evidence"
+      - "Exact T015 allowed_files, verification, and stop conditions"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The gallery’s only restoration attempt is a one-shot requestAnimationFrame scheduled beside setActive(false), so it is not coupled to the React commit that re-enables the launcher. Both traces show the flow removed and the launcher enabled, yet inactive for the full five-second assertion. Correct only the gallery component: record closed-outcome restoration intent before deactivation, then focus from an effect after active=false commits. Preserve the exact Playwright assertion and SDK/runtime unchanged."
+      evidence:
+        - "src/components/docs/flow-capability-examples.tsx:111-124 awaits the runtime outcome, schedules setActive(false), then performs the sole launcher focus attempt from requestAnimationFrame."
+        - "Desktop trace: Escape completed at 4922ms, flow count reached zero at 4924ms, launcher was enabled by 4936ms, but remained inactive through the 5000ms toBeFocused timeout."
+        - "Mobile error context reports the identical enabled launcher resolving 14 times as inactive."
+        - "e2e/flow-capability-docs.spec.ts:57-59 already expresses the required contract exactly: Escape, flow removal, then launcher focus."
+      subgoal_contract:
+        task_id: T015
+        objective: "Replace the gallery’s timer-coupled focus attempt with commit-coupled launcher restoration for closed outcomes only, preserving the exact browser assertion and all SDK/runtime behavior."
+        allowed_files:
+          - src/components/docs/flow-capability-examples.tsx
+        verify:
+          - "npm test -- --run test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-capabilities.test.ts"
+          - "npm run lint -- src/components/docs/flow-capability-example-configs.ts src/components/docs/flow-capability-examples.tsx test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx e2e/flow-capability-docs.spec.ts"
+          - "npm run build"
+          - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+          - "git diff --check"
+        stop_if:
+          - "Any correction requires editing e2e/flow-capability-docs.spec.ts, weakening its exact focus assertion, or changing the SDK/runtime."
+          - "Any file outside src/components/docs/flow-capability-examples.tsx is needed."
+          - "Focus restoration would occur for submitted or busy outcomes rather than only the closed outcome."
+          - "Verification fails twice after bounded correction."
+      parallel_safety:
+        safe: false
+        rationale: "T015 should be the sole writer because it modifies the active gallery component and completes the blocked T006 milestone."
+      blocked_tasks:
+        - T006
+      missing_evidence:
+        - "Post-correction desktop and mobile Playwright proof that the unchanged launcher toBeFocused assertion passes."
+      required_board_updates:
+        - "Record this T014 receipt."
+        - "Populate T015 with the approved contract and activate it."
+        - "Keep T006 blocked until all T015 verification passes."
+  - id: T015
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Apply only the independently approved bounded correction for live-gallery launcher focus restoration and complete T006 verification."
+    allowed_files:
+      - "src/components/docs/flow-capability-examples.tsx"
+    verify:
+      - "Exact regression proof from T014"
+      - "npm test -- --run test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-capabilities.test.ts"
+      - "npm run lint -- src/components/docs/flow-capability-example-configs.ts src/components/docs/flow-capability-examples.tsx test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx e2e/flow-capability-docs.spec.ts"
+      - "npm run build"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "Any correction requires editing e2e/flow-capability-docs.spec.ts, weakening its exact focus assertion, or changing the SDK/runtime."
+      - "Any file outside src/components/docs/flow-capability-examples.tsx is needed."
+      - "Focus restoration would occur for submitted or busy outcomes rather than only the closed outcome."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/docs/flow-capability-examples.tsx
+      commands:
+        - cmd: "Exact regression proof from T014"
+          status: pass
+          evidence: "Unchanged E2E contract remains Escape, flow removal, then launcher toBeFocused; restoration intent is set only when outcome.status === closed and consumed after active=false commits."
+        - cmd: "npm test -- --run test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-capabilities.test.ts"
+          status: pass
+          evidence: "14 tests passed."
+        - cmd: "npm run lint -- src/components/docs/flow-capability-example-configs.ts src/components/docs/flow-capability-examples.tsx test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx e2e/flow-capability-docs.spec.ts"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+          evidence: "Production build completed and generated /docs/custom-flows."
+        - cmd: "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+          status: pass
+          evidence: "All 4 desktop/mobile gallery and reduced-motion tests passed, including the unchanged focus assertion."
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Replaced timer-coupled launcher focus with commit-coupled restoration. Closed outcomes record restoration intent before deactivating the gallery; an effect focuses the re-enabled launcher after the active=false commit. Submitted and busy outcomes never restore focus. Exact unit, lint, build, desktop/mobile Playwright, and diff checks pass."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T016
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Freshly verify the corrected live gallery, close the T006 blocker only if the unchanged desktop/mobile focus, reduced-motion, exact-runtime, and no-mutation contracts all hold."
+    inputs:
+      - "T006, T014, and T015 receipts"
+      - "Complete current gallery diff"
+      - "Fresh browser and focused verification"
+    constraints:
+      - "Read-only."
+      - "Do not weaken focus, accessibility, responsive, runtime identity, or no-mutation requirements."
+      - "Require the launcher focus assertion unchanged and closed-only restoration."
+    expected_output:
+      - "approved | correction_required"
+      - "Fresh gallery evidence"
+      - "Exact follow-up package when rejected"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Fresh audit approves the corrected gallery milestone. Focus restoration is commit-coupled, consumed only after active=false, and armed only for closed outcomes; submitted and busy outcomes do not restore focus. The unchanged desktop/mobile assertion passes. Both responsive projects and reduced-motion journeys pass with zero external requests or feedback mutations. The gallery loads the exact v1.56.3 pinned runtime, whose byte length and SHA-256 match provenance, and its manifest-derived selectors/config tests cover all released fields, screens, condition branches, transitions, and supported styling values without Variant-only or unreleased claims. T006 should now resolve done and T007 should activate."
+      evidence:
+        - "Fresh focused Vitest: 14 tests passed across the gallery/config and canonical capability suites."
+        - "Fresh focused ESLint, production build, and git diff --check all passed."
+        - "Fresh Playwright with retries=0: all 4 desktop/mobile normal and reduced-motion tests passed, including Escape, flow removal, and unchanged launcher toBeFocused assertion."
+        - "src/components/docs/flow-capability-examples.tsx arms restoration only when outcome.status === closed and focuses from an effect after active becomes false."
+        - "The browser ledger asserted zero external requests and zero feedback mutations on both normal and reduced-motion journeys; the script source remained the local pinned vendor path."
+        - "Vendored widget is exactly 238591 bytes with SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e, matching v1.56.3 provenance at commit 47a392d1e7b1a8d8adeff1692f6bbbd84696280d."
+        - "Manifest-derived gallery tests prove all six field types, all three screen types, answer/context/all/any conditions, all six transition choices, released appearance/presentation values, and absence of Variant-only or unreleased exclusions."
+        - "Responsive CSS collapses recipe/preset grids and launch layout below 760px, removes local hover/loader motion under reduced motion, and both browser projects prove no horizontal overflow."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "T007 is the next sequential hardening milestone and owns already-dirty CI/browser contract files; it should be the sole writer after T006 is closed."
+      blocked_tasks: []
+      missing_evidence: []
+      required_board_updates:
+        - task_id: T016
+          status: done
+          decision: approved
+        - task_id: T006
+          status: done
+          note: "The T015 focus correction and fresh T016 audit resolve the prior browser blocker; retain the original gallery implementation plus correction receipts."
+        - task_id: T007
+          status: active
+          note: "Activate CI and browser drift hardening now that the complete gallery milestone is approved."
+  - id: T017
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Diagnose the mobile scrollable-region accessibility failures and choose the smallest safe source correction without weakening axe or CI coverage."
+    inputs:
+      - "T007 blocked receipt"
+      - "Current complete docs and CI diff"
+      - "Mobile axe violation evidence"
+    constraints:
+      - "Read-only."
+      - "Preserve the axe rule and mobile browser coverage."
+      - "Do not broaden into general docs redesign or change SDK/runtime behavior."
+    expected_output:
+      - "approved correction package | external blocker"
+      - "Exact affected sources and accessible behavior"
+      - "Exact T018 allowed_files, verification, and stop conditions"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The failures are deterministic source accessibility defects, not an external blocker. On mobile, the custom reference-table overflow host and four MDX code blocks become horizontally scrollable without entering keyboard focus order. Preserve the existing axe rule and mobile coverage; add tabIndex={0} only to those two overflow-host renderers. This gives keyboard users sequential focus and native arrow-key scrolling while retaining table, caption, and preformatted-code semantics. No SDK/runtime, content, CI, or test weakening is needed. T018 is a bounded two-file correction followed by the complete T007 verification."
+      evidence:
+        - "Fresh mobile Playwright reproduced three failures with axe-core 4.11.2; every violation was scrollable-region-focusable."
+        - "The flow-reference failure targets .mb-6.overflow-x-auto:nth-child(24), rendered by ReferenceTable in src/components/docs/flow-capability-reference.tsx."
+        - "The normal and reduced-motion custom-flow failures target pre:nth-child(12), pre:nth-child(17), pre:nth-child(21), and pre:nth-child(25), rendered by src/mdx-components.tsx."
+        - "ReferenceTable’s outer div has overflow-x-auto but no keyboard focus mechanism; its child table already retains a screen-reader caption."
+        - "The MDX pre renderer has overflow-x-auto but no keyboard focus mechanism; adding focus to the pre preserves native preformatted-code semantics."
+        - "The current e2e helper runs unmodified WCAG A/AA axe rules and the CI job runs both desktop-chromium and mobile-chromium, so the existing assertions are sufficient regression proof."
+        - "Fresh focused mobile execution failed only on these scroll hosts; no external requests, production access, SDK behavior, or broader redesign is implicated."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "T018 should be the sole writer because it touches shared documentation renderers while resolving the active T007 gate; downstream review must wait for complete verification."
+      blocked_tasks:
+        - "T007 until T018 applies and verifies the correction"
+        - "T008 until T007 completes"
+        - "T999 until all downstream review tasks complete"
+      missing_evidence: []
+      required_board_updates:
+        - task_id: T017
+          status: done
+          decision: approved
+        - task_id: T018
+          status: active
+          objective: "Make only the currently failing mobile horizontal scroll hosts keyboard-focusable, preserving native table/code semantics and all existing axe/mobile CI assertions, then complete T007 verification."
+          allowed_files: "src/components/docs/flow-capability-reference.tsx,src/mdx-components.tsx"
+  - id: T018
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Apply only the independently approved mobile scroll-region accessibility correction and complete T007 verification."
+    allowed_files:
+      - "src/components/docs/flow-capability-reference.tsx"
+      - "src/mdx-components.tsx"
+    verify:
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=mobile-chromium --retries=0"
+      - "npm test"
+      - "npm run lint"
+      - "npm run build"
+      - "npx playwright test e2e/homepage-flow-demo.spec.ts e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "npm test -- --run test/flow-capabilities.test.ts -t \"rejects a missing-capability mutation|rejects an extra-capability mutation|rejects a provenance-drift mutation|rejects a banned-capability mutation\""
+      - "git diff --check"
+    stop_if:
+      - "The correction requires changing, disabling, excluding, or weakening the axe rule, mobile project, or CI browser job."
+      - "Any change beyond adding keyboard focusability to ReferenceTable’s overflow wrapper and the MDX pre overflow host is required."
+      - "The corrected scroll hosts lose native table, caption, or preformatted-code semantics, or suppress visible keyboard focus."
+      - "Any current mobile scrollable-region-focusable violation remains after the two source corrections."
+      - "SDK/runtime behavior, public content, or a file outside the two-file allowlist must change."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/docs/flow-capability-reference.tsx
+        - src/mdx-components.tsx
+      commands:
+        - cmd: "npx playwright test e2e/flow-capability-docs.spec.ts --project=mobile-chromium --retries=0"
+          status: pass
+          evidence: "Mobile-first docs browser proof passed 3/3."
+        - cmd: "npm test"
+          status: pass
+          evidence: "196/196 tests passed."
+        - cmd: "npm run lint"
+          status: pass
+          evidence: "0 errors; 862 pre-existing vendored-runtime warnings."
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "npx playwright test e2e/homepage-flow-demo.spec.ts e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+          status: pass
+          evidence: "All 7 applicable tests passed with 39 intentional project skips."
+        - cmd: "npm test -- --run test/flow-capabilities.test.ts -t \"rejects a missing-capability mutation|rejects an extra-capability mutation|rejects a provenance-drift mutation|rejects a banned-capability mutation\""
+          status: pass
+          evidence: "All four named mutation cases passed."
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Added tabIndex={0} only to ReferenceTable’s overflow wrapper and the MDX pre overflow host, retaining native table, caption, and preformatted-code semantics with default visible focus. Mobile-first docs browser proof passed 3/3. Full tests passed 196/196; lint passed with 862 pre-existing vendored-runtime warnings; build passed; combined desktop/mobile browser proof passed all 7 applicable tests with 39 intentional skips; all four named mutations passed; diff check passed."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T019
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Freshly verify the corrected CI and accessibility hardening, resolve T007 only if all drift, desktop/mobile, axe, exact-runtime, and no-mutation contracts hold."
+    inputs:
+      - "T007, T017, and T018 receipts"
+      - "Complete current CI/docs/browser diff"
+      - "Fresh full and browser verification"
+    constraints:
+      - "Read-only."
+      - "Require existing homepage CI changes preserved."
+      - "Do not weaken axe, mobile, mutation, runtime identity, or no-mutation proof."
+    expected_output:
+      - "approved | correction_required"
+      - "Fresh CI/accessibility evidence"
+      - "Exact follow-up package when rejected"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Fresh verification approves the corrected CI/accessibility milestone. Existing homepage CI remains intact with its exact v1.56.3 runtime, while a separate desktop/mobile docs job enforces the new surface. Full unit, lint, build, combined browser, and enabled homepage suites pass. Axe runs unchanged on both viewports; the two corrected overflow hosts retain native semantics and keyboard focusability. Browser proof validates the pinned runtime bytes and SHA, responsive and reduced-motion behavior, canonical manifest rendering, and zero external or feedback mutations. All four required adversarial drift mutations pass. Resolve T007 done and activate T008."
+      evidence:
+        - "npm test: 23 files and 196 tests passed, including manifest/docs contracts."
+        - "npm run lint: 0 errors; only 862 known vendored-runtime warnings."
+        - "npm run build: passed and generated Custom Flows and Flow Reference routes."
+        - "Combined desktop/mobile Playwright: all 7 applicable docs tests passed; unchanged axe, responsive, reduced-motion, focus, runtime-identity, and no-mutation assertions held."
+        - "Enabled homepage CI-equivalent Playwright command exited successfully across 40 desktop/mobile tests using the exact v1.56.3 runtime path."
+        - "Missing-capability, extra-capability, provenance-drift, and banned-capability mutation cases all passed."
+        - "Vendored widget is 238591 bytes with SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e, exactly matching provenance."
+        - "CI diff preserves the homepage-feedback-experiences job and adds an isolated flow-capability-documentation job for both browser projects."
+        - "ReferenceTable wrapper and MDX pre host add only tabIndex=0; table captions and native preformatted-code semantics remain present."
+        - "git diff --check passed."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "Repository-required PR review must inspect the complete cumulative diff before any correction or final audit proceeds."
+      blocked_tasks:
+        - "T009 until T008 validates actionable findings"
+        - "T010 until review and any accepted corrections complete"
+        - "T999 until all downstream review tasks complete"
+      missing_evidence: []
+      required_board_updates:
+        - task_id: T019
+          status: done
+          decision: approved
+        - task_id: T007
+          status: done
+          note: "T018 corrected the two mobile overflow hosts; fresh T019 verification proves CI, axe/mobile, exact runtime, no-mutation, manifest/docs drift, homepage preservation, and all named mutations."
+        - task_id: T008
+          status: active
+          note: "Activate repository-required PR Review Toolkit review against the complete cumulative diff."
+  - id: T020
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Diagnose T009's remaining React effect lint failure and define the smallest safe correction that preserves the validated runtime-ownership behavior."
+    inputs:
+      - "T008 review receipt"
+      - "T009 blocked receipt and current allowed-file diff"
+    constraints:
+      - "Read-only."
+      - "Do not weaken docs-to-home/home-to-docs runtime ownership or test coverage."
+      - "Do not expand into SDK, manifest, authenticated fixtures, release, or deployment changes."
+    expected_output:
+      - "approved correction package or a concrete stop reason"
+      - "Exact allowed files, verification, and stop conditions"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "T009 runtime ownership is sound. The sole lint failure is synchronous runtimeReady state setters inside the ownership effect. Defer readiness through an effect-local cancellable microtask, preserving borrow/suspend/restore/teardown behavior."
+      evidence:
+        - source: "Exact lint"
+          proves: "Only react-hooks/set-state-in-effect at line 154 remains."
+        - source: "No-write transformed ESLint proof"
+          proves: "Cancellable microtask passes lint."
+        - source: "Existing E2E"
+          proves: "Both borrowing and foreign-runtime suspension/restoration are covered."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "One source-only correction plus serial gates."
+      blocked_tasks:
+        - "T010 until T021 completes"
+        - "T999 until corrected-head review"
+      missing_evidence:
+        - "T021 verification"
+      required_board_updates:
+        - task_id: T020
+          status: done
+          decision: approved
+        - task_id: T021
+          status: active
+  - id: T021
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Apply only the bounded T020 correction and complete every remaining T009 verification gate."
+    allowed_files:
+      - "src/components/docs/flow-capability-examples.tsx"
+    verify:
+      - "npm test -- --run test/flow-capabilities.test.ts test/flow-capability-docs-contract.test.ts test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-docs-content.test.ts test/homepage-demo-runtime.test.ts"
+      - "npm run lint -- src/components/docs/flow-capability-example-configs.ts src/components/docs/flow-capability-examples.tsx src/components/docs/flow-capability-reference.tsx test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-capability-docs-contract.test.ts test/flow-docs-content.test.ts e2e/flow-capability-docs.spec.ts e2e/homepage-flow-demo.spec.ts"
+      - "npm run build"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "The correction requires a file outside src/components/docs/flow-capability-examples.tsx."
+      - "The deferred callback is not cancelled by effect-local cleanup, allowing stale Strict Mode or post-unmount state updates."
+      - "Borrowed homepage runtime cleanup would delete or replace its script, API, or host, or foreign-runtime restoration would change."
+      - "Any existing runtime-ownership, navigation, accessibility, reduced-motion, exact-runtime, external-request, or feedback-mutation assertion must be weakened."
+      - "The correction requires SDK, manifest, authenticated fixture, release, deployment, or production changes."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/docs/flow-capability-examples.tsx
+      commands:
+        - cmd: "focused tests"
+          status: pass
+          evidence: 42/42
+        - cmd: "exact lint"
+          status: pass
+        - cmd: build
+          status: pass
+        - cmd: "docs Playwright desktop/mobile"
+          status: pass
+          evidence: "7 passed, 1 expected skip after T023 resolution"
+        - cmd: "enabled homepage Playwright desktop/mobile"
+          status: pass
+          evidence: "18 passed, 24 expected skips after T023 resolution"
+        - cmd: "git diff --check"
+          status: pass
+      summary: "T023 resolved the Strict Mode duplicate-host race while preserving T021's cancellable readiness correction; every remaining gate passes."
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+      resolution: "T022 diagnosed whole-transaction Strict Mode replay; T023 applied and verified the exact bounded correction."
+  - id: T022
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Diagnose the duplicate BugDrop host found by T021 during Classic-home to docs client navigation and define the smallest ownership-safe correction."
+    inputs:
+      - "T008-T021 receipts"
+      - "Current runtime ownership implementation and browser failure"
+    constraints:
+      - "Read-only."
+      - "Preserve exact pinned runtime, Classic behavior, no-mutation guarantees, and shared dirty work."
+    expected_output:
+      - "Root cause and exact bounded correction package"
+      - "Browser proof requirements for both homepage modes and return navigation"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Strict Mode replays the effect; removing the first in-flight script does not cancel execution, so both loads create hosts. Defer the entire ownership transaction through a cancellable microtask."
+      evidence:
+        - source: "Instrumented DOM trace"
+          proves: "Two pinned loads append two hosts after replay."
+        - source: "Direct docs inspection"
+          proves: "Defect also occurs without Classic."
+        - source: "Existing browser contracts"
+          proves: "Both homepage modes and return navigation are covered."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "Single owner plus overlapping tests."
+      blocked_tasks:
+        - "T010 until T023 completes"
+        - "T999 until T010"
+      missing_evidence:
+        - "Post-correction single-host proof and all gates"
+      required_board_updates:
+        - task_id: T022
+          status: done
+          decision: approved
+        - task_id: T023
+          status: active
+  - id: T023
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Apply only the T022-approved duplicate-host correction and complete all remaining correction gates."
+    allowed_files:
+      - "src/components/docs/flow-capability-examples.tsx"
+      - "test/flow-capability-examples.test.tsx"
+      - "e2e/flow-capability-docs.spec.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+    verify:
+      - "npm test -- --run test/flow-capabilities.test.ts test/flow-capability-docs-contract.test.ts test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-docs-content.test.ts test/homepage-demo-runtime.test.ts"
+      - "npm run lint -- src/components/docs/flow-capability-example-configs.ts src/components/docs/flow-capability-examples.tsx src/components/docs/flow-capability-reference.tsx test/flow-capability-example-configs.test.ts test/flow-capability-examples.test.tsx test/flow-capability-docs-contract.test.ts test/flow-docs-content.test.ts e2e/flow-capability-docs.spec.ts e2e/homepage-flow-demo.spec.ts"
+      - "npm run build"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "The complete ownership transaction cannot be placed behind one effect-local cancellation guard, or a cancelled Strict Mode probe can still suspend, append, restore, or update state."
+      - "Direct docs or either homepage mode can produce more than one docs script, BugDrop API owner, or #bugdrop-host, or return navigation leaves any docs artifact."
+      - "Borrowed pinned homepage runtime cleanup would remove or replace its script, API, or host, or suspended Classic restoration would change object identity or execute its saved script again."
+      - "Any exact-runtime, Classic, return-navigation, accessibility, reduced-motion, external-request, feedback-mutation, axe, or focus assertion must be weakened."
+      - "The correction requires SDK/runtime bytes, authenticated fixtures, manifest changes, production mutation, or a file outside the allowlist."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/docs/flow-capability-examples.tsx
+        - test/flow-capability-examples.test.tsx
+        - e2e/flow-capability-docs.spec.ts
+        - e2e/homepage-flow-demo.spec.ts
+      commands:
+        - cmd: "focused tests"
+          status: pass
+          evidence: "42 tests"
+        - cmd: "exact lint"
+          status: pass
+        - cmd: build
+          status: pass
+        - cmd: "docs Playwright desktop/mobile"
+          status: pass
+          evidence: "7 passed, 1 expected skip"
+        - cmd: "enabled homepage Playwright desktop/mobile"
+          status: pass
+          evidence: "18 passed, 24 expected skips"
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Deferred the complete docs runtime ownership transaction behind one cancellable microtask and added exact script/API/host identity proof. All gates passed first attempt."
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T024
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Close the delayed docs-runtime ownership escape and make every changed documentation table pass the existing mobile axe oracle, without weakening exact identity, navigation, accessibility, or no-mutation contracts."
+    allowed_files:
+      - "src/components/docs/flow-capability-examples.tsx"
+      - "src/mdx-components.tsx"
+      - "test/flow-capability-examples.test.tsx"
+      - "test/flow-capability-docs-contract.test.ts"
+      - "e2e/flow-capability-docs.spec.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+    verify:
+      - "Add exact delayed-response regressions for direct docs to Classic-only home and direct docs to enabled home; after releasing the response, assert one correct script/API/host owner, no docs artifacts, and correct homepage launcher behavior."
+      - "Add unchanged axe WCAG A/AA coverage for /docs/javascript-api and /docs/styling at desktop and mobile."
+      - "npm test"
+      - "npm run lint"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+      - "git diff --check"
+    stop_if:
+      - "A cancelled docs transaction can still execute without being deterministically reclaimed, or cleanup can delete/replace the current homepage owner."
+      - "The correction requires changing SDK/runtime bytes, canonical capability data, authenticated fixtures, local API routes, release state, deployment, or production."
+      - "Any existing exact script/API/host, axe, mobile, focus, reduced-motion, external-request, or feedback-mutation assertion must be weakened, skipped, or excluded."
+      - "A file outside the allowlist is required."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/docs/flow-capability-examples.tsx
+        - src/mdx-components.tsx
+        - test/flow-capability-examples.test.tsx
+        - test/flow-capability-docs-contract.test.ts
+        - e2e/flow-capability-docs.spec.ts
+        - e2e/homepage-flow-demo.spec.ts
+      commands:
+        - cmd: "npm test"
+          status: pass
+          evidence: "199 tests"
+        - cmd: "npm run lint"
+          status: pass
+          evidence: "0 errors; 862 authenticated vendored warnings"
+        - cmd: "enabled build"
+          status: pass
+        - cmd: "docs Playwright desktop/mobile"
+          status: pass
+          evidence: "13 passed, 1 expected skip after one bounded sequencing correction"
+        - cmd: "enabled homepage Playwright desktop/mobile"
+          status: pass
+          evidence: "20 passed, 24 expected skips"
+        - cmd: "runtime byte/hash"
+          status: pass
+          evidence: "238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e"
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Late detached docs execution is reclaimed while preserving the homepage owner; MDX table wrappers are keyboard-focusable; delayed response and axe regressions pass."
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T025
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Rerun the complete corrected-head PR Review Toolkit and desktop/mobile documentation oracle after T024."
+    inputs:
+      - "All receipts through T024"
+      - "Complete current tracked and intended untracked worktree"
+    constraints:
+      - "Read-only."
+      - "Require delayed-response ownership, mobile axe, exact-runtime, and no-mutation proof."
+    expected_output:
+      - "approved | correction_required"
+      - "Fresh final review and browser evidence"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "One mixed-runtime ownership defect validated at 0.98: docs trusts a global overwritten by the older lab although the exact homepage script remains."
+      evidence:
+        - finding: correctness-001
+          confidence: 0.98
+          location: "src/components/docs/flow-capability-examples.tsx:178-181"
+        - verification: "199 tests, lint/build, docs/homepage browser gates, exact runtime, and 108 cross-product launches otherwise pass"
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "One identity predicate plus regression."
+      blocked_tasks:
+        - "T999 until T026/T027"
+      missing_evidence:
+        - "Mixed-runtime correction and terminal review"
+      required_board_updates:
+        - task_id: T025
+          status: done
+          decision: not_complete
+        - task_id: T026
+          status: active
+        - task_id: T027
+          status: queued
+  - id: T026
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Correct mixed-runtime ownership so docs borrows the homepage runtime only when window.BugDrop is the exact API bound to the exact homepage script; otherwise isolate the foreign lab API while preserving and restoring the exact homepage script/API/host."
+    allowed_files:
+      - "src/components/docs/flow-capability-examples.tsx"
+      - "test/flow-capability-examples.test.tsx"
+      - "e2e/homepage-flow-demo.spec.ts"
+    verify:
+      - "npm test"
+      - "npm run lint -- src/components/docs/flow-capability-examples.tsx test/flow-capability-examples.test.tsx e2e/homepage-flow-demo.spec.ts"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+      - "git diff --check"
+    stop_if:
+      - "The correction requires changing either vendored runtime, SDK behavior, the lab implementation, homepage runtime implementation, or any file outside the allowlist."
+      - "Docs can still announce v1.56.3 readiness while window.BugDrop differs from the homepage script's symbol-bound API."
+      - "The homepage-to-lab-to-docs-to-home regression leaves multiple scripts or hosts, loses exact identity, cannot launch the gallery, or permits an external request or feedback mutation."
+      - "Verification fails twice after bounded correction."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/docs/flow-capability-examples.tsx
+        - test/flow-capability-examples.test.tsx
+        - e2e/homepage-flow-demo.spec.ts
+      commands:
+        - cmd: "npm test"
+          status: pass
+          evidence: "199 tests after bounded correction"
+        - cmd: "scoped lint"
+          status: pass
+        - cmd: "enabled build"
+          status: pass
+        - cmd: "T028 final exact gates"
+          status: pass
+          evidence: "199 tests; lint; build; docs 13 passed/1 skip; homepage 22 passed/24 skips; exact runtime identity; diff check"
+      summary: "The initial bounded package stopped at its correction cap; T027 diagnosed and T028 completed exact borrowing plus Classic suspension with every original gate passing."
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T027
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Diagnose T026's Classic-script suspension regression while preserving exact symbol-bound homepage borrowing and foreign-lab isolation; define the smallest safe correction."
+    inputs:
+      - "T025 and T026 receipts"
+      - "Current ownership implementation and failing Classic-only browser contract"
+    constraints:
+      - "Read-only."
+      - "Preserve exact borrowing only for the symbol-bound homepage API."
+      - "Preserve suspension/restoration for non-borrowable Classic and foreign runtimes."
+    expected_output:
+      - "Exact root cause and bounded correction package"
+      - "Verification and stop conditions"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "T026 conflated borrowability with suspendability. Keep exact symbol identity as the borrow gate, but separately capture and suspend the Classic owner or prefer the symbol-bound homepage owner over a foreign lab global."
+      evidence:
+        - source: "Current ownership code"
+          proves: "null borrow owner also became null suspension owner"
+        - source: "Classic browser contract"
+          proves: "script must be removed/restored with same identities"
+        - source: "Mixed enabled contract"
+          proves: "symbol-bound homepage owner must win over lab global"
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "One ownership transaction."
+      blocked_tasks:
+        - "T999 until T028/T029"
+      missing_evidence:
+        - "Corrected gates and terminal review"
+      required_board_updates:
+        - task_id: T027
+          status: done
+          decision: approved
+        - task_id: T028
+          status: active
+        - task_id: T029
+          status: queued
+  - id: T028
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Separate homepage runtime borrowability from suspendability while preserving Classic, mixed-runtime, and delayed-reclamation ownership contracts."
+    allowed_files:
+      - "src/components/docs/flow-capability-examples.tsx"
+      - "test/flow-capability-examples.test.tsx"
+      - "e2e/homepage-flow-demo.spec.ts"
+    verify:
+      - "npm test"
+      - "npm run lint -- src/components/docs/flow-capability-examples.tsx test/flow-capability-examples.test.tsx e2e/homepage-flow-demo.spec.ts"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+      - "git diff --check"
+    stop_if:
+      - "Borrowing occurs without exact symbol-bound API identity."
+      - "Classic suspension/restoration or mixed symbol-bound homepage ownership fails."
+      - "Delayed reclamation, accessibility, exact runtime, or no-mutation proof is weakened."
+      - "A file outside the allowlist or SDK/runtime/lab/homepage implementation change is required."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/docs/flow-capability-examples.tsx
+        - test/flow-capability-examples.test.tsx
+      commands:
+        - cmd: "npm test"
+          status: pass
+          evidence: 199/199
+        - cmd: "scoped lint"
+          status: pass
+        - cmd: "enabled build"
+          status: pass
+          evidence: "56 pages"
+        - cmd: "docs Playwright"
+          status: pass
+          evidence: "13 passed, 1 expected skip"
+        - cmd: "enabled homepage Playwright"
+          status: pass
+          evidence: "22 passed, 24 intended skips"
+        - cmd: "runtime identity"
+          status: pass
+          evidence: "238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e"
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Separated exact borrowing from Classic/mixed owner suspension; all gates pass."
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T029
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run terminal corrected-head PR Review Toolkit and full browser oracle after T028."
+    inputs:
+      - "All receipts through T028"
+      - "Complete current tracked and intended untracked diff"
+    constraints:
+      - "Read-only."
+      - "Require ordinary, delayed, mixed-runtime, axe, cross-product, exact-runtime, and no-mutation proof."
+    expected_output:
+      - "approved | correction_required"
+      - "Terminal review evidence"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "Borrowed homepage runtime retains registered IDs but docs cleanup discarded its handle cache; revisit same selection fails duplicate registration."
+      evidence:
+        - finding: repeat-borrow-001
+          confidence: 0.99
+          location: "src/components/docs/flow-capability-examples.tsx:196"
+        - verification: "199 tests and all ordinary browser/runtime/no-mutation gates otherwise pass"
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "One API-identity cache lifecycle."
+      blocked_tasks:
+        - "T999 until T030/T031"
+      missing_evidence:
+        - "Repeat-borrow correction and final review"
+      required_board_updates:
+        - task_id: T029
+          status: done
+          decision: not_complete
+        - task_id: T030
+          status: active
+        - task_id: T031
+          status: queued
+  - id: T030
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Make gallery handle reuse follow exact BugDrop API identity so borrowed-runtime registrations survive docs unmount/remount without weakening other ownership modes."
+    allowed_files:
+      - "src/components/docs/flow-capability-examples.tsx"
+      - "test/flow-capability-examples.test.tsx"
+      - "e2e/homepage-flow-demo.spec.ts"
+    verify:
+      - "npm test"
+      - "npm run lint -- src/components/docs/flow-capability-examples.tsx test/flow-capability-examples.test.tsx e2e/homepage-flow-demo.spec.ts"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "Run complete 3x6x3 gallery launch matrix desktop/mobile"
+      - "Verify pinned runtime byte length and SHA-256"
+      - "git diff --check"
+    stop_if:
+      - "The fix requires SDK/runtime/homepage/lab changes or files outside the allowlist."
+      - "Handles can be reused across different API identities or a replaced runtime."
+      - "Same-selection relaunch still throws or any ownership/accessibility/reduced-motion/exact-runtime/no-mutation gate regresses."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/docs/flow-capability-examples.tsx
+        - test/flow-capability-examples.test.tsx
+        - e2e/homepage-flow-demo.spec.ts
+      commands:
+        - cmd: "npm test"
+          status: pass
+          evidence: 199/199
+        - cmd: "scoped lint"
+          status: pass
+        - cmd: "enabled build"
+          status: pass
+          evidence: "56 pages"
+        - cmd: "docs Playwright"
+          status: pass
+          evidence: "13 passed, 1 intended skip"
+        - cmd: "enabled homepage Playwright"
+          status: pass
+          evidence: "22 passed, 24 intended skips; revisit passed"
+        - cmd: "3x6x3 matrix desktop/mobile"
+          status: pass
+          evidence: "108/108, no external requests/mutations/errors after bounded harness correction"
+        - cmd: "runtime identity"
+          status: pass
+          evidence: "238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e"
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Handle caches now follow exact API identity; borrowed registrations survive remount and replaced APIs cannot share handles. All gates pass."
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T031
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run the final corrected-head Toolkit and full oracle after T030, including repeat-borrow and the complete gallery cross-product."
+    inputs:
+      - "All receipts through T030"
+      - "Complete current diff"
+    constraints:
+      - "Read-only."
+      - "Require no surviving validated findings."
+    expected_output:
+      - "approved | correction_required"
+      - "Final review evidence"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "Runtime ownership/cache review closed cleanly, but private-result harness and public-type terminology require correction."
+      evidence:
+        - finding: "local harness public/private mismatch"
+          location: "e2e/homepage-flow-demo.spec.ts:63-70"
+        - finding: "unexported helpers labeled public types"
+          location: "src/components/docs/flow-capability-reference.tsx:111"
+        - verification: "199 tests, lint/build, 13 docs, 22 homepage, 108 matrix and runtime identity all pass"
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "One truthfulness correction package."
+      blocked_tasks:
+        - "T999 until T032/T033"
+      missing_evidence:
+        - "Corrected truthfulness and closure review"
+      required_board_updates:
+        - task_id: T031
+          status: done
+          decision: not_complete
+        - task_id: T032
+          status: active
+        - task_id: T033
+          status: queued
+  - id: T032
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Correct the local private-result test harness and distinguish exported public types from unexported structural helpers in Flow Reference."
+    allowed_files:
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "src/components/docs/flow-capability-reference.tsx"
+      - "src/content/docs/flow-reference.mdx"
+      - "e2e/flow-capability-docs.spec.ts"
+    verify:
+      - "npm test"
+      - "npm run lint -- e2e/homepage-flow-demo.spec.ts src/components/docs/flow-capability-reference.tsx e2e/flow-capability-docs.spec.ts"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "Verify pinned runtime bytes and SHA-256"
+      - "git diff --check"
+    stop_if:
+      - "Production runtime, SDK, local route, manifest, or files outside allowlist are required."
+      - "Principal local Flow journeys still model public results or show a GitHub link/public Issue claim."
+      - "Explicit public-runtime proof loses truthful public behavior."
+      - "Reference still implies BaseScreen/BaseField are exported or omits their structural contract."
+      - "Any ownership/accessibility/reduced-motion/exact-runtime/default-flow/no-mutation gate regresses."
+      - "Verification fails twice after bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - e2e/homepage-flow-demo.spec.ts
+        - src/components/docs/flow-capability-reference.tsx
+        - src/content/docs/flow-reference.mdx
+        - e2e/flow-capability-docs.spec.ts
+      commands:
+        - cmd: "npm test"
+          status: pass
+          evidence: "199 tests after two static contract corrections"
+        - cmd: "scoped lint"
+          status: pass
+        - cmd: "enabled build"
+          status: pass
+        - cmd: "T034 corrected docs Playwright"
+          status: pass
+          evidence: "13 passed, 1 intentional skip on desktop/mobile"
+        - cmd: "T034 enabled homepage Playwright"
+          status: pass
+          evidence: "23 passed, 25 intentional skips; private and explicit-public result paths pass"
+        - cmd: "T034 runtime identity and diff check"
+          status: pass
+          evidence: "238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e; diff clean"
+      summary: "Truthfulness fixes are complete. T033 isolated the remaining failure to an over-scoped locator, and T034 corrected it without weakening assertions; every remaining gate passes."
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T033
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Diagnose T032's over-scoped Flow Reference browser locator and define the smallest test-only correction before closure review."
+    inputs:
+      - "T031 and T032 receipts"
+      - "Current Flow Reference markup and failing locator"
+    constraints:
+      - "Read-only."
+      - "Read-only."
+      - "Do not weaken the unexported structural helper assertion."
+    expected_output:
+      - "Exact test-only correction package"
+      - "Remaining verification gates"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Markup is correct; Playwright has locators are incorrectly pre-scoped through the table and search for nested tables under each row."
+      evidence:
+        - source: "Browser error context"
+          proves: "Exact rows and labels exist"
+        - source: "E2E locators"
+          proves: "Three row filters share over-scoped pattern"
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "One test-only correction."
+      blocked_tasks:
+        - "T999 until T034/T035"
+      missing_evidence:
+        - "Corrected browser gates and closure review"
+      required_board_updates:
+        - task_id: T033
+          status: done
+          decision: approved
+        - task_id: T034
+          status: active
+        - task_id: T035
+          status: queued
+  - id: T034
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Correct only the three over-scoped canonical-public-type row locators and complete T032's remaining gates."
+    allowed_files:
+      - "e2e/flow-capability-docs.spec.ts"
+    verify:
+      - "npm run lint -- e2e/flow-capability-docs.spec.ts"
+      - "npx playwright test e2e/flow-capability-docs.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "Verify pinned runtime length/SHA-256"
+      - "git diff --check"
+    stop_if:
+      - "Any production/MDX/manifest/runtime or second test file must change."
+      - "Exact rowheader or declaration-kind assertions are weakened."
+      - "Any browser/runtime/no-mutation gate regresses."
+      - "Verification fails twice."
+    receipt:
+      result: done
+      changed_files:
+        - e2e/flow-capability-docs.spec.ts
+      commands:
+        - cmd: "npm run lint -- e2e/flow-capability-docs.spec.ts"
+          status: pass
+        - cmd: "docs Playwright desktop/mobile"
+          status: pass
+          evidence: "13 passed, 1 intentional reduced-motion project skip"
+        - cmd: "enabled homepage Playwright desktop/mobile"
+          status: pass
+          evidence: "23 passed, 25 intentional project skips"
+        - cmd: "runtime identity"
+          status: pass
+          evidence: "238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e"
+        - cmd: "git diff --check"
+          status: pass
+      summary: "The three Flow Reference assertions now locate exact top-level rowheaders while preserving exported-versus-structural-helper checks. All remaining T032 browser/runtime gates pass."
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T035
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run the corrected-head Toolkit closure after T034 and approve only with no surviving validated finding."
+    inputs:
+      - "All receipts through T034"
+      - "Complete current diff"
+    constraints:
+      - "Read-only."
+      - "Use prior exhaustive evidence where unchanged and rerun affected truthfulness/browser gates."
+    expected_output:
+      - "approved | correction_required"
+      - "Terminal closure evidence"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The corrected launcher keeps mobile chooser concealment through loading and active disabled states while retaining ordinary desktop disabled opacity. The delayed-runtime regression directly proves the previously failing interval. Complete-diff review found no surviving validated finding, including T032/T034 result truthfulness and Flow Reference labels."
+      evidence:
+        - "src/components/landing/homepage-demo-launcher.tsx keeps chooser concealment independent of disabled state and applies disabled opacity only when unconcealed."
+        - "The delayed exact-runtime mobile regression proves disabled, hidden, transparent, pointer-inert loading behavior and successful flow open after release."
+        - "199/199 tests; lint; enabled build with 56 pages; homepage desktop/mobile 24 passed with 26 intentional skips; docs 13 passed with 1 intentional skip."
+        - "Pinned runtime remains 238591 bytes with SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e; git diff --check passed."
+        - "Complete tracked plus intended-untracked worktree reviewed against merge-base 77b2b4ac0b1b17834e266dd6f69be36ff28a7b4c."
+      subgoal_contract: null
+      parallel_safety: null
+      blocked_tasks: []
+      missing_evidence: []
+      required_board_updates:
+        - "Record T035 done with decision approved."
+        - "Activate T999 final audit."
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit every receipt and current artifact against the original owner outcome and decide whether the full documentation tranche is complete."
+    inputs:
+      - "All done task receipts"
+      - "Canonical capability parity result"
+      - "Final test/build/browser/review evidence"
+      - "Current complete intended diff"
+    constraints:
+      - "Read-only."
+      - "Reject completion if any required Worker task is queued, active, or unresolved."
+      - "Reject completion if the default flow is displaced, any released capability is missing, any lab-only capability is advertised, or drift checks are weak."
+      - "Do not authorize push, PR, merge, release, deployment, or public enablement."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "Oracle-to-evidence mapping"
+      - "Missing evidence and exact next task when incomplete"
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      rationale: "The complete tranche satisfies the oracle. Authenticated v1.56.3 declarations and runtime sources drive one parity-checked manifest; public docs expose the released component, branching, lifecycle, motion, appearance, and styling contract while preserving default feedback as the primary path. Exact-runtime examples cover all fields/screens, six transitions, three styling presets, reduced motion, accessibility, responsive behavior, runtime ownership, and local-only outcomes. Fresh tests, lint, enabled build, desktop/mobile browser suites, runtime hash, diff check, and T035 Toolkit closure pass. Every non-final task is done; no Worker remains queued, active, blocked, or unresolved."
+      evidence:
+        - "Canonical parity rejects missing, extra, requiredness, value-type, literal, runtime, provenance, source-tamper, and banned-capability drift against authenticated v1.56.3 snapshots."
+        - "Custom Flows and Flow Reference are navigable after Configuration; JavaScript API and Styling cover registerFlow, lifecycle, transitions, appearance, presentation, and Shadow DOM boundaries."
+        - "Default feedback remains primary and the public showcase remains default-off."
+        - "Three curated recipes cover all six fields, all three screens, branching, issue/evidence mapping, and lifecycle; selectors derive all six transition kinds and three styling presets from the manifest."
+        - "Fresh verification: 199/199 tests; lint with zero errors; enabled build with 56 pages; docs desktop/mobile 13 passed and 1 intentional skip; homepage desktop/mobile 24 passed and 26 intentional skips."
+        - "Browser proof includes WCAG A/AA, keyboard/focus, mobile responsiveness, reduced-motion replacement, runtime ownership, and no external requests or feedback mutations."
+        - "Exact runtime is 238591 bytes with SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+        - "T035 approved the complete tracked plus intended-untracked diff against merge-base 77b2b4ac0b1b17834e266dd6f69be36ff28a7b4c with no surviving validated finding; git diff --check passes."
+      subgoal_contract: null
+      parallel_safety: null
+      blocked_tasks: []
+      missing_evidence: []
+      required_board_updates:
+        - "Record T999 done with decision complete."
+        - "Set goal.status to done and active_task to null."
+        - "Run final state and stop checks."
+checks:
+  dirty_fingerprint: "Existing homepage v1.56.3 dogfood/showcase worktree is intentionally dirty; T001 must record an exact scoped baseline before any implementation."
+  last_verification:
+    result: unknown
+    task: null
+    commands: []

@@ -15,7 +15,7 @@ export function DocsSidebar() {
             <li key={doc.slug}>
               <Link
                 href={href}
-                className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
+                className={`block rounded-lg py-2 text-sm transition-colors ${doc.parent ? "ml-3 border-l border-border pl-4 pr-3" : "px-3"} ${
                   isActive
                     ? "bg-bg-surface text-accent-warm font-medium"
                     : "text-text-subtle hover:text-text-primary hover:bg-bg-surface/50"

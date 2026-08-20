@@ -1,0 +1,18 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T009",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "changed_files": ["docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"],
+    "commands": [
+      {"cmd":"npm test -- test/integration-resource.test.ts test/homepage-demo-model.test.ts test/homepage-flow-demo-recipes.test.ts","status":"pass","details":"34 tests passed."},
+      {"cmd":"rg stale executable IDs and counts in the implementation plan","status":"pass","details":"No matches."},
+      {"cmd":"git diff --check","status":"pass"}
+    ],
+    "summary": "Reconciled executable plan tasks and checklist with Classic plus four current composable experiences. Removed stale IDs and counts while preserving v1.56.3, public-only Issue links, truthful private/local results, localhost-versus-preview evidence, canary authority, cleanup prerequisite, and default-off public posture. A broader count audit corrected the file-map journey count to five.",
+    "deviations": [],
+    "remaining_blockers": [],
+    "verification_attempts": 2,
+    "stopped_because": null
+  }
+}

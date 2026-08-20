@@ -1,0 +1,11 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result":"done","task_id":"T017","board_path":"/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "changed_files":["src/lib/links.ts","next.config.ts","test/homepage-demo-runtime.test.ts","test/integration-resource.test.ts","e2e/homepage-flow-demo.spec.ts","docs/homepage-flow-demo-operations.md","docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md","docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md"],
+    "commands":[
+      {"cmd":"focused tests","status":"pass"},{"cmd":"npm test","status":"pass"},{"cmd":"npm run lint","status":"pass","details":"862 unchanged vendor warnings."},{"cmd":"enabled missing runtime build","status":"pass","details":"Failed closed as expected."},{"cmd":"enabled mutable runtime build","status":"pass","details":"Failed closed as expected."},{"cmd":"exact public v1.56.3 build","status":"pass"},{"cmd":"root-relative local build","status":"pass"},{"cmd":"uppercase-host local build","status":"pass"},{"cmd":"full desktop/mobile browser","status":"pass"},{"cmd":"exact public runtime disclosure browser","status":"pass"},{"cmd":"dot-segment alias startup","status":"pass","details":"Rejected before browser service as expected."},{"cmd":"unset Classic control","status":"pass"},{"cmd":"false Classic control","status":"pass"},{"cmd":"runtime identity","status":"pass","details":"238591 bytes; 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."},{"cmd":"git diff --check","status":"pass"}
+    ],
+    "summary":"Centralized enabled-showcase runtime selection in one source/CSP policy. Enabled builds now require exact public v1.56.3 or approved strict local fixtures; missing, mutable, wrong-version, unsafe, and normalized aliases fail closed. Feature-off/unset Classic retains its established mutable default. Tests cover policy and CSP agreement, exact public disclosure, strict local classification, and Classic isolation. Documentation now requires the explicit runtime and digest verification. All prescribed checks passed.",
+    "deviations":[],"remaining_blockers":[],"verification_attempts":1,"stopped_because":null
+  }
+}

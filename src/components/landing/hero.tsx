@@ -7,6 +7,12 @@ import {
 } from "@/lib/links";
 
 export function Hero() {
+  const flowShowcaseEnabled =
+    process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED === "true";
+  const demoCtaLabel = flowShowcaseEnabled
+    ? "Design your flow"
+    : "Try it on this page";
+
   return (
     <header className="text-center py-16 pb-24 max-sm:-mt-6 max-sm:pt-0 max-sm:pb-16">
       <h1 className="text-[clamp(2.5rem,6vw,4rem)] font-light tracking-tight leading-[1.15] mb-6 text-text-primary max-sm:text-[2.35rem]">
@@ -72,11 +78,11 @@ export function Hero() {
         <a
           href="#try-bugdrop"
           data-analytics-event="landing_cta_click"
-          data-analytics-label="Try it on this page"
+          data-analytics-label={demoCtaLabel}
           className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium text-[0.95rem] bg-accent-cyan text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(125,207,255,0.24)] transition-all duration-300 max-sm:w-full max-sm:justify-center"
         >
           <MessageSquare className="size-4" aria-hidden="true" />
-          Try it on this page
+          {demoCtaLabel}
         </a>
         <a
           href={MARKETPLACE_URL}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "release": "v1.56.3",
+  "targetCommit": "47a392d1e7b1a8d8adeff1692f6bbbd84696280d",
+  "repository": "mean-weasel/bugdrop",
+  "declarations": {
+    "flow": {
+      "sourcePath": "src/widget/flows/public-types.d.ts",
+      "sourceUrl": "https://github.com/mean-weasel/bugdrop/blob/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/src/widget/flows/public-types.d.ts",
+      "gitBlobSha": "deda14601a1fb9c5caa7a413e359f97760c4c2ca",
+      "sha256": "aa9ba4289d30820d3a4cfe19cc6d37d34c7fe6b1237bc831adcdb6aec3fd90de"
+    },
+    "variant": {
+      "sourcePath": "src/widget/variants/public-types.d.ts",
+      "sourceUrl": "https://github.com/mean-weasel/bugdrop/blob/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/src/widget/variants/public-types.d.ts",
+      "gitBlobSha": "871d453b2fc030f4f4ed690dd6e10a66f38860dc",
+      "sha256": "63544daca4f6f740500d263e365c36623ebaae53a90ab7cce5ee1f765a26563e"
+    }
+  },
+  "runtimeSources": {
+    "validation": {
+      "snapshot": "screen-transition-config.ts.txt",
+      "sourcePath": "src/widget/flows/screen-transition-config.ts",
+      "sourceUrl": "https://github.com/mean-weasel/bugdrop/blob/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/src/widget/flows/screen-transition-config.ts",
+      "gitBlobSha": "75aca5feabc68545376030ef6ccc7faabd70710c",
+      "sha256": "c50100c0cc713c947c8d5e617d32fca4ec17bf9ff565887391e9a157486614f8"
+    },
+    "implementation": {
+      "snapshot": "screen-transition.ts.txt",
+      "sourcePath": "src/widget/flows/screen-transition.ts",
+      "sourceUrl": "https://github.com/mean-weasel/bugdrop/blob/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/src/widget/flows/screen-transition.ts",
+      "gitBlobSha": "86d467e69312b610218a773773e78289204e173c",
+      "sha256": "b74a94dcfc1913c0d1e5f83603ac49376a5ad9238facaf63d9d0d74be66272a1"
+    }
+  },
+  "vendoredRuntime": {
+    "provenancePath": "public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/PROVENANCE.json",
+    "downloadUrl": "https://github.com/mean-weasel/bugdrop/releases/download/v1.56.3/widget.v1.56.3.js",
+    "byteLength": 238591,
+    "sha256": "338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e"
+  }
+}

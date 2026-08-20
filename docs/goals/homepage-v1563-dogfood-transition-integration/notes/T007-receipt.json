@@ -1,0 +1,29 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "blocked",
+    "task_id": "T007",
+    "board_path": "docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "changed_files": [
+      "src/components/landing/homepage-flow-demo-recipes.ts",
+      "test/homepage-flow-demo-recipes.test.ts",
+      "e2e/homepage-flow-demo.spec.ts",
+      "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md",
+      "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+    ],
+    "commands": [
+      {"cmd":"Exact v1.56.3 identity","status":"pass"},
+      {"cmd":"Canonical generator check","status":"pass"},
+      {"cmd":"Focused Vitest","status":"pass","detail":"53 tests"},
+      {"cmd":"npm test","status":"pass","detail":"163 tests"},
+      {"cmd":"npm run lint","status":"pass"},
+      {"cmd":"npm run build","status":"pass"},
+      {"cmd":"Stale-v1.56.2 plan falsification","status":"pass"},
+      {"cmd":"Enabled exact-v1.56.3 E2E","status":"fail","detail":"Released rating control rendered Submit for score 3 before routing to follow-up"}
+    ],
+    "summary": "Corrected the original misleading label and stale overlay documentation, but the final strict terminal-aware label proof exposed an unachievable released-v1.56.3 contract: rating changes do not refresh conditional-route previews before advance. GoalBuddy approved a fresh neutral-Continue package rather than weakening proof or patching Shadow DOM.",
+    "deviations": ["The accepted test candidate's terminal-aware label premise was falsified by exact released-runtime behavior and source tracing."],
+    "remaining_blockers": ["T009 neutral-label correction and fresh review."],
+    "verification_attempts": 2,
+    "stopped_because": "Final exact-runtime verification falsified the strict score-3 Continue expectation; the package exhausted its two corrections."
+  }
+}

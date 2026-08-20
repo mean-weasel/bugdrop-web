@@ -1,0 +1,27 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T003",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/flow-capability-documentation/state.yaml",
+    "changed_files": [
+      "src/lib/flow-capabilities.ts",
+      "test/fixtures/flow-capabilities/v1.56.3/flows-public-types.d.ts",
+      "test/fixtures/flow-capabilities/v1.56.3/variants-public-types.d.ts",
+      "test/fixtures/flow-capabilities/v1.56.3/PROVENANCE.json",
+      "test/helpers/flow-capability-parity.ts",
+      "test/flow-capabilities.test.ts"
+    ],
+    "commands": [
+      {"cmd":"npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts","status":"pass"},
+      {"cmd":"npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts","status":"pass"},
+      {"cmd":"npm run build","status":"pass"},
+      {"cmd":"git diff --check","status":"pass"},
+      {"cmd":"GitHub API release-tag and source-blob authentication audit","status":"pass"}
+    ],
+    "summary": "Added the canonical v1.56.3 Flow inventory, byte-authenticated Flow/Variant declaration snapshots, runtime-source and vendored-runtime provenance, and AST-based exact parity checks for fields, screens, conditions, styling, transitions, issue/evidence, lifecycle, exclusions, bounds, defaults, and reduced-motion behavior. All required verification passed. The strongest failure mode—snapshots or runtime facts claiming the wrong release—was disproved by resolving the annotated v1.56.3 tag to the target commit and matching all four recorded Git blob SHAs.",
+    "deviations": [],
+    "remaining_blockers": [],
+    "verification_attempts": 1,
+    "stopped_because": null
+  }
+}

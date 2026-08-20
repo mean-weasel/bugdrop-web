@@ -1,0 +1,1433 @@
+version: 2
+
+goal:
+  title: "Homepage Composable Showcase Polish"
+  slug: "homepage-composable-showcase-polish"
+  kind: existing_plan
+  tranche: "Validate the independent critique, finish the largest safe website polish slice, then prepare the separately gated SDK handoff."
+  status: done
+  oracle:
+    signal: "A desktop-and-mobile walkthrough of all five hidden homepage experiences is polished, differentiated, accessible, and regression-free, with unresolved SDK work isolated behind a separate authority gate."
+    cadence: "after each Worker package and at final audit"
+    final_proof: "Browser walkthrough, automated tests/build, independent UX review, PR Review Toolkit receipt, and exact feature-off Classic proof."
+  intake:
+    original_request: "Plan the polish work from the independent UX critique before presenting the composable-flow feature set."
+    interpreted_outcome: "Finish the website showcase first, then hand off SDK-level attachment and Classic accessibility corrections as a separate linked tranche."
+    input_shape: existing_plan
+    audience: "Prospective BugDrop users evaluating the composable-flow SDK"
+    authority: requested
+    proof_type: demo
+    completion_proof: "All in-scope website findings are corrected and proven locally; SDK work has an exact bounded child plan and remains unexecuted until separately authorized."
+    likely_misfire: "Making the examples technically comprehensive but visually dense, or silently expanding the website tranche into an SDK release."
+    blind_spots_considered:
+      - "Mobile launcher overlap"
+      - "Feature Request pacing and viewport overflow"
+      - "Bug Report attachment presentation"
+      - "Chooser differentiation"
+      - "Onboarding guidance-versus-blocked language"
+      - "Classic accessibility and immutable runtime boundaries"
+    existing_plan_facts:
+      - "Independent UX critique found no P0 issues and three P1 presentation issues."
+      - "User selected two linked tranches: website/configuration first, SDK patch/release/repin second."
+      - "Public homepage feature flag stays off during dogfood."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  missing_input_or_credentials_do_not_stop_goal: true
+  exact_human_approval_can_terminal_wait: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/homepage-composable-showcase-polish/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.4.3/skills/goal-prep/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal docs/goals/homepage-composable-showcase-polish"
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Validate the independent UX critique, current dirty-worktree constraints, and the website-versus-SDK tranche boundary before any new edits."
+    inputs:
+      - "Independent UX critique in the current thread"
+      - "Current hidden dogfood at http://bugdrop.localhost:3000/"
+      - "Existing homepage v1.56.3 goal receipts and dirty worktree"
+    constraints:
+      - "Read-only."
+      - "Do not implement or mutate external state."
+      - "Preserve Classic behavior and the public-off feature flag."
+    expected_output:
+      - "Accepted, rejected, or reframed critique findings"
+      - "Largest safe website Worker package"
+      - "Exact allowed_files, verify, and stop_if"
+      - "SDK-only findings and authority boundary"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The critique is materially correct and the website tranche can address every presentation defect except the native attachment treatment and Classic dialog semantics. One coherent Worker slice should improve chooser differentiation, mobile launcher coexistence, Bug Report grid layout, Feature Request pacing/impact semantics, and neutral Onboarding guidance while preserving exact v1.56.3, Classic, canonical Bug Report contracts, local-only submissions, and the public-off flag. Verification must use this npm repository’s commands, not the board’s current pnpm commands."
+      worker_package:
+        objective: "Complete one coherent website/configuration polish slice: prevent the narrow-viewport floating launcher from obscuring the visible in-page chooser; show concise descriptions and distinct icons in both chooser surfaces and the selected CTA; keep Bug Report’s attachment semantics while placing attachments and logs full-width and name/email together on desktop with mobile stacking; split Feature Request into compact paced screens and replace stars with labeled Nice to have, Important, and Transformative cards; neutralize shared Onboarding help copy; update regression tests and current documentation."
+        allowed_files:
+          - src/components/landing/homepage-widget.tsx
+          - src/components/landing/homepage-demo-launcher.tsx
+          - src/components/landing/homepage-demo-model.ts
+          - src/components/landing/homepage-flow-demo-recipes.ts
+          - test/homepage-demo-model.test.ts
+          - test/homepage-flow-demo-recipes.test.ts
+          - e2e/homepage-flow-demo.spec.ts
+          - docs/homepage-flow-demo-operations.md
+          - docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md
+          - docs/goals/homepage-composable-showcase-polish/notes/
+        verify:
+          - "npm test"
+          - "npm run lint"
+          - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+          - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+          - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+          - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+          - "git diff --check"
+        stop_if:
+          - "Any correction requires SDK, generated recipe, runtime loader, vendored widget, route, CI, or other out-of-allowlist edits."
+          - "Launcher coexistence cannot be solved without losing keyboard access, focus restoration, menu synchronization, or repeated-launch behavior."
+          - "Bug Report attachment acceptance, limits, serialization, field/screen identity, Issue/evidence mapping, or capture behavior changes."
+          - "Classic behavior, styling, payload, focus, or false/unset isolation changes."
+          - "The public feature flag must be enabled or any request escapes the local harness."
+          - "Verification remains red after two bounded in-scope corrections."
+      evidence:
+        - "At 390×844, the fixed launcher visibly covers the showcase’s building-blocks link and lower card area."
+        - "Feature Request step 2 contains three category cards, two text fields, five impact stars, and actions below the visible mobile viewport."
+        - "The in-page picker currently exposes only five labels; descriptions appear only after selection and every selected CTA uses the same bug icon."
+        - "Onboarding routes both guidance and blocked answers to copy reading standing in your way and What would unblock you?."
+        - "Generated Bug Report already makes attachments span two columns, but logs/name/email have implicit placement; layout-only refinement is available without changing contracts."
+        - "The exact v1.56.3 Classic snapshot has no dialog role and exposes an unnamed close button, confirming an SDK boundary."
+        - "Prior T999 proof authenticates target 47a392d1e7b1a8d8adeff1692f6bbbd84696280d and SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e with full Classic isolation and local-request safety."
+        - "Current status contains the intended cumulative v1.56.3 dogfood diff and untracked recipe/goal files; a single writer must preserve it."
+      subgoal_contract: null
+      parallel_safety: null
+      blocked_tasks: []
+      missing_evidence:
+        - "T002 corrected-head tests, desktop/mobile walkthrough, and falsification remain."
+        - "SDK findings remain intentionally unimplemented behind separate authority."
+      required_board_updates:
+        - "Record T001 done."
+        - "Replace T002 with this exact Worker package, including npm verification commands and the narrowed allowlist."
+        - "Activate T002 as the sole writer; keep T003–T999 queued."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Complete one coherent website/configuration polish slice: prevent the narrow-viewport floating launcher from obscuring the visible in-page chooser; show concise descriptions and distinct icons in both chooser surfaces and the selected CTA; keep Bug Report's attachment semantics while placing attachments and logs full-width and name/email together on desktop with mobile stacking; split Feature Request into compact paced screens and replace stars with labeled Nice to have, Important, and Transformative cards; neutralize shared Onboarding help copy; update regression tests and current documentation."
+    inputs:
+      - "T001 receipt"
+      - "Independent UX critique"
+      - "Current v1.56.3 hidden dogfood implementation"
+    constraints:
+      - "Edit the intended dirty worktree in place; do not revert, regenerate, or omit prior v1.56.3 dogfood work or untracked files."
+      - "Use only released public FlowConfig primitives and the existing exact v1.56.3 runtime."
+      - "Preserve Classic behavior, styling, payload, focus, false/unset fallback, and public-off feature flag."
+      - "Preserve Bug Report field IDs/types, screen IDs/order, conditions, Issue/evidence mapping, accepted files, limits, and payload semantics."
+      - "Keep all submissions inside the local intercepted harness and create no real Issue."
+    expected_output:
+      - "Floating launcher no longer obscures the showcase on mobile."
+      - "Chooser communicates meaningful differences without selecting every option."
+      - "Feature Request is paced across compact screens and uses labeled impact choices instead of stars."
+      - "Onboarding guidance and blocked branches share accurate neutral help copy."
+      - "Bug Report uses the strongest layout possible through configuration without SDK edits."
+      - "Updated unit, browser, and current-documentation coverage."
+    allowed_files:
+      - "src/components/landing/homepage-widget.tsx"
+      - "src/components/landing/homepage-demo-launcher.tsx"
+      - "src/components/landing/homepage-demo-model.ts"
+      - "src/components/landing/homepage-flow-demo-recipes.ts"
+      - "test/homepage-demo-model.test.ts"
+      - "test/homepage-flow-demo-recipes.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "docs/homepage-flow-demo-operations.md"
+      - "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md"
+      - "docs/goals/homepage-composable-showcase-polish/notes/"
+    verify:
+      - "npm test"
+      - "npm run lint"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "Any correction requires SDK, generated recipe, runtime loader, vendored widget, route, CI, or other out-of-allowlist edits."
+      - "Launcher coexistence cannot be solved without losing keyboard access, focus restoration, menu synchronization, or repeated-launch behavior."
+      - "Bug Report attachment acceptance, limits, serialization, field/screen identity, Issue/evidence mapping, or capture behavior changes."
+      - "Classic behavior, styling, payload, focus, or false/unset isolation changes."
+      - "The public feature flag must be enabled or any request escapes the local harness."
+      - "Verification remains red after two bounded in-scope corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/landing/homepage-widget.tsx
+        - src/components/landing/homepage-demo-launcher.tsx
+        - src/components/landing/homepage-demo-model.ts
+        - src/components/landing/homepage-flow-demo-recipes.ts
+        - test/homepage-demo-model.test.ts
+        - test/homepage-flow-demo-recipes.test.ts
+        - e2e/homepage-flow-demo.spec.ts
+        - docs/homepage-flow-demo-operations.md
+        - docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md
+      commands:
+        - cmd: "npm test"
+          status: pass
+        - cmd: "npm run lint"
+          status: pass
+        - cmd: "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+          status: pass
+        - cmd: "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+          status: pass
+        - cmd: "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+          status: pass
+        - cmd: "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Polished both chooser surfaces with shared distinct icons/descriptions and a selected CTA icon. The mobile launcher now yields while the in-page chooser is visible without changing menu, launch, or focus ownership. Bug Report retains its canonical contracts while using full-width attachments/logs and paired desktop contact fields. Feature Request now uses compact idea, context, and labeled priority-card screens. Onboarding help copy is neutral. Unit, browser, and documentation coverage were updated; exact runtime, local-only submission safety, mobile overlap, focus, Classic unset/false isolation, build, lint, and tests pass."
+      deviations:
+        - "The first enabled Playwright invocation was blocked before tests started by a stale same-worktree next dev process on port 3000. After terminating exact PIDs 40579 and 40593, the unchanged command passed."
+        - "Lint emitted 862 warnings from the unchanged vendored v1.56.3 widget; it reported zero errors."
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run an independent desktop/mobile UX and accessibility review of the complete website polish package."
+    inputs:
+      - "T002 receipt"
+      - "Live named-localhost dogfood"
+      - "Desktop and 390×844 screenshots/walkthrough"
+    constraints:
+      - "Read-only."
+      - "Judge observable release quality, not implementation taste."
+      - "Separate website/config defects from SDK-only limitations."
+    expected_output:
+      - "Accepted website findings"
+      - "SDK-only findings"
+      - "Release-quality recommendation"
+      - "Exact bounded correction package if needed"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The website/configuration tranche is release-quality with no bounded correction required. Desktop and 390×844 walkthroughs show differentiated, accessible chooser surfaces; compact, unobstructed flows; neutral Onboarding guidance; and a mobile launcher that yields over the showcase and returns afterward. Feature Request now fits every mobile step, and Bug Report uses the strongest available configuration layout. Remaining native attachment presentation and Classic dialog semantics are authenticated SDK-only limitations, not website regressions. Proceed past the correction slot while preserving the separate SDK handoff and final review gates."
+      worker_package: null
+      evidence:
+        - "Desktop chooser presents five distinct icons, concise descriptions, selected-state styling, and a matching selected CTA without visual crowding."
+        - "At 390×844, the floating launcher is absent while the showcase is visible, does not cover the building-blocks link, and becomes visible again after the section leaves the viewport."
+        - "Bug Report desktop and mobile screens fit without overflow; attachments and logs are full-width, desktop contact fields are paired, and mobile contact fields stack cleanly."
+        - "Quick Rating remains the strongest compact experience and fits comfortably on mobile."
+        - "Feature Request’s opportunity, context, and labeled Nice to have/Important/Transformative priority screens each fit within 390×844 with actions visible."
+        - "Onboarding’s check-in and conditional help screens fit mobile and use neutral guidance copy: How can we help?, next step clearer, and What would help?."
+        - "Chooser radios expose aria-describedby links to their descriptions; the floating chooser exposes a named menu with descriptive menuitemradio names."
+        - "Composable experiences expose named dialogs and named Close buttons; browser logs contained no warnings or errors during the walkthrough."
+        - "Classic remains visually functional on desktop/mobile but exposes no dialog role and an unnamed close control; the native attachment chooser remains browser chrome. Both are SDK-only findings already isolated in the handoff."
+        - "T002 receipt records passing unit tests, lint, exact-runtime build, enabled desktop/mobile E2E, false/unset Classic isolation, and git diff check; an independent git diff check also remained clean."
+      subgoal_contract: null
+      parallel_safety: null
+      blocked_tasks: []
+      missing_evidence:
+        - "Final SDK handoff confirmation, PR Review Toolkit review, complete browser oracle, and T999 completion audit remain."
+        - "SDK-only attachment treatment and Classic dialog accessibility remain intentionally unimplemented pending separate authority."
+      required_board_updates:
+        - "Record T003 done with this receipt."
+        - "Record T004 as no correction required/done because worker_package is null."
+        - "Activate T005 as the next task."
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Apply one bounded corrected-head website polish package selected by T003, or record that no correction is required."
+    inputs:
+      - "T003 receipt"
+    constraints:
+      - "Do not implement rejected or taste-only suggestions."
+      - "No SDK, vendored-runtime, release, or public-enablement changes."
+    expected_output:
+      - "Accepted findings corrected"
+      - "Focused regression proof"
+      - "Updated visual evidence"
+    allowed_files:
+      - "src/components/landing/homepage-widget.tsx"
+      - "src/components/landing/homepage-demo-launcher.tsx"
+      - "src/components/landing/homepage-demo-model.ts"
+      - "src/components/landing/homepage-flow-demo-recipes.ts"
+      - "test/homepage-demo-model.test.ts"
+      - "test/homepage-demo-runtime.test.ts"
+      - "test/homepage-flow-demo-recipes.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "docs/homepage-flow-demo-operations.md"
+      - "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md"
+      - "docs/goals/homepage-composable-showcase-polish/notes/"
+      - "docs/goals/homepage-composable-showcase-polish/notes/T004-no-correction.md"
+    verify:
+      - "Commands selected by T003 plus pnpm test, feature-enabled build, exact-runtime desktop/mobile E2E, Classic false/unset controls, and git diff --check"
+    stop_if:
+      - "Correction requires SDK or vendored-runtime edits."
+      - "Correction changes Classic behavior."
+      - "Verification fails after two bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - docs/goals/homepage-composable-showcase-polish/notes/T004-no-correction.md
+      commands:
+        - cmd: "git diff --check"
+          status: pass
+      summary: "No website correction is required based on T003’s independent approval. The control note records that SDK-only attachment treatment and Classic dialog accessibility remain deferred."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T005
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: high
+    objective: "Finalize the separately gated SDK attachment/accessibility tranche handoff without executing it."
+    inputs:
+      - "T003 and T004 receipts"
+      - "notes/sdk-tranche.md"
+    constraints:
+      - "Control-file updates only."
+      - "Do not edit the SDK, dispatch workflows, release, or repin."
+      - "Preserve exact authority phrases and stop conditions for later execution."
+    expected_output:
+      - "Validated SDK problem statements"
+      - "Local SDK verification oracle"
+      - "PR/release/repin authority boundaries"
+      - "Exact recommended next goal"
+    receipt:
+      result: done
+      summary: "Finalized the separate SDK handoff with validated problem statements, a desktop/mobile accessibility and compatibility oracle, the exact v1.56.3 website baseline, and fresh authority gates for SDK PR, merge, release, and website repin. No SDK or external action was performed."
+      evidence:
+        - "T003 confirmed the website now uses the strongest public FlowConfig attachment layout while native attachment chrome remains an SDK concern."
+        - "T003 confirmed Classic remains functional but lacks a dialog role and accessible Close name."
+        - "notes/sdk-tranche.md now records the named-localhost browser oracle and immutable-release repin boundary."
+        - "git diff --check passed."
+      facts:
+        - "Recommended next goal: docs/goals/sdk-showcase-attachment-accessibility-polish/goal.md in the SDK repository."
+        - "The future SDK goal starts read-only with Scout and Judge."
+        - "Website v1.56.3 remains pinned until a separately authorized immutable SDK release is authenticated."
+      contradictions: []
+      ambiguity_requiring_judge: []
+      commands:
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "rg -n validated SDK handoff anchors"
+          status: pass
+      note_needed: false
+  - id: T006
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run PR Review Toolkit and the final corrected-head browser oracle for the website tranche."
+    inputs:
+      - "All website Worker receipts"
+      - "Current complete dirty worktree including untracked files"
+      - "Exact v1.56.3 runtime identity"
+    constraints:
+      - "Read-only unless a validated finding is returned to a new bounded Worker task."
+      - "Review complete intended scope, not tracked git diff alone."
+      - "Reject completion if mobile, reduced-motion, branching, focus, payload, or Classic isolation proof is missing."
+    expected_output:
+      - "PR Review Toolkit receipt"
+      - "Five-experience desktop/mobile walkthrough receipt"
+      - "Strongest falsification"
+      - "approved | correction_required"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "The corrected-head gate found two independently validated defects. Local Classic submissions return isPublic:false with a synthetic GitHub URL, but showIssueLink=always exposes a misleading View on GitHub action. Separately, the design calls the merge-group localhost Playwright lane preview-deployment coverage even though no deployed preview is exercised. The complete desktop/mobile browser oracle otherwise passed, including all five experiences, reduced motion, branching, cleanup, request safety, exact runtime identity, and false/unset Classic isolation. A bounded website-only correction and corrected-head review rerun are required."
+      worker_package:
+        objective: "Correct local Classic result truthfulness and preview-coverage documentation: use the public-only issue-link policy so the actual local isPublic:false response exposes neither a GitHub link nor an Issue-created implication while public results retain their link; add focused unit and actual-route browser proof; rewrite merge-queue preview claims to describe the localhost candidate lane accurately while retaining separate preview-deployment verification as pre-enable evidence."
+        allowed_files:
+          - src/components/landing/homepage-demo-runtime.ts
+          - test/homepage-demo-runtime.test.ts
+          - test/integration-resource.test.ts
+          - test/homepage-local-flow-routes.test.ts
+          - e2e/homepage-flow-demo.spec.ts
+          - docs/homepage-flow-demo-operations.md
+          - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+          - docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md
+        verify_commands:
+          - "npm test"
+          - "npm run lint"
+          - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+          - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+          - "npx playwright test e2e/homepage-flow-demo.spec.ts --project=classic-unset-chromium --retries=0"
+          - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false npx playwright test e2e/homepage-flow-demo.spec.ts --project=classic-false-chromium --retries=0"
+          - "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+          - "git diff --check"
+        stop_if:
+          - "The correction requires changing SDK or immutable vendored runtime bytes."
+          - "The correction requires changing the local feedback route response schema."
+          - "A public isPublic:true result loses its valid GitHub issue link."
+          - "False or unset feature-flag Classic behavior changes."
+          - "Any test makes a real external request or creates a real GitHub Issue."
+          - "The documentation correction expands into implementing preview-deployment infrastructure or workflow behavior."
+          - "Verification remains red after two bounded correction attempts."
+      evidence:
+        - kind: review_target
+          result: verified
+          details: "Reviewed origin/main at merge-base 77b2b4ac0b1b17834e266dd6f69be36ff28a7b4c against the complete intended dirty worktree, including every tracked modification and untracked addition."
+        - kind: pr_review_toolkit
+          result: completed
+          details: "Ran native codex review plus independent correctness, tests, contracts/types, silent-failures, and comments/docs discovery. Every candidate received fresh validation."
+        - kind: validated_finding
+          id: SF-001
+          confidence: 0.99
+          location: "src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/feedback/route.ts:133"
+          details: "Local isPublic:false results could expose a misleading GitHub destination through showIssueLink=always."
+        - kind: validated_finding
+          id: merge-queue-preview-coverage
+          confidence: 0.99
+          location: "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md:188"
+          details: "The specification described deployed-preview coverage although the CI lane targets bugdrop.localhost:3000."
+        - kind: browser_oracle
+          result: passed
+          details: "Feature-enabled desktop and exact 390x844 mobile coverage passed for all five experiences with reduced motion, branching, focus, cleanup, request safety, and Classic isolation."
+        - kind: runtime_identity
+          result: verified
+          details: "Pinned widget is 238591 bytes with SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+      subgoal_contract: null
+      parallel_safety: null
+      blocked_tasks:
+        - T999
+      missing_evidence:
+        - "The bounded Classic-link and documentation corrections are not implemented."
+        - "PR Review Toolkit and the browser oracle have not been rerun against the corrected head."
+        - "Final T999 outcome audit remains pending."
+      required_board_updates:
+        - "Record T006 as not_complete."
+        - "Create and activate one bounded Worker correction task using the exact worker package."
+        - "After correction verification, rerun T006 on the corrected complete worktree before T999."
+  - id: T007
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Correct local Classic result truthfulness and preview-coverage documentation: use the public-only issue-link policy so the actual local isPublic:false response exposes neither a GitHub link nor an Issue-created implication while public results retain their link; add focused unit and actual-route browser proof; rewrite merge-queue preview claims to describe the localhost candidate lane accurately while retaining separate preview-deployment verification as pre-enable evidence."
+    inputs:
+      - "T006 receipt and validated SF-001 finding"
+      - "T006 validated merge-queue preview-coverage documentation finding"
+      - "Current complete dirty worktree including untracked files"
+    constraints:
+      - "Edit the intended dirty worktree in place and preserve all prior website polish."
+      - "Do not change SDK or immutable vendored runtime bytes."
+      - "Do not change the local feedback route response schema."
+      - "Preserve valid GitHub links for public isPublic:true results."
+      - "Preserve false/unset Classic behavior and create no real GitHub Issue."
+      - "Do not implement preview-deployment infrastructure or workflow behavior in this correction."
+    expected_output:
+      - "Local/private Classic success has no misleading GitHub action or public-Issue implication."
+      - "Public Classic results retain valid Issue links."
+      - "Documentation accurately distinguishes localhost candidate CI from separate deployed-preview evidence."
+      - "Focused and full corrected-head verification."
+    allowed_files:
+      - "src/components/landing/homepage-demo-runtime.ts"
+      - "test/homepage-demo-runtime.test.ts"
+      - "test/integration-resource.test.ts"
+      - "test/homepage-local-flow-routes.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "docs/homepage-flow-demo-operations.md"
+      - "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+      - "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md"
+    verify:
+      - "npm test"
+      - "npm run lint"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+      - "git diff --check"
+    stop_if:
+      - "The correction requires changing SDK or immutable vendored runtime bytes."
+      - "The correction requires changing the local feedback route response schema."
+      - "A public isPublic:true result loses its valid GitHub issue link."
+      - "False or unset feature-flag Classic behavior changes."
+      - "Any test makes a real external request or creates a real GitHub Issue."
+      - "The documentation correction expands into implementing preview-deployment infrastructure or workflow behavior."
+      - "Verification remains red after two bounded correction attempts."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/landing/homepage-demo-runtime.ts
+        - test/homepage-demo-runtime.test.ts
+        - test/integration-resource.test.ts
+        - e2e/homepage-flow-demo.spec.ts
+        - docs/homepage-flow-demo-operations.md
+        - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+        - docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md
+      commands:
+        - cmd: "npm test"
+          status: pass
+          details: "19 files, 167 tests passed."
+        - cmd: "npm run lint"
+          status: pass
+          details: "Zero errors; 862 warnings from unchanged vendored runtime."
+        - cmd: "feature-enabled exact-v1.56.3 npm run build"
+          status: pass
+        - cmd: "feature-enabled desktop/mobile Playwright, retries=0"
+          status: pass
+          details: "18 passed, 20 project-inapplicable tests skipped after two bounded locator corrections."
+        - cmd: "unset Classic desktop control"
+          status: pass
+          details: "1 passed."
+        - cmd: "false Classic desktop control"
+          status: pass
+          details: "1 passed."
+        - cmd: "exact runtime size and SHA-256"
+          status: pass
+          details: "238591 bytes; 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Classic now uses the public-only Issue-link policy. Focused unit/integration assertions pin that configuration; browser proof exercises the actual local private route, verifies no GitHub action or Issue-created message, blocks external requests, and separately proves public results retain their valid link. Documentation now identifies merge-queue coverage as a localhost candidate lane and retains deployed-preview walkthrough evidence as a separate pre-enable requirement. Full tests, lint, build, enabled desktop/mobile browser coverage, false/unset Classic controls, runtime identity, and diff checks pass."
+      deviations:
+        - "The new actual-route test required two bounded locator corrections before the full enabled browser command passed."
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T008
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Rerun PR Review Toolkit and the complete corrected-head browser oracle after the bounded T007 corrections."
+    inputs:
+      - "T006 and T007 receipts"
+      - "Complete corrected dirty worktree including untracked files"
+    constraints:
+      - "Read-only."
+      - "Run fresh independent review roles and validate every candidate."
+      - "Reject completion if local/private Classic still exposes a GitHub link or if localhost CI is described as deployed-preview proof."
+      - "Preserve the exact v1.56.3 identity, all five experiences, and false/unset Classic isolation."
+    expected_output:
+      - "Corrected-head PR Review Toolkit receipt"
+      - "Corrected-head desktop/mobile browser oracle"
+      - "approved | correction_required"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "Corrected runtime and browser behavior are sound, but validated review found one P2 documentation defect: the active implementation plan declares five experiences while executable tasks and its checklist retain superseded three-flow/four-choice IDs and counts. One bounded docs-only correction remains."
+      worker_package:
+        objective: "Reconcile every executable task and final checklist in the homepage multi-flow implementation plan with the current five-experience contract: Classic, Bug Report, Quick Rating, Feature Request, and Onboarding Check-in."
+        allowed_files:
+          - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+        verify_commands:
+          - "npm test -- test/integration-resource.test.ts test/homepage-demo-model.test.ts test/homepage-flow-demo-recipes.test.ts"
+          - "rg -n \"Product Triage|Customer Pulse|four canonical choices|four-option menu|all three canonical recipes|cache all three|register three\" docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+          - "git diff --check"
+        stop_if:
+          - "Any correction requires source, test, workflow, runtime, route, specification, or operations-guide edits."
+          - "The plan cannot be made internally consistent without changing current feature scope or behavior."
+          - "The correction weakens the localhost-candidate versus deployed-preview distinction or changes exact v1.56.3, issue-link, local/private, canary, cleanup, or public-off contracts."
+          - "Verification remains red after two bounded documentation corrections."
+      evidence:
+        - kind: validated_finding
+          id: comments-docs-stale-five-experience-plan
+          confidence: 0.97
+          priority: P2
+          location: "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md:153-158"
+        - kind: corrected_behavior
+          result: passed
+          details: "Local private results have no GitHub action; public results retain valid links."
+        - kind: browser_oracle
+          result: passed
+          details: "18 enabled desktop/mobile tests, separate unset/false controls, and exact 390x844 five-experience oracle passed."
+        - kind: runtime_identity
+          result: verified
+          details: "238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+      subgoal_contract: null
+      parallel_safety: null
+      blocked_tasks:
+        - T999
+      missing_evidence:
+        - "Plan consistency correction and corrected-head review remain."
+        - "T999 remains pending."
+      required_board_updates:
+        - "Create and activate a docs-only Worker correction, then rerun review before T999."
+  - id: T009
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Reconcile every executable task and final checklist in the homepage multi-flow implementation plan with the current five-experience contract: Classic, Bug Report, Quick Rating, Feature Request, and Onboarding Check-in."
+    inputs:
+      - "T008 validated comments/docs finding"
+      - "Current model, specification, operations guide, and browser contract"
+    constraints:
+      - "Edit only the implementation plan."
+      - "Preserve exact v1.56.3 identity, public-only Issue links, local/private truthfulness, localhost-versus-preview distinction, canary authority, cleanup prerequisite, and public-off posture."
+      - "Do not change product or test behavior."
+    expected_output:
+      - "All executable steps and checklists describe Classic plus the four current composable experiences."
+      - "No stale Product Triage/Customer Pulse or three-flow/four-choice executable instruction remains."
+    allowed_files:
+      - "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+    verify:
+      - "npm test -- test/integration-resource.test.ts test/homepage-demo-model.test.ts test/homepage-flow-demo-recipes.test.ts"
+      - "rg -n \"Product Triage|Customer Pulse|four canonical choices|four-option menu|all three canonical recipes|cache all three|register three\" docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+      - "git diff --check"
+    stop_if:
+      - "Any correction requires a file outside the plan."
+      - "The plan cannot be made consistent without changing current scope or behavior."
+      - "The correction weakens current security, preview, runtime, or public-off contracts."
+      - "Verification remains red after two bounded documentation corrections."
+    receipt:
+      result: done
+      changed_files:
+        - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+      commands:
+        - cmd: "npm test -- test/integration-resource.test.ts test/homepage-demo-model.test.ts test/homepage-flow-demo-recipes.test.ts"
+          status: pass
+          details: "34 tests passed."
+        - cmd: "rg stale executable IDs and counts in the implementation plan"
+          status: pass
+          details: "No matches."
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Reconciled executable plan tasks and checklist with Classic plus four current composable experiences. Removed stale IDs and counts while preserving v1.56.3, public-only Issue links, truthful private/local results, localhost-versus-preview evidence, canary authority, cleanup prerequisite, and default-off public posture. A broader count audit corrected the file-map journey count to five."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T010
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Perform a fresh corrected-head documentation consistency and PR Review Toolkit closure check after T009."
+    inputs:
+      - "T008 and T009 receipts"
+      - "Complete intended worktree including untracked files"
+    constraints:
+      - "Read-only."
+      - "Validate that all accepted T006/T008 findings are resolved and no stale executable plan contract remains."
+      - "Do not repeat full browser suites unless evidence drift or a production file changed."
+    expected_output:
+      - "approved | correction_required"
+      - "Fresh comments/docs validation and full-review closure evidence"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "Closure review found three validated defects: absolute same-origin local runtime URLs select a false public-Issue disclosure; the plan retains stale plural/eager registration; and it incorrectly requires private results to omit their intentional synthetic issueUrl."
+      worker_package:
+        objective: "Correct local disclosure truthfulness for root-relative and absolute same-origin vendored-runtime URLs, preserve genuinely public warnings, add regression proof, and reconcile the plan with singular lazy registration and the private synthetic-issueUrl contract."
+        allowed_files:
+          - src/lib/links.ts
+          - src/components/landing/homepage-widget.tsx
+          - test/homepage-demo-runtime.test.ts
+          - e2e/homepage-flow-demo.spec.ts
+          - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+        verify_commands:
+          - "npm test"
+          - "npm run lint"
+          - "feature-enabled exact-v1.56.3 build"
+          - "feature-enabled desktop/mobile Playwright"
+          - "absolute same-origin local Classic truthfulness Playwright"
+          - "stale plan phrase audit"
+          - "exact runtime size/hash"
+          - "git diff --check"
+        stop_if:
+          - "Route schema, vendored bytes, SDK, or generated recipes must change."
+          - "A public runtime loses warning/link."
+          - "Either local URL form still displays a public-Issue claim."
+          - "Server/client rendering disagrees or public flag must be enabled."
+          - "Plan expands into external infrastructure or release changes."
+          - "Verification stays red after two bounded attempts."
+      evidence:
+        - kind: validated_finding
+          id: COR-ABSOLUTE-LOCAL-DISCLOSURE
+          confidence: 0.98
+          location: "src/components/landing/homepage-widget.tsx:29"
+        - kind: validated_finding
+          id: PLAN-REGISTRATION-STALE
+          confidence: 0.99
+          location: "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md:210"
+        - kind: validated_finding
+          id: PLAN-PRIVATE-ISSUEURL
+          confidence: 0.96
+          location: "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md:342"
+        - kind: prior_browser_evidence
+          result: authenticated
+          details: "T008 full desktop/mobile, false/unset controls, request safety, and exact runtime identity remain applicable after docs-only T009."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "One coherent truthfulness contract."
+      blocked_tasks:
+        - T999
+      missing_evidence:
+        - "Corrections and corrected-head closure remain."
+        - "T999 remains pending."
+      required_board_updates:
+        - "Create one Worker correction then rerun closure before T999."
+  - id: T011
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Correct local disclosure truthfulness for both root-relative and absolute same-origin vendored-runtime URLs, preserve the public warning for genuinely public runtimes, add focused regression proof, and reconcile the executable plan with singular selected-flow lazy registration and the private synthetic-issueUrl wire contract."
+    inputs:
+      - "T010 receipt and three validated findings"
+      - "Current complete intended worktree"
+    constraints:
+      - "Preserve prior polish and exact v1.56.3."
+      - "Do not change route schema, vendored runtime, SDK, generated recipes, public flag, workflow, preview infrastructure, canary, cleanup, release, or deployment behavior."
+    expected_output:
+      - "Both supported local runtime URL forms show truthful local/private disclosure."
+      - "Genuinely public runtime retains public-Issue warning and links."
+      - "Plan describes singular lazy registration and synthetic private issueUrl with hidden presentation."
+    allowed_files:
+      - "src/lib/links.ts"
+      - "src/components/landing/homepage-widget.tsx"
+      - "test/homepage-demo-runtime.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+    verify:
+      - "npm test"
+      - "npm run lint"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=http://bugdrop.localhost:3000/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'actual local Classic result private and truthful' --retries=0"
+      - "rg -n \"registerHomepageFlows|openHomepageExperience\\(api, handles|exactly four registrations|Cache four handles|private .*no Issue URL|Product Triage|Customer Pulse|four canonical choices|four-option menu|all three canonical recipes|cache all three|register three\" docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+      - "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+      - "git diff --check"
+    stop_if:
+      - "Route schema, vendored runtime bytes, SDK, or generated recipes must change."
+      - "A genuinely public runtime loses its warning or valid link."
+      - "Either supported local URL form still shows a public-Issue claim."
+      - "Server/client rendering disagreement or public enablement is required."
+      - "Plan correction expands beyond documentation truthfulness."
+      - "Verification remains red after two bounded correction attempts."
+    receipt:
+      result: done
+      changed_files:
+        - src/lib/links.ts
+        - src/components/landing/homepage-widget.tsx
+        - test/homepage-demo-runtime.test.ts
+        - e2e/homepage-flow-demo.spec.ts
+        - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+      commands:
+        - cmd: "npm test"
+          status: pass
+        - cmd: "npm run lint"
+          status: pass
+          details: "Only existing vendored warnings."
+        - cmd: "feature-enabled exact-v1.56.3 build"
+          status: pass
+        - cmd: "feature-enabled desktop/mobile Playwright retries=0"
+          status: pass
+        - cmd: "absolute same-origin local Classic truthfulness Playwright"
+          status: pass
+        - cmd: "stale executable plan phrase audit"
+          status: pass
+        - cmd: "exact runtime size/hash"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Both exact local runtime URL forms now select deterministic private disclosure without server/client disagreement; genuinely public runtimes retain the warning. Focused unit and browser proof covers URL classification, hidden private GitHub presentation, synthetic issueUrl/isPublic:false wire shape, and public links. The plan now specifies singular selected-flow lazy registration and the truthful private wire/presentation contract. All tests, lint, build, browser suites, runtime identity, stale-phrase audit, and diff checks passed."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T012
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run the final corrected-head PR Review Toolkit closure check after T011."
+    inputs:
+      - "T010 and T011 receipts"
+      - "Complete intended worktree including untracked files"
+    constraints:
+      - "Read-only."
+      - "Freshly validate all prior accepted findings and any new candidate."
+      - "Reject unless both local URL forms are truthful, public behavior is preserved, and executable documentation is internally consistent."
+    expected_output:
+      - "approved | correction_required"
+      - "Final PR Review Toolkit closure receipt"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "One validated P2 remains: the absolute local-runtime classifier uses case-sensitive raw equality although URL hostnames are case-insensitive, so uppercase same-origin spelling renders a false public-Issue warning."
+      worker_package:
+        objective: "Canonicalize exact local dogfood runtime recognition with URL semantics while preserving fail-closed public classification and add focused unit/browser proof."
+        allowed_files:
+          - src/lib/links.ts
+          - test/homepage-demo-runtime.test.ts
+          - e2e/homepage-flow-demo.spec.ts
+        verify_commands:
+          - "focused runtime/integration tests"
+          - "npm test"
+          - "npm run lint"
+          - "root-relative build"
+          - "uppercase absolute-local build/browser"
+          - "full desktop/mobile browser"
+          - "exact runtime identity"
+          - "git diff --check"
+        stop_if:
+          - "Any file outside classifier/tests must change."
+          - "Wrong scheme/port/path/query/fragment/credentials/external origin becomes private."
+          - "Supported local forms remain public."
+          - "Public runtime loses warning/link."
+          - "Public flag must be enabled."
+          - "Red after two bounded attempts."
+      evidence:
+        - kind: validated_finding
+          id: COR-T011-URL-CANONICALIZATION
+          confidence: 0.99
+          severity: P2
+          location: "src/lib/links.ts:39-43"
+        - kind: other_roles
+          result: clean
+          details: "Tests, silent failures, contracts/types, and comments/docs found no candidate."
+        - kind: runtime_identity
+          result: verified
+          details: "238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "Classifier and proof are one package."
+      blocked_tasks:
+        - T999
+      missing_evidence:
+        - "Canonicalization correction, final closure, and T999 remain."
+      required_board_updates:
+        - "Create Worker correction and rerun closure before T999."
+  - id: T013
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Canonicalize exact local dogfood runtime recognition with URL semantics so root-relative and equivalent absolute same-origin spellings select private disclosure; preserve fail-closed public classification and add regression proof."
+    inputs:
+      - "T012 receipt and validated URL canonicalization finding"
+    constraints:
+      - "Edit only classifier and its unit/browser tests."
+      - "Preserve homepage behavior, routes, recipes, vendored runtime, SDK, Classic, docs, and public flag."
+    expected_output:
+      - "Uppercase-host equivalent local URL is private."
+      - "Wrong scheme, port, path, query, fragment, credentials, and external origin stay public."
+      - "Root-relative local and genuine public behavior remain correct."
+    allowed_files:
+      - "src/lib/links.ts"
+      - "test/homepage-demo-runtime.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+    verify:
+      - "npx vitest run test/homepage-demo-runtime.test.ts test/integration-resource.test.ts"
+      - "npm test"
+      - "npm run lint"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=http://BUGDROP.LOCALHOST:3000/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=http://BUGDROP.LOCALHOST:3000/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'actual local Classic result private and truthful' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+      - "git diff --check"
+    stop_if:
+      - "Any file outside the classifier/tests must change."
+      - "Different scheme, port, path, query, fragment, credentials, or external origin becomes private."
+      - "Supported local forms remain public."
+      - "A public runtime loses warning or link."
+      - "Public enablement is required."
+      - "Verification remains red after two bounded attempts."
+    receipt:
+      result: done
+      changed_files:
+        - src/lib/links.ts
+        - test/homepage-demo-runtime.test.ts
+        - e2e/homepage-flow-demo.spec.ts
+      commands:
+        - cmd: "focused runtime/integration tests"
+          status: pass
+        - cmd: "npm test"
+          status: pass
+        - cmd: "npm run lint"
+          status: pass
+          details: "0 errors; existing vendored warnings only."
+        - cmd: "root-relative feature build"
+          status: pass
+        - cmd: "uppercase-host absolute-local feature build"
+          status: pass
+        - cmd: "uppercase-host actual local Classic browser proof"
+          status: pass
+        - cmd: "full root-relative desktop/mobile browser suite"
+          status: pass
+          details: "18 passed, 20 expected skips."
+        - cmd: "exact runtime identity"
+          status: pass
+          details: "238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+        - cmd: "git diff --check"
+          status: pass
+      summary: "URL-semantic classification now recognizes the exact root-relative runtime and equivalent uppercase-host same-origin absolute URL as private. Wrong scheme, port, path, query, fragment, credentials, malformed values, and external origins remain public. Focused browser proof confirms the uppercase configured runtime retains truthful private disclosure. All required tests, builds, browser suites, runtime identity, lint, and diff checks passed."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T014
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run the definitive corrected-head PR Review Toolkit closure check after T013."
+    inputs:
+      - "T012 and T013 receipts"
+      - "Complete intended worktree"
+    constraints:
+      - "Read-only."
+      - "Freshly validate all candidates; reject any unsupported private classification or false disclosure."
+    expected_output:
+      - "approved | correction_required"
+      - "Definitive review closure evidence"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "One validated P2 remains: URL normalization admits unsupported raw aliases as private, contrary to the governing exact-form fail-closed contract."
+      worker_package:
+        objective: "Restrict local classification to exact root-relative and exact absolute http://bugdrop.localhost:3000 form with hostname case only; reject all other raw spellings and add proof."
+        allowed_files:
+          - src/lib/links.ts
+          - test/homepage-demo-runtime.test.ts
+          - e2e/homepage-flow-demo.spec.ts
+        verify:
+          - "focused/full tests"
+          - lint
+          - "root-relative and uppercase-host builds"
+          - "private and fail-closed browser proofs"
+          - "full desktop/mobile"
+          - "false/unset controls"
+          - "runtime identity"
+          - "diff check"
+        stop_if:
+          - "Any other file changes."
+          - "Supported exact forms become public."
+          - "Any unsupported raw alias remains private."
+          - "Public warning/link regresses."
+          - "Classic/runtime/routes/recipes/public-off changes."
+          - "Red after two attempts."
+      evidence:
+        - kind: validated_finding
+          id: correctness-local-runtime-canonicalization
+          confidence: 0.98
+          severity: P2
+          location: "src/lib/links.ts:42-50"
+        - kind: other_roles
+          result: clean
+        - kind: runtime_identity
+          result: verified
+          details: "238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "Classifier and proof are serial."
+      blocked_tasks:
+        - T999
+      missing_evidence:
+        - "Exact raw-form correction, closure, T999."
+      required_board_updates:
+        - "Create Worker correction and rerun closure."
+  - id: T015
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Restrict local dogfood classification to the exact root-relative runtime path and exact absolute http://bugdrop.localhost:3000 form while allowing hostname case only; reject every other raw spelling before normalization and add focused proof."
+    inputs:
+      - "T014 receipt and validated raw-alias finding"
+    constraints:
+      - "Edit only classifier and unit/browser tests."
+      - "Preserve all other product, runtime, route, recipe, Classic, documentation, and public-off behavior."
+    expected_output:
+      - "Only two documented lexical forms classify private, with hostname case equivalence."
+      - "All unsupported aliases fail closed and public behavior remains intact."
+    allowed_files:
+      - "src/lib/links.ts"
+      - "test/homepage-demo-runtime.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+    verify:
+      - "npx vitest run test/homepage-demo-runtime.test.ts test/integration-resource.test.ts"
+      - "npm test"
+      - "npm run lint"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=http://BUGDROP.LOCALHOST:3000/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "Run focused Playwright proof that uppercase-host exact form is private and one dot-segment alias is public/fail-closed"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+      - "git diff --check"
+    stop_if:
+      - "Any file outside classifier/tests must change."
+      - "Exact supported forms become public."
+      - "Whitespace, uppercase scheme, zero-padded port, dot segment, backslash, encoded hostname, credentials, query, fragment, wrong path/origin, or malformed input remains private."
+      - "Public warning/link regresses."
+      - "Classic/runtime/routes/recipes/public-off changes."
+      - "Verification remains red after two bounded attempts."
+    receipt:
+      result: done
+      changed_files:
+        - src/lib/links.ts
+        - test/homepage-demo-runtime.test.ts
+        - e2e/homepage-flow-demo.spec.ts
+      commands:
+        - cmd: "focused runtime/integration tests"
+          status: pass
+        - cmd: "npm test"
+          status: pass
+        - cmd: "npm run lint"
+          status: pass
+        - cmd: "root-relative build"
+          status: pass
+        - cmd: "uppercase-host build"
+          status: pass
+        - cmd: "uppercase-host private browser proof"
+          status: pass
+        - cmd: "dot-segment fail-closed browser proof"
+          status: pass
+        - cmd: "full desktop/mobile browser suite"
+          status: pass
+        - cmd: "unset Classic control"
+          status: pass
+        - cmd: "false Classic control"
+          status: pass
+        - cmd: "runtime identity"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Implemented raw pre-normalization classification: only the exact root-relative path and exact HTTP origin/path classify private, with hostname case equivalence only. Added exhaustive rejection coverage for whitespace, scheme/port aliases, dot segments, backslashes, encoded hostnames, credentials, query/fragment, wrong origins/paths, and malformed inputs. Focused browser proofs confirmed uppercase-host private behavior and dot-segment fail-closed public behavior. Full tests, lint, builds, desktop/mobile browser, public-off controls, artifact identity, and diff hygiene pass."
+      deviations:
+        - "One TypeScript test-narrowing failure was fixed within the first bounded attempt."
+      remaining_blockers: []
+      verification_attempts: 2
+      stopped_because: null
+  - id: T016
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run the terminal corrected-head PR Review Toolkit closure check after T015."
+    inputs:
+      - "T014 and T015 receipts"
+      - "Complete intended worktree"
+    constraints:
+      - "Read-only."
+      - "Freshly validate classifier exactness and every reported candidate."
+      - "Return approved only with no accepted finding."
+    expected_output:
+      - "approved | correction_required"
+      - "Terminal toolkit closure evidence"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "One validated P1 remains: enabled showcase without explicit runtime silently falls back to mutable widget.js despite exact v1.56.3 rollout claims."
+      worker_package:
+        objective: "Require an explicit exact runtime for enabled showcase, keep feature-off Classic default unchanged, align CSP/docs/tests."
+        allowed_files:
+          - src/lib/links.ts
+          - next.config.ts
+          - test/homepage-demo-runtime.test.ts
+          - test/integration-resource.test.ts
+          - e2e/homepage-flow-demo.spec.ts
+          - docs/homepage-flow-demo-operations.md
+          - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+          - docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md
+        verify:
+          - "focused/full tests"
+          - lint
+          - "missing/mutable builds fail"
+          - "exact public/local builds pass"
+          - "browser proofs"
+          - "false/unset Classic"
+          - "runtime identity"
+          - "diff check"
+        stop_if:
+          - "Feature-off Classic changes."
+          - "Enabled accepts unsupported runtime."
+          - "Exact supported runtimes fail."
+          - "Strict local classifier regresses."
+          - "SDK/runtime/routes/recipes/workflow/deployment/public enable change."
+          - "Red after two attempts."
+      evidence:
+        - kind: validated_finding
+          id: comments-docs-unpinned-production-runtime
+          severity: P1
+          confidence: 0.98
+          location: "docs/homepage-flow-demo-operations.md:5-20"
+        - kind: other_review
+          result: clean
+        - kind: runtime_identity
+          result: verified
+          details: "238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "Runtime/CSP/docs are one boundary."
+      blocked_tasks:
+        - T999
+      missing_evidence:
+        - "Runtime-pin correction, closure, T999."
+      required_board_updates:
+        - "Create Worker correction and rerun closure."
+  - id: T017
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Make enabled-showcase runtime selection fail closed without changing feature-off Classic: require an explicit runtime whenever the showcase flag is true; accept only exact v1.56.3 public or approved local fixture forms; align CSP, docs, and proof."
+    inputs:
+      - "T016 receipt and validated unpinned-runtime finding"
+    constraints:
+      - "Feature-off/unset Classic keeps established mutable Worker default and behavior."
+      - "No SDK, vendored runtime, route, generated recipe, workflow, deployment, or public enablement changes."
+      - "Preserve strict local raw-form classifier."
+    expected_output:
+      - "Enabled missing/mutable/wrong runtime builds fail closed."
+      - "Exact public v1.56.3 and approved local fixtures build."
+      - "CSP and runtime share one policy; operations require exact variable and digest check."
+    allowed_files:
+      - "src/lib/links.ts"
+      - "next.config.ts"
+      - "test/homepage-demo-runtime.test.ts"
+      - "test/integration-resource.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "docs/homepage-flow-demo-operations.md"
+      - "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+      - "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md"
+    verify:
+      - "npx vitest run test/homepage-demo-runtime.test.ts test/integration-resource.test.ts"
+      - "npm test"
+      - "npm run lint"
+      - "env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true npm run build # must fail"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=https://bugdrop.neonwatty.workers.dev/widget.js npm run build # must fail"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=https://bugdrop.neonwatty.workers.dev/widget.v1.56.3.js npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=http://BUGDROP.LOCALHOST:3000/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "Run focused browser proof for exact public v1.56.3 public disclosure and dot-segment local fail-closed disclosure"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+      - "git diff --check"
+    stop_if:
+      - "Feature-off/unset Classic default or behavior changes."
+      - "Enabled accepts missing, mutable, wrong-version, unsafe, or unsupported runtime."
+      - "Exact public v1.56.3 or approved local fixtures cannot build."
+      - "Strict local raw classifier or fail-closed aliases regress."
+      - "SDK, runtime bytes, routes, recipes, workflow, deployment, or public enablement must change."
+      - "Verification remains red after two bounded attempts."
+    receipt:
+      result: done
+      changed_files:
+        - src/lib/links.ts
+        - next.config.ts
+        - test/homepage-demo-runtime.test.ts
+        - test/integration-resource.test.ts
+        - e2e/homepage-flow-demo.spec.ts
+        - docs/homepage-flow-demo-operations.md
+        - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+        - docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md
+      commands:
+        - cmd: "focused tests"
+          status: pass
+        - cmd: "npm test"
+          status: pass
+        - cmd: "npm run lint"
+          status: pass
+          details: "862 unchanged vendor warnings."
+        - cmd: "enabled missing runtime build"
+          status: pass
+          details: "Failed closed as expected."
+        - cmd: "enabled mutable runtime build"
+          status: pass
+          details: "Failed closed as expected."
+        - cmd: "exact public v1.56.3 build"
+          status: pass
+        - cmd: "root-relative local build"
+          status: pass
+        - cmd: "uppercase-host local build"
+          status: pass
+        - cmd: "full desktop/mobile browser"
+          status: pass
+        - cmd: "exact public runtime disclosure browser"
+          status: pass
+        - cmd: "dot-segment alias startup"
+          status: pass
+          details: "Rejected before browser service as expected."
+        - cmd: "unset Classic control"
+          status: pass
+        - cmd: "false Classic control"
+          status: pass
+        - cmd: "runtime identity"
+          status: pass
+          details: "238591 bytes; 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Centralized enabled-showcase runtime selection in one source/CSP policy. Enabled builds now require exact public v1.56.3 or approved strict local fixtures; missing, mutable, wrong-version, unsafe, and normalized aliases fail closed. Feature-off/unset Classic retains its established mutable default. Tests cover policy and CSP agreement, exact public disclosure, strict local classification, and Classic isolation. Documentation now requires the explicit runtime and digest verification. All prescribed checks passed."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T018
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run final security/truthfulness PR Review Toolkit closure after T017."
+    inputs:
+      - "T016 and T017 receipts"
+      - "Complete intended worktree"
+    constraints:
+      - "Read-only; validate every candidate."
+      - "Approve only if enabled runtime selection and CSP fail closed, Classic off remains unchanged, and no accepted finding survives."
+    expected_output:
+      - "approved | correction_required"
+      - "Final toolkit closure"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "One P2 test defect remains: dot-segment Playwright is unreachable because correct policy rejects startup; replace with executable startup-policy proof."
+      worker_package:
+        objective: "Remove unreachable dot-segment browser test and retain/strengthen executable unit/config rejection proof."
+        allowed_files:
+          - e2e/homepage-flow-demo.spec.ts
+          - test/homepage-demo-runtime.test.ts
+          - test/integration-resource.test.ts
+        verify:
+          - "focused/full tests"
+          - lint
+          - "dot-segment build expected fail"
+          - "supported build/browser"
+          - "false/unset Classic"
+          - "runtime identity"
+          - "diff check"
+        stop_if:
+          - "Production/docs/runtime files change."
+          - "Dot segment stops failing startup."
+          - "Supported forms regress."
+          - "Classic changes."
+          - "Alias/public truthfulness weakens."
+          - "Red after two attempts."
+      evidence:
+        - kind: validated_finding
+          id: TESTS-DOTSEG-UNREACHABLE
+          severity: P2
+          confidence: 0.99
+          location: "e2e/homepage-flow-demo.spec.ts:526-541"
+        - kind: other_roles
+          result: clean
+        - kind: existing_policy_proof
+          result: verified
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "One test contract."
+      blocked_tasks:
+        - T999
+      missing_evidence:
+        - "Test correction, final closure, T999."
+      required_board_updates:
+        - "Create test-only Worker and final closure."
+  - id: T019
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Remove the unreachable dot-segment Playwright test and ensure executable unit/config contract tests prove that unsupported runtime is rejected before startup, without changing product behavior."
+    inputs:
+      - "T018 receipt and validated dead-test finding"
+    constraints:
+      - "Test-only edits."
+      - "Preserve all production/runtime/CSP/docs/Classic/public-off behavior."
+    expected_output:
+      - "No unreachable dot-segment browser assertion remains."
+      - "Executable unit/config/startup proof covers rejection."
+    allowed_files:
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "test/homepage-demo-runtime.test.ts"
+      - "test/integration-resource.test.ts"
+    verify:
+      - "npx vitest run test/homepage-demo-runtime.test.ts test/integration-resource.test.ts"
+      - "npm test"
+      - "npm run lint"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=http://bugdrop.localhost:3000/vendor/bugdrop/./47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build # must fail"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+      - "git diff --check"
+    stop_if:
+      - "Any non-test file must change."
+      - "Dot-segment alias no longer fails startup."
+      - "Supported forms or Classic regress."
+      - "Alias rejection or public truthfulness weakens."
+      - "Verification remains red after two bounded attempts."
+    receipt:
+      result: done
+      changed_files:
+        - e2e/homepage-flow-demo.spec.ts
+        - test/integration-resource.test.ts
+      commands:
+        - cmd: "focused tests"
+          status: pass
+        - cmd: "npm test"
+          status: pass
+          details: "170 tests."
+        - cmd: "npm run lint"
+          status: pass
+        - cmd: "hostile dot-segment startup"
+          status: pass
+          details: "Failed closed with approved-runtime TypeError."
+        - cmd: "supported build"
+          status: pass
+        - cmd: "desktop/mobile browser"
+          status: pass
+        - cmd: "unset Classic"
+          status: pass
+        - cmd: "false Classic"
+          status: pass
+        - cmd: "runtime identity"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Removed the unreachable dot-segment Playwright assertion and added executable config-path coverage requiring that exact alias to fail before CSP/startup. Existing unit coverage independently pins rejection. All verification passed: 170 unit tests, lint with zero errors, supported build, enabled desktop/mobile browser matrix, both Classic public-off cases, artifact integrity, and diff checks."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T020
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run final corrected-head PR Review Toolkit closure after T019."
+    inputs:
+      - "T018 and T019 receipts"
+      - "Complete intended worktree"
+    constraints:
+      - "Read-only; fresh roles and validators."
+      - "Approve only with no accepted finding and executable proof."
+    expected_output:
+      - "approved | correction_required"
+      - "Final toolkit closure receipt"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "Final corrected-head review found no accepted issue across fresh correctness, tests, silent-failure, contracts/types, comments/docs, native review filtering, and direct proof."
+      evidence:
+        - "Complete tracked+untracked worktree reviewed vs merge-base 77b2b4ac."
+        - "Fresh correctness/tests/silent/contracts/comments roles returned no candidate."
+        - "T019 removed dead browser assertion and retained executable startup rejection proof."
+        - "170 unit tests, zero-error lint, supported build/browser, false/unset Classic, hostile startup rejection, runtime identity, and diff check passed."
+        - "Exact v1.56.3 policy/CSP/disclosures/five-flow/local-only/public-off contracts are authenticated."
+      subgoal_contract: null
+      parallel_safety: null
+      blocked_tasks: []
+      missing_evidence:
+        - "T999 final audit."
+      required_board_updates:
+        - "Activate T999."
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit whether the hidden homepage showcase satisfies the website oracle and the SDK handoff is complete."
+    inputs:
+      - "All done task receipts"
+      - "Final verification"
+      - "Current dirty diff"
+      - "notes/sdk-tranche.md"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if required website Worker work remains."
+      - "Do not require unauthorized SDK execution for website-tranche completion."
+      - "Do not claim public launch, SDK release, or repin complete."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false for this website tranche"
+      - "Missing evidence"
+      - "Exact linked SDK next step"
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      rationale: "The website/configuration tranche satisfies its full oracle. All Worker packages, independent UX review, final corrected-head PR Review Toolkit, exact-runtime/build/browser/Classic-off/local-only proofs, and separate SDK handoff are complete."
+      evidence:
+        - "GoalBuddy state check passed with 21 tasks and no queued Worker work."
+        - "Independent desktop and 390x844 review covers all five differentiated experiences."
+        - "Final PR Review Toolkit found no accepted issue across all required roles and validation."
+        - "Fresh final verification passed 170 tests, zero-error lint, exact enabled build, desktop/mobile journeys, reduced motion, branching, focus, cleanup, request isolation, and both Classic-off controls."
+        - "Exact runtime remains 238591 bytes SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+        - "Enabled missing/unapproved runtime fails closed; exact approved runtime builds."
+        - "Public showcase remains disabled by default; deployed-preview proof remains separately required before future enablement."
+        - "Exact SDK next step: run docs/goals/sdk-showcase-attachment-accessibility-polish/goal.md in the SDK repo with fresh commit/PR, merge, release, and repin authorities."
+      subgoal_contract: null
+      parallel_safety: null
+      blocked_tasks: []
+      missing_evidence: []
+      required_board_updates:
+        - "Record T999 done."
+        - "Set goal.status done and active_task null."
+        - "Record fresh final verification/fingerprints."
+        - "Run GoalBuddy state and stop checks."
+checks:
+  dirty_fingerprint: "tracked ed503359cfcd722000e1bdac5a17866ba96b6f66d498adfbab8f2628aa362c5e; untracked cd7cdabc3d534acbcbaa2b43004c162478131259b461b5c9dce0a370821a5b7e"
+  last_verification:
+    result: pass
+    task: T999
+    commands:
+      - "npm test (170 passed)"
+      - "npm run lint (0 errors; immutable vendored warnings only)"
+      - "feature-enabled exact-v1.56.3 npm run build (54 pages)"
+      - "enabled desktop/mobile Playwright (18 applicable passed, retries=0)"
+      - "unset and explicit-false Classic controls (1 passed each)"
+      - "missing/unapproved enabled runtime fails closed"
+      - "exact runtime 238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e"
+      - "terminal PR Review Toolkit approved"
+      - "git diff --check"

@@ -1,0 +1,9 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result":"done","task_id":"T014","board_path":"/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml","decision":"not_complete","full_outcome_complete":false,
+    "rationale":"One validated P2 remains: URL normalization admits unsupported raw aliases as private, contrary to the governing exact-form fail-closed contract.",
+    "worker_package":{"objective":"Restrict local classification to exact root-relative and exact absolute http://bugdrop.localhost:3000 form with hostname case only; reject all other raw spellings and add proof.","allowed_files":["src/lib/links.ts","test/homepage-demo-runtime.test.ts","e2e/homepage-flow-demo.spec.ts"],"verify":["focused/full tests","lint","root-relative and uppercase-host builds","private and fail-closed browser proofs","full desktop/mobile","false/unset controls","runtime identity","diff check"],"stop_if":["Any other file changes.","Supported exact forms become public.","Any unsupported raw alias remains private.","Public warning/link regresses.","Classic/runtime/routes/recipes/public-off changes.","Red after two attempts."]},
+    "evidence":[{"kind":"validated_finding","id":"correctness-local-runtime-canonicalization","confidence":0.98,"severity":"P2","location":"src/lib/links.ts:42-50"},{"kind":"other_roles","result":"clean"},{"kind":"runtime_identity","result":"verified","details":"238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."}],
+    "subgoal_contract":null,"parallel_safety":{"safe":false,"reason":"Classifier and proof are serial."},"blocked_tasks":["T999"],"missing_evidence":["Exact raw-form correction, closure, T999."],"required_board_updates":["Create Worker correction and rerun closure."]
+  }
+}

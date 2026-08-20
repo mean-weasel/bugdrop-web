@@ -1,0 +1,9 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result":"done","task_id":"T018","board_path":"/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml","decision":"not_complete","full_outcome_complete":false,
+    "rationale":"One P2 test defect remains: dot-segment Playwright is unreachable because correct policy rejects startup; replace with executable startup-policy proof.",
+    "worker_package":{"objective":"Remove unreachable dot-segment browser test and retain/strengthen executable unit/config rejection proof.","allowed_files":["e2e/homepage-flow-demo.spec.ts","test/homepage-demo-runtime.test.ts","test/integration-resource.test.ts"],"verify":["focused/full tests","lint","dot-segment build expected fail","supported build/browser","false/unset Classic","runtime identity","diff check"],"stop_if":["Production/docs/runtime files change.","Dot segment stops failing startup.","Supported forms regress.","Classic changes.","Alias/public truthfulness weakens.","Red after two attempts."]},
+    "evidence":[{"kind":"validated_finding","id":"TESTS-DOTSEG-UNREACHABLE","severity":"P2","confidence":0.99,"location":"e2e/homepage-flow-demo.spec.ts:526-541"},{"kind":"other_roles","result":"clean"},{"kind":"existing_policy_proof","result":"verified"}],
+    "subgoal_contract":null,"parallel_safety":{"safe":false,"reason":"One test contract."},"blocked_tasks":["T999"],"missing_evidence":["Test correction, final closure, T999."],"required_board_updates":["Create test-only Worker and final closure."]
+  }
+}

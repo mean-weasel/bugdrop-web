@@ -2,6 +2,13 @@ import Link from "next/link";
 import { GITHUB_REPO_URL } from "@/lib/links";
 
 export function Nav() {
+  const flowShowcaseEnabled =
+    process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED === "true";
+  const demoCtaLabel = flowShowcaseEnabled ? "Design your flow" : "Try Widget";
+  const demoCtaEvent = flowShowcaseEnabled
+    ? "nav_design_flow_click"
+    : "nav_try_widget_click";
+
   return (
     <nav className="flex justify-between items-center px-8 py-6 max-w-[1100px] mx-auto max-md:flex-col max-md:gap-4">
       <Link href="/" className="text-xl font-semibold text-text-primary no-underline flex items-center gap-2">
@@ -27,11 +34,11 @@ export function Nav() {
         </a>
         <Link
           href="/#try-bugdrop"
-          data-analytics-event="nav_try_widget_click"
-          data-analytics-label="Try Widget"
+          data-analytics-event={demoCtaEvent}
+          data-analytics-label={demoCtaLabel}
           className="inline-flex items-center rounded-[10px] border border-accent-cyan/40 bg-accent-cyan/10 px-3 py-1.5 text-sm font-medium text-accent-cyan transition-all hover:-translate-y-0.5 hover:border-accent-cyan hover:bg-accent-cyan/15"
         >
-          Try Widget
+          {demoCtaLabel}
         </Link>
       </div>
     </nav>

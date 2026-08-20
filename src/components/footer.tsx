@@ -45,7 +45,6 @@ const footerGroups: Array<{ title: string; links: FooterLink[] }> = [
 
 function FooterNavLink({ link }: { link: FooterLink }) {
   const className = "text-sm text-text-muted no-underline transition-colors hover:text-accent-cyan";
-
   if (link.external) {
     return (
       <a href={link.href} target="_blank" rel="noopener noreferrer" className={className}>
@@ -54,7 +53,6 @@ function FooterNavLink({ link }: { link: FooterLink }) {
       </a>
     );
   }
-
   return <Link href={link.href} className={className}>{link.label}</Link>;
 }
 
@@ -96,7 +94,6 @@ export function Footer() {
           </nav>
         ))}
       </div>
-
       <div className="mt-12 flex items-center justify-between gap-5 border-t border-border/70 py-6 text-xs text-text-muted max-sm:flex-col max-sm:items-start">
         <p>
           Open source under the MIT License · Built by{" "}

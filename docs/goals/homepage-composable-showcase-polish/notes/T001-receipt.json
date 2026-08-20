@@ -1,0 +1,64 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T001",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "decision": "approved",
+    "full_outcome_complete": false,
+    "rationale": "The critique is materially correct and the website tranche can address every presentation defect except the native attachment treatment and Classic dialog semantics. One coherent Worker slice should improve chooser differentiation, mobile launcher coexistence, Bug Report grid layout, Feature Request pacing/impact semantics, and neutral Onboarding guidance while preserving exact v1.56.3, Classic, canonical Bug Report contracts, local-only submissions, and the public-off flag. Verification must use this npm repository’s commands, not the board’s current pnpm commands.",
+    "worker_package": {
+      "objective": "Complete one coherent website/configuration polish slice: prevent the narrow-viewport floating launcher from obscuring the visible in-page chooser; show concise descriptions and distinct icons in both chooser surfaces and the selected CTA; keep Bug Report’s attachment semantics while placing attachments and logs full-width and name/email together on desktop with mobile stacking; split Feature Request into compact paced screens and replace stars with labeled Nice to have, Important, and Transformative cards; neutralize shared Onboarding help copy; update regression tests and current documentation.",
+      "allowed_files": [
+        "src/components/landing/homepage-widget.tsx",
+        "src/components/landing/homepage-demo-launcher.tsx",
+        "src/components/landing/homepage-demo-model.ts",
+        "src/components/landing/homepage-flow-demo-recipes.ts",
+        "test/homepage-demo-model.test.ts",
+        "test/homepage-flow-demo-recipes.test.ts",
+        "e2e/homepage-flow-demo.spec.ts",
+        "docs/homepage-flow-demo-operations.md",
+        "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md",
+        "docs/goals/homepage-composable-showcase-polish/notes/"
+      ],
+      "verify": [
+        "npm test",
+        "npm run lint",
+        "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build",
+        "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0",
+        "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0",
+        "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0",
+        "git diff --check"
+      ],
+      "stop_if": [
+        "Any correction requires SDK, generated recipe, runtime loader, vendored widget, route, CI, or other out-of-allowlist edits.",
+        "Launcher coexistence cannot be solved without losing keyboard access, focus restoration, menu synchronization, or repeated-launch behavior.",
+        "Bug Report attachment acceptance, limits, serialization, field/screen identity, Issue/evidence mapping, or capture behavior changes.",
+        "Classic behavior, styling, payload, focus, or false/unset isolation changes.",
+        "The public feature flag must be enabled or any request escapes the local harness.",
+        "Verification remains red after two bounded in-scope corrections."
+      ]
+    },
+    "evidence": [
+      "At 390×844, the fixed launcher visibly covers the showcase’s building-blocks link and lower card area.",
+      "Feature Request step 2 contains three category cards, two text fields, five impact stars, and actions below the visible mobile viewport.",
+      "The in-page picker currently exposes only five labels; descriptions appear only after selection and every selected CTA uses the same bug icon.",
+      "Onboarding routes both guidance and blocked answers to copy reading standing in your way and What would unblock you?.",
+      "Generated Bug Report already makes attachments span two columns, but logs/name/email have implicit placement; layout-only refinement is available without changing contracts.",
+      "The exact v1.56.3 Classic snapshot has no dialog role and exposes an unnamed close button, confirming an SDK boundary.",
+      "Prior T999 proof authenticates target 47a392d1e7b1a8d8adeff1692f6bbbd84696280d and SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e with full Classic isolation and local-request safety.",
+      "Current status contains the intended cumulative v1.56.3 dogfood diff and untracked recipe/goal files; a single writer must preserve it."
+    ],
+    "subgoal_contract": null,
+    "parallel_safety": null,
+    "blocked_tasks": [],
+    "missing_evidence": [
+      "T002 corrected-head tests, desktop/mobile walkthrough, and falsification remain.",
+      "SDK findings remain intentionally unimplemented behind separate authority."
+    ],
+    "required_board_updates": [
+      "Record T001 done.",
+      "Replace T002 with this exact Worker package, including npm verification commands and the narrowed allowlist.",
+      "Activate T002 as the sole writer; keep T003–T999 queued."
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T004",
+    "board_path": "docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "changed_files": [
+      "e2e/homepage-flow-demo.spec.ts",
+      "src/components/landing/homepage-demo-model.ts",
+      "src/components/landing/homepage-demo-runtime.ts",
+      "src/components/landing/homepage-flow-demo-recipes.ts",
+      "test/homepage-demo-model.test.ts",
+      "test/homepage-demo-runtime.test.ts",
+      "test/homepage-flow-demo-recipes.test.ts"
+    ],
+    "commands": [
+      {"cmd":"Exact v1.56.3 widget identity","status":"pass"},
+      {"cmd":"Canonical recipe generator identity","status":"pass"},
+      {"cmd":"Focused Vitest","status":"pass","detail":"52 tests"},
+      {"cmd":"Focused ESLint","status":"pass"},
+      {"cmd":"Production build","status":"pass"},
+      {"cmd":"Feature-enabled exact-runtime desktop/mobile E2E","status":"pass","detail":"15 passed, 17 intentional skips"},
+      {"cmd":"Unset Classic-only control","status":"pass"},
+      {"cmd":"False Classic-only control","status":"pass"},
+      {"cmd":"git diff --check","status":"pass"},
+      {"cmd":"Transition leakage and payload/condition drift falsification","status":"pass"}
+    ],
+    "summary": "Added a deeply frozen local overlay that preserves canonical recipe contracts while giving all three composable examples concise, distinct copy. Only Product Triage receives slide-horizontal at exactly 500 ms. Exact-runtime browser proof covered forward/back animation, reduced-motion bypass, unchanged payloads and pruning, nonlocal-request blocking, and Classic false/unset isolation.",
+    "deviations": [],
+    "remaining_blockers": [],
+    "verification_attempts": 1,
+    "stopped_because": null
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T008",
+    "board_path": "docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "summary": "Prepared the local dogfood handoff with live named-origin URL, exact runtime identity, manual QA checklist, proven scope, complete-staging warning, and the precise commit/push/PR authorization boundary. No external mutation or public enablement occurred.",
+    "evidence": [
+      "Feature-enabled server is live at http://bugdrop.localhost:3000/.",
+      "Served widget hashes to 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e.",
+      "T010 corrected-head PR Review Toolkit accepted no findings.",
+      "T008-handoff.md records the exact manual checklist and approval phrase."
+    ],
+    "facts": [
+      "Public feature flag remains disabled by default.",
+      "No real Issue, deployment, push, PR, or merge action occurred.",
+      "All intended untracked files must be included in any later complete staging."
+    ],
+    "contradictions": [],
+    "ambiguity_requiring_judge": [],
+    "commands": [
+      {"cmd":"Start feature-enabled named-origin local server","status":"pass"},
+      {"cmd":"Fetch homepage and hash served exact widget","status":"pass"},
+      {"cmd":"Inspect complete worktree status and diff scope","status":"pass"}
+    ],
+    "note_needed": false
+  }
+}

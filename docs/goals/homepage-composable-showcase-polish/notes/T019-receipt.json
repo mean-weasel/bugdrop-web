@@ -1,0 +1,9 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result":"done","task_id":"T019","board_path":"/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "changed_files":["e2e/homepage-flow-demo.spec.ts","test/integration-resource.test.ts"],
+    "commands":[{"cmd":"focused tests","status":"pass"},{"cmd":"npm test","status":"pass","details":"170 tests."},{"cmd":"npm run lint","status":"pass"},{"cmd":"hostile dot-segment startup","status":"pass","details":"Failed closed with approved-runtime TypeError."},{"cmd":"supported build","status":"pass"},{"cmd":"desktop/mobile browser","status":"pass"},{"cmd":"unset Classic","status":"pass"},{"cmd":"false Classic","status":"pass"},{"cmd":"runtime identity","status":"pass"},{"cmd":"git diff --check","status":"pass"}],
+    "summary":"Removed the unreachable dot-segment Playwright assertion and added executable config-path coverage requiring that exact alias to fail before CSP/startup. Existing unit coverage independently pins rejection. All verification passed: 170 unit tests, lint with zero errors, supported build, enabled desktop/mobile browser matrix, both Classic public-off cases, artifact integrity, and diff checks.",
+    "deviations":[],"remaining_blockers":[],"verification_attempts":1,"stopped_because":null
+  }
+}

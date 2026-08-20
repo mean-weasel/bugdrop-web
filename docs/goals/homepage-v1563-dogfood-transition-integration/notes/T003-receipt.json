@@ -1,0 +1,52 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T003",
+    "board_path": "docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "decision": "approved",
+    "full_outcome_complete": false,
+    "rationale": "The repin is exact and fail-closed: authenticated v1.56.3 release bytes, provenance, generated identity, CI binding, routes, and tests agree. Classic and flag behavior were untouched. Proceed with a local overlay that differentiates copy and adds only Product Triage's 500 ms horizontal transition.",
+    "worker_package": {
+      "objective": "Create a local homepage demo recipe overlay that keeps canonical recipes immutable while making Bug Report, Product Triage, and Customer Pulse succinct and distinct; configure only Product Triage with presentation.screenTransition={kind:'slide-horizontal',durationMs:500}; preserve IDs, paths, conditions, Issue/evidence mappings, Classic, and flag isolation; add unit and exact-v1.56.3 browser proof.",
+      "allowed_files": [
+        "src/components/landing/homepage-flow-demo-recipes.ts",
+        "src/components/landing/homepage-demo-runtime.ts",
+        "src/components/landing/homepage-demo-model.ts",
+        "src/components/landing/homepage-widget.tsx",
+        "test/homepage-flow-demo-recipes.test.ts",
+        "test/homepage-demo-runtime.test.ts",
+        "test/homepage-demo-model.test.ts",
+        "e2e/homepage-flow-demo.spec.ts"
+      ],
+      "verify": [
+        "Exact v1.56.3 widget SHA-256 and byte-size check",
+        "Canonical recipe generator identity check",
+        "Focused recipe/runtime/model/route/resource Vitest suite",
+        "Focused ESLint",
+        "Production build",
+        "Feature-enabled desktop/mobile exact-v1.56.3 E2E with zero retries",
+        "Unset Classic-only control",
+        "False Classic-only control",
+        "git diff --check"
+      ],
+      "stop_if": [
+        "Implementation requires any file outside allowed_files.",
+        "Any canonical ID, field path, condition, Issue/evidence mapping, payload, or pruning behavior changes.",
+        "Any flow other than Product Triage receives a transition, or its transition is not slide-horizontal at 500 ms.",
+        "Exact-runtime proof cannot observe forward/back behavior or reduced-motion safety.",
+        "Classic or flag isolation changes, or any request can reach a nonlocal endpoint.",
+        "Verification remains red after two bounded corrections."
+      ]
+    },
+    "evidence": [
+      "Release v1.56.3, annotated tag, local artifact, provenance, generated identity, routes, and tests agree on target 47a392d1e7b1a8d8adeff1692f6bbbd84696280d and SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e.",
+      "Focused Vitest passed 43/43 and git diff --check passed.",
+      "Classic implementation, canonical recipe source, and flag behavior were not modified."
+    ],
+    "subgoal_contract": null,
+    "parallel_safety": null,
+    "blocked_tasks": [],
+    "missing_evidence": ["T004 implementation and browser proof remain."],
+    "required_board_updates": ["Record T003 done, populate T004 from worker_package, and activate T004."]
+  }
+}

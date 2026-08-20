@@ -1,0 +1,10 @@
+{
+  "decision": "not_complete",
+  "accepted_finding": "SF-1",
+  "confidence": 0.98,
+  "location": "src/components/landing/homepage-demo-runtime.ts:150-162",
+  "claim": "While the exact script is present but unbound and pending, a second launch can authenticate a foreign lab window.BugDrop before consulting the exact load promise.",
+  "fresh_roles": {"correctness":"none","tests":"none","silent_failures":"SF-1 accepted","contracts_types":"none","comments_docs":"none"},
+  "rejected_native": ["untracked omissions rejected at 0.99 because complete scope includes all additions"],
+  "required_action": "Bounded loader and regression-test correction, full verification, and clean rereview."
+}

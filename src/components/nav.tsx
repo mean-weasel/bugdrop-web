@@ -65,7 +65,7 @@ export function Nav() {
           <span className="max-md:hidden">Get Started</span>
           <span className="md:hidden">Start</span>
         </ChapterLink>
-        <Link href="/docs" className="text-sm text-text-subtle no-underline transition-colors hover:text-text-primary max-lg:hidden">
+        <Link href="/docs" className="text-sm text-text-subtle no-underline transition-colors hover:text-text-primary max-md:text-xs">
           Docs
         </Link>
         <a

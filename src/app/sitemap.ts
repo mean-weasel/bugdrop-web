@@ -28,6 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...compareNav.map((comparison) => ({
       url: `${base}/compare/${comparison.slug}`,
     })),
+    { url: `${base}/resources` },
     ...resourceNav.map((resource) => ({
       url: `${base}/resources/${resource.slug}`,
     })),

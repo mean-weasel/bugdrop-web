@@ -12,8 +12,12 @@ describe("site navigation and footer", () => {
 
   it("organizes footer links into standard destination groups", async () => {
     const footer = await readFile("src/components/footer.tsx", "utf8");
-    for (const heading of ["Explore", "Developers", "Trust"]) expect(footer).toContain(`title: "${heading}"`);
-    for (const destination of ["/compare", "/resources", "/docs", "/docs/security", "/status"]) expect(footer).toContain(`href: "${destination}"`);
+    for (const heading of ["Explore", "Developers", "Trust"]) {
+      expect(footer).toContain(`title: "${heading}"`);
+    }
+    for (const destination of ["/compare", "/resources", "/docs", "/docs/security", "/status"]) {
+      expect(footer).toContain(`href: "${destination}"`);
+    }
     expect(footer).not.toContain("More from the maker");
     expect(footer).not.toContain("makerProducts");
   });
@@ -28,7 +32,10 @@ describe("site navigation and footer", () => {
 
   it("links to resources without rendering a resource directory", async () => {
     const page = await readFile("src/app/page.tsx", "utf8");
-    const quickStart = await readFile("src/components/landing/quick-start.tsx", "utf8");
+    const quickStart = await readFile(
+      "src/components/landing/quick-start.tsx",
+      "utf8",
+    );
     expect(page).not.toContain("Portable review resources");
     expect(page).not.toContain("/resources/visual-bug-report-template");
     expect(quickStart).toContain('href="/resources"');

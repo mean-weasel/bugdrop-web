@@ -8,7 +8,12 @@ const baseArg = process.argv.slice(2).find((arg) => arg.startsWith("--base-url="
 const baseUrl = (baseArg?.slice("--base-url=".length) ?? "http://127.0.0.1:3211").replace(/\/$/, "");
 const outputArg = process.argv.slice(2).find((arg) => arg.startsWith("--output="));
 const output = outputArg?.slice("--output=".length) ?? "/tmp/bugdrop-t012-resources";
-const slugs = ["visual-bug-report-template", "client-website-qa-checklist"];
+const targets = [
+  { id: "hub", path: "/resources", hub: true },
+  { id: "visual-bug-report-template", path: "/resources/visual-bug-report-template", hub: false },
+  { id: "client-website-qa-checklist", path: "/resources/client-website-qa-checklist", hub: false },
+  { id: "screenshot-privacy-checklist", path: "/resources/screenshot-privacy-checklist", hub: false },
+];
 const states = [
   { name: "desktop", width: 1440, height: 1000, javaScriptEnabled: true },
   { name: "mobile", width: 390, height: 844, javaScriptEnabled: true },
@@ -21,15 +26,15 @@ const results = [];
 try {
   for (const state of states) {
     const context = await browser.newContext({ viewport: { width: state.width, height: state.height }, javaScriptEnabled: state.javaScriptEnabled });
-    for (const slug of slugs) {
+    for (const target of targets) {
       const page = await context.newPage();
       const errors = [];
       page.on("pageerror", (error) => errors.push(error.message));
       page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
-      const response = await page.goto(`${baseUrl}/resources/${slug}`, { waitUntil: state.javaScriptEnabled ? "networkidle" : "load" });
-      assert.equal(response?.status(), 200, `${slug}/${state.name}: HTTP ${response?.status()}`);
-      const audit = await page.evaluate(({ expectedSlug, js }) => {
-        const root = document.querySelector(`[data-resource-page="${expectedSlug}"]`);
+      const response = await page.goto(`${baseUrl}${target.path}`, { waitUntil: state.javaScriptEnabled ? "networkidle" : "load" });
+      assert.equal(response?.status(), 200, `${target.id}/${state.name}: HTTP ${response?.status()}`);
+      const audit = await page.evaluate(({ expectedSlug, hub, js }) => {
+        const root = document.querySelector(hub ? "[data-resource-hub]" : `[data-resource-page="${expectedSlug}"]`);
         const paragraphs = [...(root?.querySelectorAll("p, li") ?? [])];
         const overflowing = [...document.querySelectorAll("main *")].filter((element) => {
           const rect = element.getBoundingClientRect();
@@ -43,6 +48,7 @@ try {
           overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
           overflowing,
           articleWords: (root?.querySelector("article")?.textContent?.match(/[A-Za-z0-9]+/g) ?? []).length,
+          hubLinks: root?.querySelectorAll("[data-resource-hub-link]").length ?? 0,
           source: Boolean(root?.querySelector("[data-resource-provenance]")),
           download: Boolean(root?.querySelector('a[download][href$=".md"]')),
           related: root?.querySelectorAll("[data-resource-related-link]").length ?? 0,
@@ -53,8 +59,9 @@ try {
           }),
           secondaryConversion: (() => {
             const section = root?.querySelector(`[data-resource-secondary-conversion="${expectedSlug}"]`);
-            const expectedHref = expectedSlug === "visual-bug-report-template" ? "/demo" : "/sandbox";
-            const expectedEvent = expectedSlug === "visual-bug-report-template" ? "resource_demo_click" : "resource_sandbox_click";
+            const expectedHref = expectedSlug === "client-website-qa-checklist" ? "/sandbox" : "/demo";
+            const expectedEvent = expectedSlug === "visual-bug-report-template" ? "resource_demo_click"
+              : expectedSlug === "screenshot-privacy-checklist" ? "privacy_checklist_demo_click" : "resource_sandbox_click";
             const link = section?.querySelector(`a[href="${expectedHref}"]`);
             return link?.getAttribute("data-analytics-event") === expectedEvent
               && link?.getAttribute("data-analytics-label") === expectedSlug;
@@ -63,22 +70,26 @@ try {
             === (expectedSlug === "visual-bug-report-template" ? "Print template" : "Print checklist"),
           noJsHelp: !js ? document.body.textContent?.includes("JavaScript is off") : true,
         };
-      }, { expectedSlug: slug, js: state.javaScriptEnabled });
-      assert(audit.shell && audit.h1Count === 1, `${slug}/${state.name}: shell or H1 failed`);
-      assert(audit.articleWords >= 600, `${slug}/${state.name}: resource is too thin (${audit.articleWords})`);
-      assert(audit.source && audit.download && audit.related >= 3, `${slug}/${state.name}: provenance or portable paths missing`);
-      assert(audit.actions, `${slug}/${state.name}: action controls missing`);
-      assert(audit.trackedActions, `${slug}/${state.name}: portable action analytics missing`);
-      assert(audit.secondaryConversion, `${slug}/${state.name}: secondary conversion analytics missing`);
-      assert(audit.truthfulPrintLabel, `${slug}/${state.name}: print action label is misleading`);
-      assert(audit.noJsHelp, `${slug}/${state.name}: no-JavaScript help missing`);
-      assert(audit.minFont >= 14, `${slug}/${state.name}: prose is too small`);
-      assert(audit.overflow <= 1 && audit.overflowing.length === 0, `${slug}/${state.name}: horizontal overflow ${JSON.stringify(audit)}`);
-      if (state.width === 390) assert(audit.h1Top !== null && audit.h1Top < 360, `${slug}/${state.name}: intent is not above fold`);
-      assert.equal(errors.length, 0, `${slug}/${state.name}: browser errors ${errors.join(" | ")}`);
-      const screenshot = `${output}/${state.name}-${slug}.png`;
+      }, { expectedSlug: target.id, hub: target.hub, js: state.javaScriptEnabled });
+      assert(audit.shell && audit.h1Count === 1, `${target.id}/${state.name}: shell or H1 failed`);
+      if (target.hub) {
+        assert.equal(audit.hubLinks, 3, `${target.id}/${state.name}: hub must expose all three assets`);
+      } else {
+        assert(audit.articleWords >= 600, `${target.id}/${state.name}: resource is too thin (${audit.articleWords})`);
+        assert(audit.source && audit.download && audit.related >= 3, `${target.id}/${state.name}: provenance or portable paths missing`);
+        assert(audit.actions, `${target.id}/${state.name}: action controls missing`);
+        assert(audit.trackedActions, `${target.id}/${state.name}: portable action analytics missing`);
+        assert(audit.secondaryConversion, `${target.id}/${state.name}: secondary conversion analytics missing`);
+        assert(audit.truthfulPrintLabel, `${target.id}/${state.name}: print action label is misleading`);
+        assert(audit.noJsHelp, `${target.id}/${state.name}: no-JavaScript help missing`);
+      }
+      assert(audit.minFont >= 14, `${target.id}/${state.name}: prose is too small`);
+      assert(audit.overflow <= 1 && audit.overflowing.length === 0, `${target.id}/${state.name}: horizontal overflow ${JSON.stringify(audit)}`);
+      if (state.width === 390) assert(audit.h1Top !== null && audit.h1Top < 360, `${target.id}/${state.name}: intent is not above fold`);
+      assert.equal(errors.length, 0, `${target.id}/${state.name}: browser errors ${errors.join(" | ")}`);
+      const screenshot = `${output}/${state.name}-${target.id}.png`;
       await page.screenshot({ path: screenshot, fullPage: true });
-      results.push({ slug, state: state.name, screenshot, ...audit });
+      results.push({ slug: target.id, state: state.name, screenshot, ...audit });
       await page.close();
     }
     await context.close();
@@ -98,4 +109,4 @@ try {
   await contactBrowser.close();
 }
 
-console.log(JSON.stringify({ status: "pass", resources: slugs.length, renderedStates: results.length, noJsStates: results.filter((result) => result.state.startsWith("nojs")).length, output, results }, null, 2));
+console.log(JSON.stringify({ status: "pass", resources: targets.length - 1, hub: 1, renderedStates: results.length, noJsStates: results.filter((result) => result.state.startsWith("nojs")).length, output, results }, null, 2));

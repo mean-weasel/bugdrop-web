@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import Link from "next/link";
 import { MARKETPLACE_URL, WIDGET_URL, widgetScriptTag } from "@/lib/links";
@@ -50,11 +51,14 @@ export function QuickStart() {
           <div><p className="text-text-subtle"><strong className="text-text-primary">That&apos;s it!</strong> Users can now submit feedback that becomes GitHub issues.</p></div>
         </div>
       </div>
-      <p className="mt-8 text-center">
-        <Link href="/resources" className="text-sm font-medium text-accent-cyan no-underline hover:underline">
-          Browse portable review resources →
+      <div className="mt-8 border-t border-border/70 pt-6 text-center">
+        <Link
+          href="/resources"
+          className="inline-flex text-sm font-medium text-accent-cyan no-underline transition-colors hover:text-text-primary"
+        >
+          Browse portable review resources&nbsp;→
         </Link>
-      </p>
+      </div>
     </section>
   );
 }

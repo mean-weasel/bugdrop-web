@@ -39,11 +39,17 @@ export function Features() {
           </Link>
         ))}
       </div>
-      <p className="mt-6 text-center">
-        <Link href="/use-cases" className="text-sm font-medium text-accent-cyan no-underline hover:underline">
-          Explore all feedback workflows →
+      <div className="mt-6 text-center" data-acquisition-related-for="/">
+        <Link
+          href="/use-cases"
+          data-acquisition-related-link="/use-cases"
+          data-analytics-event="acquisition_path_click"
+          data-analytics-label="Explore website feedback use cases"
+          className="inline-flex text-sm font-medium text-accent-cyan no-underline transition-colors hover:text-text-primary"
+        >
+          Explore all feedback workflows&nbsp;→
         </Link>
-      </p>
+      </div>
       <div className="mt-6 rounded-2xl border border-accent-cyan/25 bg-accent-cyan/10 p-6 text-center animate-fade-up max-sm:pb-20" style={{ animationDelay: "0.3s" }}>
         <p className="mx-auto mb-4 max-w-[760px] text-sm leading-relaxed text-text-subtle">
           Looking for a lighter alternative to Userback, Marker.io, BugHerd,

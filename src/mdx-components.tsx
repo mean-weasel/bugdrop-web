@@ -1,29 +1,29 @@
 import type { MDXComponents } from "mdx/types";
-import type { ReactNode } from "react";
+import { isValidElement, type ReactNode } from "react";
 
-function headingText(children: ReactNode): string {
-  if (typeof children === "string" || typeof children === "number") return String(children);
-  if (Array.isArray(children)) return children.map(headingText).join("");
-  if (children && typeof children === "object" && "props" in children) {
-    return headingText((children as { props?: { children?: ReactNode } }).props?.children);
-  }
+function headingText(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(headingText).join("");
+  if (isValidElement<{ children?: ReactNode }>(node)) return headingText(node.props.children);
   return "";
 }
 
-export function docHeadingId(children: ReactNode): string | undefined {
-  const value = headingText(children)
-    .trim()
+export function mdxHeadingId(children: ReactNode): string {
+  return headingText(children)
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-  return value || undefined;
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
 }
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    h1: ({ children, id }) => <h1 id={id ?? docHeadingId(children)} className="text-3xl font-bold text-text-primary mb-4">{children}</h1>,
-    h2: ({ children, id }) => <h2 id={id ?? docHeadingId(children)} className="text-2xl font-semibold text-text-primary mt-8 mb-3">{children}</h2>,
-    h3: ({ children, id }) => <h3 id={id ?? docHeadingId(children)} className="text-xl font-semibold text-text-primary mt-6 mb-2">{children}</h3>,
+    h1: ({ children, id }) => <h1 id={id ?? mdxHeadingId(children)} className="text-3xl font-bold text-text-primary mb-4">{children}</h1>,
+    h2: ({ children, id }) => <h2 id={id ?? mdxHeadingId(children)} className="text-2xl font-semibold text-text-primary mt-8 mb-3">{children}</h2>,
+    h3: ({ children, id }) => <h3 id={id ?? mdxHeadingId(children)} className="text-xl font-semibold text-text-primary mt-6 mb-2">{children}</h3>,
     p: ({ children }) => <p className="text-text-subtle mb-4 leading-relaxed">{children}</p>,
     a: ({ href, children }) => <a href={href} className="text-accent-cyan hover:underline">{children}</a>,
     code: ({ children }) => <code className="font-mono text-sm bg-bg-elevated px-1.5 py-0.5 rounded text-accent-cyan">{children}</code>,

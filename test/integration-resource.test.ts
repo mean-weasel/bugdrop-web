@@ -10,6 +10,7 @@ import {
   resolveWidgetUrl,
   widgetScriptTag,
 } from "@/lib/links";
+import { mdxHeadingId } from "@/mdx-components";
 import { widgetCspSource } from "../next.config";
 
 const homepageCiRuntime =
@@ -194,6 +195,23 @@ describe("T012 integration and resource contracts", () => {
     " https://bugdrop.neonwatty.workers.dev/widget.js",
   ])("rejects an unsafe widget runtime URL: %s", (value) => {
     expect(() => widgetCspSource(value)).toThrow("Unsafe BugDrop widget URL");
+  });
+
+  it("keeps the screenshot privacy checklist identical across page and portable actions", async () => {
+    const pageChecklist = await readFile("src/content/resources/screenshot-privacy-checklist.mdx", "utf8");
+    const checklistItems = (markdown: string) =>
+      [...markdown.matchAll(/^- \[ \] (.+)$/gm)].map((match) => match[1]);
+
+    expect(checklistItems(portableResourceText["screenshot-privacy-checklist"])).toEqual(
+      checklistItems(pageChecklist),
+    );
+  });
+
+  it("generates stable MDX heading IDs without changing heading text", () => {
+    expect(mdxHeadingId("Screenshot masking")).toBe("screenshot-masking");
+    expect(mdxHeadingId("What “simpler” costs")).toBe("what-simpler-costs");
+    expect(mdxHeadingId("429 Response Behavior")).toBe("429-response-behavior");
+    expect(mdxHeadingId("Screenshot masking")).toBe(mdxHeadingId("Screenshot masking"));
   });
 
   it("loads the Vercel integration only in preview", () => {
@@ -387,9 +405,10 @@ describe("T012 integration and resource contracts", () => {
     expect(globals).not.toContain("--color-text-subtle: #787c99");
   });
 
-  it("publishes exactly the two approved reusable resources", async () => {
+  it("publishes exactly the three approved reusable resources", async () => {
     expect(resourceNav.map(({ slug }) => slug).sort()).toEqual([
       "client-website-qa-checklist",
+      "screenshot-privacy-checklist",
       "visual-bug-report-template",
     ]);
     const content = (await readdir("src/content/resources")).filter((file) => file.endsWith(".mdx")).sort();
@@ -413,6 +432,7 @@ describe("T012 integration and resource contracts", () => {
     const page = await readFile("src/app/resources/[slug]/page.tsx", "utf8");
     expect(page).toContain('event: "resource_demo_click"');
     expect(page).toContain('event: "resource_sandbox_click"');
+    expect(page).toContain('event: "privacy_checklist_demo_click"');
     expect(page).toContain("data-resource-secondary-conversion={resource.slug}");
     expect(page).toContain("data-analytics-label={resource.slug}");
   });

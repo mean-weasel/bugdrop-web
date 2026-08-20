@@ -9,21 +9,23 @@ assert(baseArg, "Usage: node scripts/integration-resource-contract.mjs --base-ur
 const baseUrl = new URL(baseArg.slice("--base-url=".length));
 assert(["127.0.0.1", "localhost"].includes(baseUrl.hostname), "Contract must target localhost");
 
-const slugs = ["visual-bug-report-template", "client-website-qa-checklist"];
+const slugs = ["visual-bug-report-template", "client-website-qa-checklist", "screenshot-privacy-checklist"];
 const files = (await readdir(new URL("../src/content/resources/", import.meta.url)))
   .filter((file) => file.endsWith(".mdx"))
   .map((file) => file.replace(/\.mdx$/, ""))
   .sort();
-assert.deepEqual(files, [...slugs].sort(), "Resource content inventory must contain exactly two approved assets");
+assert.deepEqual(files, [...slugs].sort(), "Resource content inventory must contain exactly three approved assets");
 
 const architecture = JSON.parse(await readFile(new URL("../src/lib/acquisition-architecture.json", import.meta.url), "utf8"));
 const owners = new Map([
   ["visual-bug-report-template", "visual bug report template"],
   ["client-website-qa-checklist", "client website qa checklist"],
+  ["screenshot-privacy-checklist", "screenshot privacy checklist"],
 ]);
 const secondaryConversions = new Map([
   ["visual-bug-report-template", { href: "/demo", event: "resource_demo_click", printLabel: "Print template" }],
   ["client-website-qa-checklist", { href: "/sandbox", event: "resource_sandbox_click", printLabel: "Print checklist" }],
+  ["screenshot-privacy-checklist", { href: "/demo", event: "privacy_checklist_demo_click", printLabel: "Print checklist" }],
 ]);
 
 for (const slug of slugs) {
@@ -35,7 +37,7 @@ for (const slug of slugs) {
   assert(html.includes(`data-resource-page="${slug}"`), `${route} is missing resource shell`);
   const h1 = html.match(/<h1[^>]*>(.*?)<\/h1>/is)?.[1]?.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().toLowerCase() ?? "";
   assert(h1.includes(owners.get(slug)), `${route} H1 does not own its query`);
-  assert(visibleText.includes("Source reviewed 2026-08-14"), `${route} is missing visible source/review date`);
+  assert(visibleText.includes(`Sources reviewed ${slug === "screenshot-privacy-checklist" ? "2026-08-16" : "2026-08-14"}`), `${route} is missing visible source/review date`);
   assert(html.includes("data-resource-actions"), `${route} is missing copy/download/print actions`);
   const actionTags = [...html.matchAll(/<(?:a|button)\b[^>]*>/gi)].map((match) => match[0]);
   for (const event of ["resource_copy_click", "resource_download_click", "resource_print_click"]) {
@@ -48,6 +50,11 @@ for (const slug of slugs) {
   assert(visibleText.includes(secondary.printLabel), `${route} print action label is not resource-specific`);
   assert(html.includes(`href="/resources/${slug}.md"`), `${route} is missing its portable download`);
   assert((html.match(/data-resource-related-link/g) ?? []).length >= 3, `${route} needs contextual links`);
+  const relatedHrefs = actionTags
+    .filter((tag) => tag.includes("data-resource-related-link"))
+    .map((tag) => tag.match(/href=["']([^"']+)/i)?.[1])
+    .filter(Boolean);
+  assert.equal(new Set(relatedHrefs).size, relatedHrefs.length, `${route} must not repeat a related-link destination`);
   assert(visibleText.includes("JavaScript is off"), `${route} lacks an explicit no-JavaScript path`);
   const canonical = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)/i)?.[1]
     ?? html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["']/i)?.[1];
@@ -61,6 +68,7 @@ for (const slug of slugs) {
 }
 
 const browser = await chromium.launch({ headless: true });
+const fragmentNavigationProof = [];
 try {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const preview = await context.newPage();
@@ -83,8 +91,28 @@ try {
   assert.equal(await production.locator('script[data-label="Preview feedback"]').count(), 0, "production must omit preview script");
   assert.equal(await production.locator("#bugdrop-host").count(), 0, "production must omit preview widget host");
   await context.close();
+
+  for (const viewport of [{ name: "desktop", width: 1280, height: 900 }, { name: "mobile", width: 390, height: 844 }]) {
+    const fragmentContext = await browser.newContext({ viewport });
+    const page = await fragmentContext.newPage();
+    await page.goto(new URL("/resources/screenshot-privacy-checklist", baseUrl).href, { waitUntil: "networkidle" });
+    const link = page.locator('a[href="/docs/security#screenshot-masking"]').first();
+    assert.equal(await link.count(), 1, `${viewport.name}: privacy checklist must link to screenshot masking`);
+    await link.click();
+    await page.waitForURL(/\/docs\/security#screenshot-masking$/);
+    const target = page.locator("#screenshot-masking");
+    await target.waitFor();
+    assert.equal((await target.textContent())?.trim(), "Screenshot masking", `${viewport.name}: fragment must target the Screenshot masking heading`);
+    await page.waitForFunction(() => {
+      const heading = document.getElementById("screenshot-masking");
+      const bounds = heading?.getBoundingClientRect();
+      return location.hash === "#screenshot-masking" && bounds && bounds.top >= -1 && bounds.top < innerHeight;
+    });
+    fragmentNavigationProof.push({ viewport: viewport.name, hash: await page.evaluate(() => location.hash), target: await target.getAttribute("id") });
+    await fragmentContext.close();
+  }
 } finally {
   await browser.close();
 }
 
-console.log(JSON.stringify({ status: "pass", resources: 2, integrationModes: 2, loading: "synchronous", selectors: ["#bugdrop-host", ".bd-trigger", ".bd-modal", ".bd-close"] }, null, 2));
+console.log(JSON.stringify({ status: "pass", resources: 3, integrationModes: 2, fragmentNavigationProof, loading: "synchronous", selectors: ["#bugdrop-host", ".bd-trigger", ".bd-modal", ".bd-close"] }, null, 2));

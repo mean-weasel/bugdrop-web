@@ -73,7 +73,8 @@
       "related": [
         { "path": "/use-cases", "anchor": "Browse all website feedback use cases", "rationale": "Compare screenshot capture with other reporting workflows." },
         { "path": "/use-cases/visual-bug-reporting", "anchor": "Build a visual bug reporting process", "rationale": "Move from the capture tool to a repeatable QA practice." },
-        { "path": "/demo", "anchor": "Try screenshot feedback in the live demo", "rationale": "Experience the visual reporting flow directly." }
+        { "path": "/demo", "anchor": "Try screenshot feedback in the live demo", "rationale": "Experience the visual reporting flow directly." },
+        { "path": "/resources/screenshot-privacy-checklist", "anchor": "Run the screenshot privacy checklist", "rationale": "Review capture scope, the final image, its destination, and retention." }
       ]
     },
     {
@@ -89,7 +90,8 @@
         { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Choose a screenshot feedback widget", "rationale": "See the capture tool behind visual reporting." },
         { "path": "/use-cases/client-projects", "anchor": "Apply visual reporting to client review", "rationale": "Use visual evidence during staging feedback rounds." },
         { "path": "/use-cases/internal-tools", "anchor": "Apply visual reporting to internal tools", "rationale": "Reduce reporting friction in authenticated dashboards." },
-        { "path": "/resources/visual-bug-report-template", "anchor": "Copy a visual bug report template", "rationale": "Standardize expected behavior, steps, evidence, privacy, and triage." }
+        { "path": "/resources/visual-bug-report-template", "anchor": "Copy a visual bug report template", "rationale": "Standardize expected behavior, steps, evidence, privacy, and triage." },
+        { "path": "/resources/screenshot-privacy-checklist", "anchor": "Review screenshot privacy", "rationale": "Add a repeatable privacy gate to the visual reporting process." }
       ]
     },
     {
@@ -182,7 +184,8 @@
         { "path": "/use-cases/client-website-feedback-tool", "anchor": "Choose a client website feedback tool", "rationale": "Evaluate the tool requirements behind the review process." },
         { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Collect screenshot feedback from clients", "rationale": "Give stakeholders a precise visual reporting method." },
         { "path": "/compare/bugherd", "anchor": "Compare BugDrop with BugHerd for client review", "rationale": "Contrast GitHub-native and hosted task-board workflows." },
-        { "path": "/resources/client-website-qa-checklist", "anchor": "Run the client website QA checklist", "rationale": "Give the review round a portable scope and exit contract." }
+        { "path": "/resources/client-website-qa-checklist", "anchor": "Run the client website QA checklist", "rationale": "Give the review round a portable scope and exit contract." },
+        { "path": "/resources/screenshot-privacy-checklist", "anchor": "Give clients a screenshot privacy checklist", "rationale": "Set a shared capture and sharing boundary before review begins." }
       ]
     },
     {
@@ -331,12 +334,26 @@
       ]
     },
     {
+      "path": "/resources",
+      "kind": "resource-hub",
+      "primaryQuery": "website feedback resources",
+      "title": "Website Feedback Resources",
+      "description": "Browse free, portable website feedback resources for screenshot privacy, visual bug reports, and client website QA.",
+      "related": [
+        { "path": "/resources/screenshot-privacy-checklist", "anchor": "Use the screenshot privacy checklist", "rationale": "Review capture, sharing, and retention before submitting an image." },
+        { "path": "/resources/visual-bug-report-template", "anchor": "Use the visual bug report template", "rationale": "Turn visual evidence into a reproducible report." },
+        { "path": "/resources/client-website-qa-checklist", "anchor": "Use the client website QA checklist", "rationale": "Run a bounded review and handoff." },
+        { "path": "/demo", "anchor": "Try the reporting demo", "rationale": "Practice an in-page reporting workflow." }
+      ]
+    },
+    {
       "path": "/resources/visual-bug-report-template",
       "kind": "resource",
       "primaryQuery": "visual bug report template",
       "title": "Visual Bug Report Template",
       "description": "Copy, download, or print a visual bug report template for reproduction, environment, evidence, privacy review, and triage.",
       "related": [
+        { "path": "/resources", "anchor": "Browse all website feedback resources", "rationale": "Find the complete portable resource library." },
         { "path": "/use-cases/visual-bug-reporting", "anchor": "Plan a visual bug reporting process", "rationale": "Use the template inside a repeatable reporting workflow." },
         { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Capture screenshot feedback", "rationale": "Evaluate an in-page capture path for the visual evidence." },
         { "path": "/resources/client-website-qa-checklist", "anchor": "Use the client website QA checklist", "rationale": "Pair individual reports with a bounded review round." }
@@ -349,9 +366,23 @@
       "title": "Client Website QA Checklist",
       "description": "Print or download a client website QA checklist for scope, responsive review, content, accessibility, privacy, and launch handoff.",
       "related": [
+        { "path": "/resources", "anchor": "Browse all website feedback resources", "rationale": "Find the complete portable resource library." },
         { "path": "/use-cases/client-projects", "anchor": "Design a client feedback workflow", "rationale": "Place the checklist inside a review round with owners and closure." },
         { "path": "/use-cases/vercel-preview-feedback", "anchor": "Collect feedback on Vercel previews", "rationale": "Use the checklist on a tested preview surface." },
         { "path": "/resources/visual-bug-report-template", "anchor": "Write a visual bug report", "rationale": "Turn failed checks into reproducible individual issues." }
+      ]
+    },
+    {
+      "path": "/resources/screenshot-privacy-checklist",
+      "kind": "resource",
+      "primaryQuery": "screenshot privacy checklist",
+      "title": "Screenshot Privacy Checklist",
+      "description": "Copy, download, or print a screenshot privacy checklist for capture scope, redaction review, destination access, and retention.",
+      "related": [
+        { "path": "/resources", "anchor": "Browse all website feedback resources", "rationale": "Find the complete portable resource library." },
+        { "path": "/use-cases/screenshot-feedback-widget", "anchor": "Choose a screenshot capture path", "rationale": "Apply the checklist to manual and automatic capture decisions." },
+        { "path": "/docs/security", "anchor": "Review BugDrop masking limits", "rationale": "Understand supported paths, storage, and explicit limitations." },
+        { "path": "/resources/visual-bug-report-template", "anchor": "Write a privacy-reviewed visual report", "rationale": "Pair safer evidence with reproducible reporting fields." }
       ]
     }
   ]

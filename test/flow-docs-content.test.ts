@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { FlowCapabilityReference } from "../src/components/docs/flow-capability-reference";
 import { FLOW_CAPABILITIES } from "../src/lib/flow-capabilities";
 import { docsNav } from "../src/lib/docs-nav";
-import { docHeadingId } from "../src/mdx-components";
+import { mdxHeadingId } from "../src/mdx-components";
 
 const read = (path: string) => readFileSync(path, "utf8");
 
@@ -76,8 +76,8 @@ describe("public custom-flow documentation", () => {
   });
 
   it("gives plain MDX headings stable fragment IDs", () => {
-    expect(docHeadingId("Custom-flow lifecycle")).toBe("custom-flow-lifecycle");
-    expect(docHeadingId(["Short text ", 2])).toBe("short-text-2");
+    expect(mdxHeadingId("Custom-flow lifecycle")).toBe("custom-flow-lifecycle");
+    expect(mdxHeadingId(["Short text ", 2])).toBe("short-text-2");
   });
 
   it("keeps the default feedback path first and places the new IA after Configuration", () => {

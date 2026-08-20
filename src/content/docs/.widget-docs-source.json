@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceRepository": "mean-weasel/bugdrop",
-  "sourceRevision": "00302ac3e733e4c04562423d365eb3d59dbe887e",
+  "sourceRevision": "1ffb44b2b7e4cadc33ccd75af6c0260e5bbc29e9",
   "files": [
     {
       "source": "docs/website/ci-testing.mdx",
@@ -16,7 +16,7 @@
     {
       "source": "docs/website/custom-flows.mdx",
       "target": "src/content/docs/custom-flows.mdx",
-      "sha256": "903aac32638aad9bd5b39972373f4d46127c8c9dc7e458b5dd4196eabec33ac8"
+      "sha256": "ffb8cc2f7885db42b04c80a0e63448719b7880180e3c42c5b1506d5baeb41a8b"
     },
     {
       "source": "docs/website/faq.mdx",
@@ -26,12 +26,12 @@
     {
       "source": "docs/website/flow-branching-and-output.mdx",
       "target": "src/content/docs/flow-branching-and-output.mdx",
-      "sha256": "7beb027335d1230295f9cd5041420613500d6284598da1fb5d5b299f98843a86"
+      "sha256": "979314d666611a275c8a206d7d39a596fa2ec730da59cc214316f2e77d595b3c"
     },
     {
       "source": "docs/website/flow-design.mdx",
       "target": "src/content/docs/flow-design.mdx",
-      "sha256": "07cb0b827e365b41c3140d759d41fd95510e06f829e6ea1dcbc12b3009aa1144"
+      "sha256": "8a7ba6c4587cd7d88e9af0f72d3410201675d3d3836443115a9506fc198e3090"
     },
     {
       "source": "docs/website/flow-examples.mdx",
@@ -61,7 +61,7 @@
     {
       "source": "docs/website/flow-reference.mdx",
       "target": "src/content/docs/flow-reference.mdx",
-      "sha256": "b307561878ac130c95392fbd977f0c61acb66b04424d0b576c0dd68489a49d87"
+      "sha256": "1889124d284bc8c754ba7f03f0123f91941b3d1c8495445c94b41740db3bfff7"
     },
     {
       "source": "docs/website/flow-screen-guide.mdx",
@@ -101,7 +101,7 @@
     {
       "source": "docs/website/styling.mdx",
       "target": "src/content/docs/styling.mdx",
-      "sha256": "41202872f5b2f45e2bb0c89c161c50f87d13ea4e0a8fe1ec1047a25d01f67b5c"
+      "sha256": "251cf586b40481b84d3861ad5758394892a98b9ac9441f62d60a95b606316b9d"
     },
     {
       "source": "docs/website/version-pinning.mdx",
@@ -111,7 +111,7 @@
     {
       "source": "docs/website/flow-capabilities.ts",
       "target": "src/lib/flow-capabilities.ts",
-      "sha256": "924380cacb44e1535a2078b10ce46293e7deb0d4a9b8db989418566274377db9"
+      "sha256": "6b69552ebb74b656f3fafba27d998bdbc8d29e080d0933fce063482ea4fe641f"
     }
   ]
 }

@@ -1,0 +1,24 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T005",
+    "board_path": "docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "changed_files": ["docs/homepage-flow-demo-operations.md"],
+    "commands": [
+      {"cmd":"Exact v1.56.3 SHA-256 and byte-size check","status":"pass"},
+      {"cmd":"npm test","status":"pass","detail":"19 files, 162 tests"},
+      {"cmd":"npm run lint","status":"pass","detail":"0 errors; vendored-runtime warnings only"},
+      {"cmd":"npm run build","status":"pass"},
+      {"cmd":"Feature-enabled exact-runtime desktop/mobile Playwright","status":"pass","detail":"15 passed, 17 intentional skips, zero retries"},
+      {"cmd":"Unset Classic-only control","status":"pass"},
+      {"cmd":"False Classic-only control","status":"pass"},
+      {"cmd":"Named-origin desktop/mobile visual walkthrough","status":"pass","detail":"10 screenshots; exact hash/size; zero unauthorized requests"},
+      {"cmd":"git diff --check","status":"pass"}
+    ],
+    "summary": "Documented and completed repeatable exact-runtime QA at bugdrop.localhost across desktop and mobile. The procedure covers exact URL/hash/size, chooser and all four experiences, keyboard/focus, 500 ms forward/back transition, reduced motion, capture cleanup, payload isolation, overflow, false/unset Classic controls, and the zero-real-request ledger. Served bytes matched v1.56.3 and no real Issue or nonlocal request occurred.",
+    "deviations": [],
+    "remaining_blockers": [],
+    "verification_attempts": 1,
+    "stopped_because": null
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "decision": "approved",
+  "coverage": ["native codex review","correctness","tests","silent-failures","contracts-types","comments-docs","fresh validation"],
+  "accepted_findings": [],
+  "evidence": ["Focused runtime and overlay tests passed 15/15.","Delayed-script real-lab browser regression passed 1/1 with retries disabled.","Exact widget identity and git diff check passed.","Native untracked-file candidates were rejected at 0.99 because complete scope includes all additions."]
+}

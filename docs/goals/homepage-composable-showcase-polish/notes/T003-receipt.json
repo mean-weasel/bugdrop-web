@@ -1,0 +1,35 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T003",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "decision": "approved",
+    "full_outcome_complete": false,
+    "rationale": "The website/configuration tranche is release-quality with no bounded correction required. Desktop and 390×844 walkthroughs show differentiated, accessible chooser surfaces; compact, unobstructed flows; neutral Onboarding guidance; and a mobile launcher that yields over the showcase and returns afterward. Feature Request now fits every mobile step, and Bug Report uses the strongest available configuration layout. Remaining native attachment presentation and Classic dialog semantics are authenticated SDK-only limitations, not website regressions. Proceed past the correction slot while preserving the separate SDK handoff and final review gates.",
+    "worker_package": null,
+    "evidence": [
+      "Desktop chooser presents five distinct icons, concise descriptions, selected-state styling, and a matching selected CTA without visual crowding.",
+      "At 390×844, the floating launcher is absent while the showcase is visible, does not cover the building-blocks link, and becomes visible again after the section leaves the viewport.",
+      "Bug Report desktop and mobile screens fit without overflow; attachments and logs are full-width, desktop contact fields are paired, and mobile contact fields stack cleanly.",
+      "Quick Rating remains the strongest compact experience and fits comfortably on mobile.",
+      "Feature Request’s opportunity, context, and labeled Nice to have/Important/Transformative priority screens each fit within 390×844 with actions visible.",
+      "Onboarding’s check-in and conditional help screens fit mobile and use neutral guidance copy: How can we help?, next step clearer, and What would help?.",
+      "Chooser radios expose aria-describedby links to their descriptions; the floating chooser exposes a named menu with descriptive menuitemradio names.",
+      "Composable experiences expose named dialogs and named Close buttons; browser logs contained no warnings or errors during the walkthrough.",
+      "Classic remains visually functional on desktop/mobile but exposes no dialog role and an unnamed close control; the native attachment chooser remains browser chrome. Both are SDK-only findings already isolated in the handoff.",
+      "T002 receipt records passing unit tests, lint, exact-runtime build, enabled desktop/mobile E2E, false/unset Classic isolation, and git diff check; an independent git diff check also remained clean."
+    ],
+    "subgoal_contract": null,
+    "parallel_safety": null,
+    "blocked_tasks": [],
+    "missing_evidence": [
+      "Final SDK handoff confirmation, PR Review Toolkit review, complete browser oracle, and T999 completion audit remain.",
+      "SDK-only attachment treatment and Classic dialog accessibility remain intentionally unimplemented pending separate authority."
+    ],
+    "required_board_updates": [
+      "Record T003 done with this receipt.",
+      "Record T004 as no correction required/done because worker_package is null.",
+      "Activate T005 as the next task."
+    ]
+  }
+}

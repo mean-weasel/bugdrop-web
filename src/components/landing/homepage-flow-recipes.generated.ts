@@ -18,11 +18,11 @@ export const HOMEPAGE_FLOW_RECIPE_SOURCE = Object.freeze({
 });
 
 export const HOMEPAGE_BUGDROP_RUNTIME = Object.freeze({
-  release: "v1.56.2",
-  targetSha: "81293491bf9924879465c668a391a5e4aeae912d",
-  localPath: "public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js",
-  byteLength: 229988,
-  sha256: "a0b85b64c85ab324364ac967207030202c998445ffca644be4b312c4c94ffc2f",
+  release: "v1.56.3",
+  targetSha: "47a392d1e7b1a8d8adeff1692f6bbbd84696280d",
+  localPath: "public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js",
+  byteLength: 238591,
+  sha256: "338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e",
 });
 
 export type HomepageFlowRecipeId = 'bug-report' | 'product-triage' | 'customer-pulse';

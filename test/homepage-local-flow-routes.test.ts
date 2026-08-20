@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { GET } from "@/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/check/[...repo]/route";
-import { POST } from "@/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/feedback/route";
+import { GET } from "@/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/check/[...repo]/route";
+import { POST } from "@/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/feedback/route";
 import {
   clearLocalSubmissionsForTests,
   getLocalSubmission,
   MAX_LOCAL_SUBMISSION_BYTES,
 } from "@/lib/public-flow-lab/local-submissions";
 
-const RUNTIME_PATH = "/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d";
+const RUNTIME_PATH = "/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d";
 const ORIGIN = "http://bugdrop.localhost:3000";
 const REPO = "mean-weasel/bugdrop-widget-test";
 
@@ -23,7 +23,7 @@ function localHeaders(overrides: Record<string, string> = {}) {
 
 function checkContext(repo = REPO) {
   return { params: Promise.resolve({ repo: repo.split("/") }) } as RouteContext<
-    "/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/check/[...repo]"
+    "/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/check/[...repo]"
   >;
 }
 

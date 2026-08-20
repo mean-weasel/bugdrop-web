@@ -1,0 +1,19 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T012",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/flow-capability-documentation/state.yaml",
+    "changed_files": ["src/lib/flow-capabilities.ts","test/helpers/flow-capability-parity.ts","test/flow-capabilities.test.ts"],
+    "commands": [
+      {"cmd":"npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts","status":"pass"},
+      {"cmd":"npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts","status":"pass"},
+      {"cmd":"npm run build","status":"pass"},
+      {"cmd":"git diff --check","status":"pass"}
+    ],
+    "summary": "Added a canonical normalized public value-type contract covering all Flow declarations, their transitive Variant dependencies, and registerFlow. Parity now compares contract keys and signatures bidirectionally, checks complete condition/issue/outcome branch sets, and validates every built-in transition shape. Adversarial tests prove failures for all branch-family removals, requiredness, value-type, literal, runtime, provenance, authenticated-source tampering, and banned multiSelect drift. Runtime facts remain source-derived from authenticated snapshots. All required verification passed after one bounded correction.",
+    "deviations": [],
+    "remaining_blockers": [],
+    "verification_attempts": 2,
+    "stopped_because": null
+  }
+}

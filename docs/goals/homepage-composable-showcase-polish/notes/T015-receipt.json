@@ -1,0 +1,11 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result":"done","task_id":"T015","board_path":"/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "changed_files":["src/lib/links.ts","test/homepage-demo-runtime.test.ts","e2e/homepage-flow-demo.spec.ts"],
+    "commands":[
+      {"cmd":"focused runtime/integration tests","status":"pass"},{"cmd":"npm test","status":"pass"},{"cmd":"npm run lint","status":"pass"},{"cmd":"root-relative build","status":"pass"},{"cmd":"uppercase-host build","status":"pass"},{"cmd":"uppercase-host private browser proof","status":"pass"},{"cmd":"dot-segment fail-closed browser proof","status":"pass"},{"cmd":"full desktop/mobile browser suite","status":"pass"},{"cmd":"unset Classic control","status":"pass"},{"cmd":"false Classic control","status":"pass"},{"cmd":"runtime identity","status":"pass"},{"cmd":"git diff --check","status":"pass"}
+    ],
+    "summary":"Implemented raw pre-normalization classification: only the exact root-relative path and exact HTTP origin/path classify private, with hostname case equivalence only. Added exhaustive rejection coverage for whitespace, scheme/port aliases, dot segments, backslashes, encoded hostnames, credentials, query/fragment, wrong origins/paths, and malformed inputs. Focused browser proofs confirmed uppercase-host private behavior and dot-segment fail-closed public behavior. Full tests, lint, builds, desktop/mobile browser, public-off controls, artifact identity, and diff hygiene pass.",
+    "deviations":["One TypeScript test-narrowing failure was fixed within the first bounded attempt."],"remaining_blockers":[],"verification_attempts":2,"stopped_because":null
+  }
+}

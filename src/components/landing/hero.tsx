@@ -72,11 +72,11 @@ export function Hero() {
         <a
           href="#try-bugdrop"
           data-analytics-event="landing_cta_click"
-          data-analytics-label="Try it on this page"
+          data-analytics-label="Design your flow"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-[10px] font-medium text-[0.95rem] bg-accent-cyan text-bg-deep hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(125,207,255,0.24)] transition-all duration-300 max-sm:w-full max-sm:justify-center"
         >
           <MessageSquare className="size-4" aria-hidden="true" />
-          Try it on this page
+          Design your flow
         </a>
         <a
           href={MARKETPLACE_URL}

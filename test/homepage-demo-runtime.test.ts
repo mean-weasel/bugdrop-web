@@ -1,6 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { homepageFlowRecipeList } from "@/components/landing/homepage-flow-recipes.generated";
+import { homepageFlowDemoRecipeList } from "@/components/landing/homepage-flow-demo-recipes";
+import {
+  CLASSIC_WIDGET_URL,
+  HOMEPAGE_DOGFOOD_RUNTIME_PATH,
+  HOMEPAGE_SHOWCASE_WIDGET_URL,
+  WIDGET_ORIGIN,
+  isLocalHomepageDogfoodRuntime,
+  resolveWidgetUrl,
+} from "@/lib/links";
 
 type Runtime = typeof import("@/components/landing/homepage-demo-runtime");
 
@@ -56,6 +64,89 @@ describe("homepage demo runtime", () => {
     delete (globalThis as { HTMLScriptElement?: unknown }).HTMLScriptElement;
   });
 
+  it("accepts only the two exact local dogfood runtime spellings", () => {
+    expect(isLocalHomepageDogfoodRuntime(HOMEPAGE_DOGFOOD_RUNTIME_PATH)).toBe(true);
+    expect(isLocalHomepageDogfoodRuntime(
+      `http://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+    )).toBe(true);
+    expect(isLocalHomepageDogfoodRuntime(
+      `http://BUGDROP.LOCALHOST:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+    )).toBe(true);
+    expect(isLocalHomepageDogfoodRuntime(
+      `http://BuGdRoP.LoCaLhOsT:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+    )).toBe(true);
+
+    const publicRuntimeUrls = [
+      ` ${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `${HOMEPAGE_DOGFOOD_RUNTIME_PATH} `,
+      ` http://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `http://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH} `,
+      `HTTP://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `Http://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `http://bugdrop.localhost:03000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `http://bugdrop.localhost:3000/vendor/bugdrop/./47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js`,
+      `http://bugdrop.localhost:3000/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/../47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js`,
+      `http:\\bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `http://bugdrop.localhost:3000\\vendor\\bugdrop\\47a392d1e7b1a8d8adeff1692f6bbbd84696280d\\widget.js`,
+      `http://bugdrop%2elocalhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `http://%62ugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `https://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `http://bugdrop.localhost:3001${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      "http://bugdrop.localhost:3000/widget.js",
+      `http://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}?preview=true`,
+      `http://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}#preview`,
+      `http://user@bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `http://user:secret@bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      `https://bugdrop.neonwatty.workers.dev${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      "https://bugdrop.neonwatty.workers.dev/widget.js",
+      `${HOMEPAGE_DOGFOOD_RUNTIME_PATH}?preview=true`,
+      `${HOMEPAGE_DOGFOOD_RUNTIME_PATH}#preview`,
+      "",
+      "http://",
+      "http://bugdrop.localhost:3000",
+      "not a URL",
+    ];
+
+    for (const widgetUrl of publicRuntimeUrls) {
+      expect(isLocalHomepageDogfoodRuntime(widgetUrl), widgetUrl).toBe(false);
+    }
+  });
+
+  it("fails enabled showcase runtime selection closed while preserving Classic defaults", () => {
+    const localAbsolute =
+      `http://BUGDROP.LOCALHOST:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`;
+
+    expect(resolveWidgetUrl(undefined, undefined)).toBe(CLASSIC_WIDGET_URL);
+    expect(resolveWidgetUrl("false", undefined)).toBe(CLASSIC_WIDGET_URL);
+    expect(resolveWidgetUrl(undefined, "https://example.com/custom-widget.js"))
+      .toBe("https://example.com/custom-widget.js");
+    expect(resolveWidgetUrl("false", "https://example.com/custom-widget.js"))
+      .toBe("https://example.com/custom-widget.js");
+
+    expect(resolveWidgetUrl("true", HOMEPAGE_SHOWCASE_WIDGET_URL))
+      .toBe(HOMEPAGE_SHOWCASE_WIDGET_URL);
+    expect(resolveWidgetUrl("true", HOMEPAGE_DOGFOOD_RUNTIME_PATH))
+      .toBe(HOMEPAGE_DOGFOOD_RUNTIME_PATH);
+    expect(resolveWidgetUrl("true", localAbsolute)).toBe(localAbsolute);
+
+    const unsupported = [
+      undefined,
+      "",
+      CLASSIC_WIDGET_URL,
+      `${WIDGET_ORIGIN}/widget.v1.56.2.js`,
+      `${HOMEPAGE_SHOWCASE_WIDGET_URL}?cache=mutable`,
+      `http://bugdrop.localhost:3000/vendor/bugdrop/./47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js`,
+      `https://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
+      "javascript:alert(1)",
+    ];
+
+    for (const candidate of unsupported) {
+      expect(() => resolveWidgetUrl("true", candidate), candidate).toThrow(
+        "Enabled homepage showcase requires the exact v1.56.3 public runtime or an approved local fixture",
+      );
+    }
+  });
+
   it("preserves the Classic configuration while suppressing the SDK trigger", () => {
     expect(runtime.homepageRuntimeAttributes()).toMatchObject({
       repo: "mean-weasel/bugdrop-widget-test",
@@ -66,7 +157,7 @@ describe("homepage demo runtime", () => {
       text: "#c0caf5",
       radius: "10",
       font: "inherit",
-      showIssueLink: "always",
+      showIssueLink: "public",
     });
   });
 
@@ -112,6 +203,42 @@ describe("homepage demo runtime", () => {
       registerFlow: vi.fn(),
     };
 
+    await expect(runtime.loadHomepageBugDrop()).resolves.toBe(exactApi);
+  });
+
+  it("keeps a pending exact load from resolving a foreign cross-route API", async () => {
+    const { document, runtimeWindow } = installBrowser();
+    const first = runtime.loadHomepageBugDrop();
+    const foreignApi = {
+      open: vi.fn(),
+      close: vi.fn(),
+      registerFlow: vi.fn(),
+    };
+    runtimeWindow.BugDrop = foreignApi;
+
+    const second = runtime.loadHomepageBugDrop();
+    expect(second).toBe(first);
+    expect(runtimeWindow.BugDrop).toBeUndefined();
+
+    let settled = false;
+    void second.finally(() => {
+      settled = true;
+    });
+    await Promise.resolve();
+    expect(settled).toBe(false);
+    expect(foreignApi.open).not.toHaveBeenCalled();
+    expect(foreignApi.registerFlow).not.toHaveBeenCalled();
+
+    const exactApi = {
+      open: vi.fn(),
+      close: vi.fn(),
+      registerFlow: vi.fn(),
+    };
+    runtimeWindow.BugDrop = exactApi;
+    document.scripts[0].dispatchEvent(new Event("load"));
+
+    await expect(first).resolves.toBe(exactApi);
+    await expect(second).resolves.toBe(exactApi);
     await expect(runtime.loadHomepageBugDrop()).resolves.toBe(exactApi);
   });
 
@@ -170,7 +297,7 @@ describe("homepage demo runtime", () => {
 
     const handle = runtime.registerHomepageFlow(api, "bug-report");
     expect(api.registerFlow).toHaveBeenCalledOnce();
-    expect(api.registerFlow).toHaveBeenCalledWith(homepageFlowRecipeList[0].config);
+    expect(api.registerFlow).toHaveBeenCalledWith(homepageFlowDemoRecipeList[0].config);
     expect(runtime.registerHomepageFlow(api, "bug-report")).toBe(handle);
     expect(api.registerFlow).toHaveBeenCalledOnce();
 
@@ -182,12 +309,12 @@ describe("homepage demo runtime", () => {
   });
 
   it("preserves successful selected handles when another registration fails and retries", () => {
-    let productAttempts = 0;
+    let featureAttempts = 0;
     const api = {
       open: vi.fn(),
       close: vi.fn(),
       registerFlow: vi.fn((config: { id: string }) => {
-        if (config.id === "product-triage" && productAttempts++ === 0) {
+        if (config.id === "feature-request" && featureAttempts++ === 0) {
           throw new Error("one-time registration failure");
         }
         return { id: config.id, open: vi.fn() };
@@ -195,11 +322,11 @@ describe("homepage demo runtime", () => {
     };
 
     const bugReport = runtime.registerHomepageFlow(api, "bug-report");
-    expect(() => runtime.registerHomepageFlow(api, "product-triage")).toThrow(
+    expect(() => runtime.registerHomepageFlow(api, "feature-request")).toThrow(
       "one-time registration failure",
     );
     expect(runtime.registerHomepageFlow(api, "bug-report")).toBe(bugReport);
-    expect(runtime.registerHomepageFlow(api, "product-triage").id).toBe("product-triage");
+    expect(runtime.registerHomepageFlow(api, "feature-request").id).toBe("feature-request");
     expect(api.registerFlow).toHaveBeenCalledTimes(3);
   });
 
@@ -224,7 +351,7 @@ describe("homepage demo runtime", () => {
     expect(api.close).toHaveBeenCalledOnce();
 
     const flow = runtime.openHomepageExperience(api, handle, "bug-report");
-    expect(flowOpen).toHaveBeenCalledWith(homepageFlowRecipeList[0].openOptions);
+    expect(flowOpen).toHaveBeenCalledWith(homepageFlowDemoRecipeList[0].openOptions);
     if (flow.id === "classic") throw new Error("Expected the Bug Report Flow session.");
     await expect(flow.result).resolves.toEqual({ status: "closed" });
     flow.close();

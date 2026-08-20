@@ -7,12 +7,12 @@ import {
 } from "@/components/landing/homepage-demo-model";
 
 describe("homepage demo model", () => {
-  it("keeps Classic first and derives the three composable choices from canonical recipes", () => {
-    expect(homepageExperiences.map(({ id, label }) => ({ id, label }))).toEqual([
-      { id: "classic", label: "General Feedback" },
-      { id: "bug-report", label: "Bug Report" },
-      { id: "product-triage", label: "Product Triage" },
-      { id: "customer-pulse", label: "Customer Pulse" },
+  it("keeps Classic first and exposes three differentiated composable choices", () => {
+    expect(homepageExperiences.map(({ id, label, icon }) => ({ id, label, icon }))).toEqual([
+      { id: "classic", label: "General Feedback", icon: "💬" },
+      { id: "bug-report", label: "Bug Report", icon: "🐛" },
+      { id: "quick-rating", label: "Quick Rating", icon: "⭐" },
+      { id: "feature-request", label: "Feature Request", icon: "💡" },
     ]);
     expect(Object.isFrozen(homepageExperiences)).toBe(true);
     expect(homepageExperiences.every(Object.isFrozen)).toBe(true);
@@ -22,16 +22,16 @@ describe("homepage demo model", () => {
         launchLabel: "Open General Feedback",
       },
       {
-        description: "Capture a reproducible problem with evidence.",
+        description: "Reproduce a bug and attach proof.",
         launchLabel: "Open Bug Report",
       },
       {
-        description: "Route product signals with conditional follow-up.",
-        launchLabel: "Open Product Triage",
+        description: "Share a 1–5 star rating in one step.",
+        launchLabel: "Open Quick Rating",
       },
       {
-        description: "Ask a focused customer satisfaction question.",
-        launchLabel: "Open Customer Pulse",
+        description: "Shape and prioritize a product idea.",
+        launchLabel: "Open Feature Request",
       },
     ]);
   });
@@ -40,27 +40,23 @@ describe("homepage demo model", () => {
     expect(initialHomepageDemoState).toEqual({
       selectedId: "classic",
       activeId: null,
-      menuOpen: false,
       runtimeState: "idle",
       announcement: "",
     });
   });
 
-  it("keeps the last selected experience highlighted after it settles and the menu reopens", () => {
+  it("keeps the last selected experience highlighted after it settles", () => {
     const selected = reduceHomepageDemo(initialHomepageDemoState, {
       type: "select",
-      id: "product-triage",
+      id: "feature-request",
     });
-    const reopened = reduceHomepageDemo(
-      reduceHomepageDemo(reduceHomepageDemo(selected, { type: "launch" }), {
-        type: "settled",
-      }),
-      { type: "open-menu" },
+    const settled = reduceHomepageDemo(
+      reduceHomepageDemo(selected, { type: "launch" }),
+      { type: "settled" },
     );
 
-    expect(reopened).toMatchObject({
-      selectedId: "product-triage",
-      menuOpen: true,
+    expect(settled).toMatchObject({
+      selectedId: "feature-request",
       activeId: null,
       runtimeState: "idle",
     });
@@ -70,13 +66,13 @@ describe("homepage demo model", () => {
     const active = reduceHomepageDemo(initialHomepageDemoState, { type: "launch" });
     const selectedWhileActive = reduceHomepageDemo(active, {
       type: "select",
-      id: "customer-pulse",
+      id: "quick-rating",
     });
     const duplicateLaunch = reduceHomepageDemo(selectedWhileActive, { type: "launch" });
 
     expect(selectedWhileActive).toMatchObject({
       activeId: "classic",
-      selectedId: "customer-pulse",
+      selectedId: "quick-rating",
     });
     expect(duplicateLaunch).toBe(selectedWhileActive);
   });
@@ -94,7 +90,6 @@ describe("homepage demo model", () => {
     expect(failed).toMatchObject({
       selectedId: "bug-report",
       activeId: null,
-      menuOpen: false,
       runtimeState: "error",
     });
     expect(reduceHomepageDemo(failed, { type: "launch" })).toMatchObject({

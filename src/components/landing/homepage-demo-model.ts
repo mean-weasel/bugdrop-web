@@ -1,13 +1,14 @@
 import {
-  homepageFlowRecipeList,
-  type HomepageFlowRecipeId,
-} from "./homepage-flow-recipes.generated";
+  homepageFlowDemoRecipeList,
+  type HomepageDemoFlowRecipeId,
+} from "./homepage-flow-demo-recipes";
 
-export type HomepageExperienceId = "classic" | HomepageFlowRecipeId;
+export type HomepageExperienceId = "classic" | HomepageDemoFlowRecipeId;
 
 export interface HomepageExperience {
   readonly id: HomepageExperienceId;
   readonly label: string;
+  readonly icon: string;
   readonly description: string;
   readonly launchLabel: string;
 }
@@ -15,14 +16,11 @@ export interface HomepageExperience {
 export interface HomepageDemoState {
   readonly selectedId: HomepageExperienceId;
   readonly activeId: HomepageExperienceId | null;
-  readonly menuOpen: boolean;
   readonly runtimeState: "idle" | "loading" | "ready" | "error";
   readonly announcement: string;
 }
 
 export type HomepageDemoAction =
-  | { readonly type: "open-menu" }
-  | { readonly type: "close-menu" }
   | { readonly type: "select"; readonly id: HomepageExperienceId }
   | { readonly type: "launch" }
   | { readonly type: "runtime-loading" }
@@ -35,30 +33,37 @@ export type HomepageDemoAction =
 const classicExperience = Object.freeze({
   id: "classic" as const,
   label: "General Feedback",
+  icon: "💬",
   description: "The familiar screenshot-first feedback widget.",
   launchLabel: "Open General Feedback",
 });
 
 const flowCopy: Readonly<
-  Record<HomepageFlowRecipeId, Pick<HomepageExperience, "description" | "launchLabel">>
+  Record<
+    HomepageDemoFlowRecipeId,
+    Pick<HomepageExperience, "icon" | "description" | "launchLabel">
+  >
 > = Object.freeze({
   "bug-report": Object.freeze({
-    description: "Capture a reproducible problem with evidence.",
+    icon: "🐛",
+    description: "Reproduce a bug and attach proof.",
     launchLabel: "Open Bug Report",
   }),
-  "product-triage": Object.freeze({
-    description: "Route product signals with conditional follow-up.",
-    launchLabel: "Open Product Triage",
+  "quick-rating": Object.freeze({
+    icon: "⭐",
+    description: "Share a 1–5 star rating in one step.",
+    launchLabel: "Open Quick Rating",
   }),
-  "customer-pulse": Object.freeze({
-    description: "Ask a focused customer satisfaction question.",
-    launchLabel: "Open Customer Pulse",
+  "feature-request": Object.freeze({
+    icon: "💡",
+    description: "Shape and prioritize a product idea.",
+    launchLabel: "Open Feature Request",
   }),
 });
 
 export const homepageExperiences: readonly HomepageExperience[] = Object.freeze([
   classicExperience,
-  ...homepageFlowRecipeList.map(({ id, label }) =>
+  ...homepageFlowDemoRecipeList.map(({ id, label }) =>
     Object.freeze({ id, label, ...flowCopy[id] }),
   ),
 ]);
@@ -66,7 +71,6 @@ export const homepageExperiences: readonly HomepageExperience[] = Object.freeze(
 export const initialHomepageDemoState: HomepageDemoState = Object.freeze({
   selectedId: "classic",
   activeId: null,
-  menuOpen: false,
   runtimeState: "idle",
   announcement: "",
 });
@@ -86,16 +90,11 @@ export function reduceHomepageDemo(
   action: HomepageDemoAction,
 ): HomepageDemoState {
   switch (action.type) {
-    case "open-menu":
-      return state.activeId === null ? { ...state, menuOpen: true } : state;
-    case "close-menu":
-      return state.menuOpen ? { ...state, menuOpen: false } : state;
     case "select":
       return isHomepageExperienceId(action.id)
         ? {
             ...state,
             selectedId: action.id,
-            menuOpen: false,
             announcement: `Selected ${experienceLabel(action.id)}.`,
           }
         : state;
@@ -104,7 +103,6 @@ export function reduceHomepageDemo(
         ? {
             ...state,
             activeId: state.selectedId,
-            menuOpen: false,
             announcement: `Opening ${experienceLabel(state.selectedId)}.`,
           }
         : state;
@@ -124,7 +122,6 @@ export function reduceHomepageDemo(
       return {
         ...state,
         activeId: null,
-        menuOpen: false,
         runtimeState: "error",
         announcement: "The feedback experience could not load. Try again.",
       };
@@ -132,14 +129,12 @@ export function reduceHomepageDemo(
       return {
         ...state,
         activeId: null,
-        menuOpen: false,
         announcement: "The feedback experience has closed.",
       };
     case "clear":
       return {
         ...state,
         activeId: null,
-        menuOpen: false,
         announcement: "",
       };
     case "unmount":

@@ -1,0 +1,31 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T009",
+    "board_path": "docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "changed_files": [
+      "src/components/landing/homepage-flow-demo-recipes.ts",
+      "test/homepage-flow-demo-recipes.test.ts",
+      "e2e/homepage-flow-demo.spec.ts",
+      "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md",
+      "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+    ],
+    "commands": [
+      {"cmd":"Exact v1.56.3 identity","status":"pass"},
+      {"cmd":"Canonical generator check","status":"pass"},
+      {"cmd":"Focused Vitest","status":"pass","detail":"53 tests"},
+      {"cmd":"npm test","status":"pass","detail":"163 tests"},
+      {"cmd":"npm run lint","status":"pass"},
+      {"cmd":"npm run build","status":"pass"},
+      {"cmd":"Enabled exact-runtime desktop/mobile E2E","status":"pass","detail":"15 passed, 17 intentional skips"},
+      {"cmd":"Unset Classic control","status":"pass"},
+      {"cmd":"False Classic control","status":"pass"},
+      {"cmd":"git diff --check","status":"pass"}
+    ],
+    "summary": "Preserved Customer Pulse's canonical neutral Continue label without DOM patching. Exact v1.56.3 proves score 3 reaches follow-up with zero submissions and score 8 submits exactly once. Canonical contracts, Classic isolation, Product Triage transition, and corrected v1.56.3 plan/spec remain intact.",
+    "deviations": [],
+    "remaining_blockers": ["T010 exact-runtime loader race correction and clean rereview."],
+    "verification_attempts": 1,
+    "stopped_because": null
+  }
+}

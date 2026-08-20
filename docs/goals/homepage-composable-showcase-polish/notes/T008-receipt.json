@@ -1,0 +1,36 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T008",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "decision": "not_complete",
+    "full_outcome_complete": false,
+    "rationale": "Corrected runtime and browser behavior are sound, but validated review found one P2 documentation defect: the active implementation plan declares five experiences while executable tasks and its checklist retain superseded three-flow/four-choice IDs and counts. One bounded docs-only correction remains.",
+    "worker_package": {
+      "objective": "Reconcile every executable task and final checklist in the homepage multi-flow implementation plan with the current five-experience contract: Classic, Bug Report, Quick Rating, Feature Request, and Onboarding Check-in.",
+      "allowed_files": ["docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"],
+      "verify_commands": [
+        "npm test -- test/integration-resource.test.ts test/homepage-demo-model.test.ts test/homepage-flow-demo-recipes.test.ts",
+        "rg -n \"Product Triage|Customer Pulse|four canonical choices|four-option menu|all three canonical recipes|cache all three|register three\" docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md",
+        "git diff --check"
+      ],
+      "stop_if": [
+        "Any correction requires source, test, workflow, runtime, route, specification, or operations-guide edits.",
+        "The plan cannot be made internally consistent without changing current feature scope or behavior.",
+        "The correction weakens the localhost-candidate versus deployed-preview distinction or changes exact v1.56.3, issue-link, local/private, canary, cleanup, or public-off contracts.",
+        "Verification remains red after two bounded documentation corrections."
+      ]
+    },
+    "evidence": [
+      {"kind":"validated_finding","id":"comments-docs-stale-five-experience-plan","confidence":0.97,"priority":"P2","location":"docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md:153-158"},
+      {"kind":"corrected_behavior","result":"passed","details":"Local private results have no GitHub action; public results retain valid links."},
+      {"kind":"browser_oracle","result":"passed","details":"18 enabled desktop/mobile tests, separate unset/false controls, and exact 390x844 five-experience oracle passed."},
+      {"kind":"runtime_identity","result":"verified","details":"238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."}
+    ],
+    "subgoal_contract": null,
+    "parallel_safety": null,
+    "blocked_tasks": ["T999"],
+    "missing_evidence": ["Plan consistency correction and corrected-head review remain.", "T999 remains pending."],
+    "required_board_updates": ["Create and activate a docs-only Worker correction, then rerun review before T999."]
+  }
+}

@@ -1,5 +1,6 @@
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
+import { WIDGET_URL } from "./src/lib/links";
 
 function origin(value: string) {
   return new URL(value).origin;
@@ -49,10 +50,7 @@ export function widgetCspSource(value: string) {
   return url.origin;
 }
 
-const widgetOrigin = widgetCspSource(
-  process.env.NEXT_PUBLIC_BUGDROP_WIDGET_URL ??
-    "https://bugdrop.neonwatty.workers.dev/widget.js",
-);
+const widgetOrigin = widgetCspSource(WIDGET_URL);
 const posthogOrigin = origin(
   process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com",
 );

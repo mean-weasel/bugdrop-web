@@ -1,0 +1,26 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T012",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "decision": "not_complete",
+    "full_outcome_complete": false,
+    "rationale": "One validated P2 remains: the absolute local-runtime classifier uses case-sensitive raw equality although URL hostnames are case-insensitive, so uppercase same-origin spelling renders a false public-Issue warning.",
+    "worker_package": {
+      "objective": "Canonicalize exact local dogfood runtime recognition with URL semantics while preserving fail-closed public classification and add focused unit/browser proof.",
+      "allowed_files": ["src/lib/links.ts","test/homepage-demo-runtime.test.ts","e2e/homepage-flow-demo.spec.ts"],
+      "verify_commands": ["focused runtime/integration tests","npm test","npm run lint","root-relative build","uppercase absolute-local build/browser","full desktop/mobile browser","exact runtime identity","git diff --check"],
+      "stop_if": ["Any file outside classifier/tests must change.","Wrong scheme/port/path/query/fragment/credentials/external origin becomes private.","Supported local forms remain public.","Public runtime loses warning/link.","Public flag must be enabled.","Red after two bounded attempts."]
+    },
+    "evidence": [
+      {"kind":"validated_finding","id":"COR-T011-URL-CANONICALIZATION","confidence":0.99,"severity":"P2","location":"src/lib/links.ts:39-43"},
+      {"kind":"other_roles","result":"clean","details":"Tests, silent failures, contracts/types, and comments/docs found no candidate."},
+      {"kind":"runtime_identity","result":"verified","details":"238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."}
+    ],
+    "subgoal_contract": null,
+    "parallel_safety": {"safe":false,"reason":"Classifier and proof are one package."},
+    "blocked_tasks": ["T999"],
+    "missing_evidence": ["Canonicalization correction, final closure, and T999 remain."],
+    "required_board_updates": ["Create Worker correction and rerun closure before T999."]
+  }
+}

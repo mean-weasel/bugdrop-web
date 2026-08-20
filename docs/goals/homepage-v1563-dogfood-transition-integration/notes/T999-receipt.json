@@ -1,0 +1,25 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T999",
+    "board_path": "docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "decision": "complete",
+    "full_outcome_complete": true,
+    "rationale": "The full hidden-dogfood tranche is proven: exact v1.56.3, Product Triage-only 500 ms transition and reduced-motion bypass, distinct composable copy, unchanged Classic/flag isolation, safe local submissions, full tests/build/browser/visual QA, fail-closed cross-route runtime identity, and clean corrected-head review. No external integration or public enablement occurred.",
+    "worker_package": {"objective":"","allowed_files":[],"verify":[],"stop_if":[]},
+    "evidence": [
+      "Live bugdrop.localhost:3000 serves the exact 238591-byte v1.56.3 widget with SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e.",
+      "Canonical recipe invariants and generated identity pass; only Product Triage uses slide-horizontal at 500 ms.",
+      "Full verification passed 164 tests, lint, production build, diff check, 16 exact-runtime desktop/mobile browser journeys, and false/unset Classic controls.",
+      "Visual QA covered ten desktop/mobile states and all four experiences with no unauthorized requests or real Issues.",
+      "Delayed exact script plus foreign lab runtime race now binds only exact v1.56.3 and has unit plus real-browser regression proof.",
+      "Final corrected-head PR Review Toolkit accepted no high-confidence findings and included all intended untracked files.",
+      "T008 handoff records the local URL, QA checklist, complete staging boundary, and exact authorization phrase."
+    ],
+    "subgoal_contract": null,
+    "parallel_safety": null,
+    "blocked_tasks": [],
+    "missing_evidence": [],
+    "required_board_updates": ["Record T999 done, set goal complete, clear active_task, preserve external authority boundary."]
+  }
+}

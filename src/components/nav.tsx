@@ -14,9 +14,6 @@ export function Nav() {
         <Link href="/use-cases" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Use Cases
         </Link>
-        <Link href="/compare" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
-          Compare
-        </Link>
         <Link href="/status" className="text-sm text-text-subtle hover:text-text-primary transition-colors">
           Status
         </Link>
@@ -30,11 +27,11 @@ export function Nav() {
         </a>
         <Link
           href="/#try-bugdrop"
-          data-analytics-event="nav_try_widget_click"
-          data-analytics-label="Try Widget"
+          data-analytics-event="nav_design_flow_click"
+          data-analytics-label="Design your flow"
           className="inline-flex items-center rounded-[10px] border border-accent-cyan/40 bg-accent-cyan/10 px-3 py-1.5 text-sm font-medium text-accent-cyan transition-all hover:-translate-y-0.5 hover:border-accent-cyan hover:bg-accent-cyan/15"
         >
-          Try Widget
+          Design your flow
         </Link>
       </div>
     </nav>

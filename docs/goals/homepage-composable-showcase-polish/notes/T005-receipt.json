@@ -1,0 +1,26 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T005",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "summary": "Finalized the separate SDK handoff with validated problem statements, a desktop/mobile accessibility and compatibility oracle, the exact v1.56.3 website baseline, and fresh authority gates for SDK PR, merge, release, and website repin. No SDK or external action was performed.",
+    "evidence": [
+      "T003 confirmed the website now uses the strongest public FlowConfig attachment layout while native attachment chrome remains an SDK concern.",
+      "T003 confirmed Classic remains functional but lacks a dialog role and accessible Close name.",
+      "notes/sdk-tranche.md now records the named-localhost browser oracle and immutable-release repin boundary.",
+      "git diff --check passed."
+    ],
+    "facts": [
+      "Recommended next goal: docs/goals/sdk-showcase-attachment-accessibility-polish/goal.md in the SDK repository.",
+      "The future SDK goal starts read-only with Scout and Judge.",
+      "Website v1.56.3 remains pinned until a separately authorized immutable SDK release is authenticated."
+    ],
+    "contradictions": [],
+    "ambiguity_requiring_judge": [],
+    "commands": [
+      {"cmd": "git diff --check", "status": "pass"},
+      {"cmd": "rg -n validated SDK handoff anchors", "status": "pass"}
+    ],
+    "note_needed": false
+  }
+}

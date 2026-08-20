@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "mean-weasel/bugdrop",
+  "sourceRevision": "00302ac3e733e4c04562423d365eb3d59dbe887e",
+  "files": [
+    {
+      "source": "docs/website/ci-testing.mdx",
+      "target": "src/content/docs/ci-testing.mdx",
+      "sha256": "1e8f889b5a9e2c5e2ce09f215886d685b8d20d6e4ca9595ed04de4806b229161"
+    },
+    {
+      "source": "docs/website/configuration.mdx",
+      "target": "src/content/docs/configuration.mdx",
+      "sha256": "88d970a2d5b88453898da13132ce2c7fa7b5a5053e4b549bfdfff65ac800154d"
+    },
+    {
+      "source": "docs/website/custom-flows.mdx",
+      "target": "src/content/docs/custom-flows.mdx",
+      "sha256": "903aac32638aad9bd5b39972373f4d46127c8c9dc7e458b5dd4196eabec33ac8"
+    },
+    {
+      "source": "docs/website/faq.mdx",
+      "target": "src/content/docs/faq.mdx",
+      "sha256": "581aaee97b6128c0f3a94b7df016778765158645ac5e7dd7910390b0c35a5957"
+    },
+    {
+      "source": "docs/website/flow-branching-and-output.mdx",
+      "target": "src/content/docs/flow-branching-and-output.mdx",
+      "sha256": "7beb027335d1230295f9cd5041420613500d6284598da1fb5d5b299f98843a86"
+    },
+    {
+      "source": "docs/website/flow-design.mdx",
+      "target": "src/content/docs/flow-design.mdx",
+      "sha256": "07cb0b827e365b41c3140d759d41fd95510e06f829e6ea1dcbc12b3009aa1144"
+    },
+    {
+      "source": "docs/website/flow-examples.mdx",
+      "target": "src/content/docs/flow-examples.mdx",
+      "sha256": "06b27f21081e170500f6e0ce2e79e08b44e4181b9b58c15572acca81d916a79a"
+    },
+    {
+      "source": "docs/website/flow-field-guide.mdx",
+      "target": "src/content/docs/flow-field-guide.mdx",
+      "sha256": "ed415cec070665959e637926f9d7a36959d2c9059f4718f6350c6dcd7af68149"
+    },
+    {
+      "source": "docs/website/flow-fields-and-screens-reference.mdx",
+      "target": "src/content/docs/flow-fields-and-screens-reference.mdx",
+      "sha256": "5404ecde59b7c057d21309f0d71b301d9f943f500fafcb6b83f11dcbfaf410ae"
+    },
+    {
+      "source": "docs/website/flow-fields-and-screens.mdx",
+      "target": "src/content/docs/flow-fields-and-screens.mdx",
+      "sha256": "12e8dca984ba09a379a479eac53462e967c893d73f69238266fcbafba3cd2e96"
+    },
+    {
+      "source": "docs/website/flow-presentation-and-motion.mdx",
+      "target": "src/content/docs/flow-presentation-and-motion.mdx",
+      "sha256": "9f0ccf95e307396a1f869f5977486ed58e1021da775962aeb7e28726a62ce9fe"
+    },
+    {
+      "source": "docs/website/flow-reference.mdx",
+      "target": "src/content/docs/flow-reference.mdx",
+      "sha256": "b307561878ac130c95392fbd977f0c61acb66b04424d0b576c0dd68489a49d87"
+    },
+    {
+      "source": "docs/website/flow-screen-guide.mdx",
+      "target": "src/content/docs/flow-screen-guide.mdx",
+      "sha256": "460fa443f7e661e1faa92863c7e45a6f9da3e8ebe6711beceaef3d760f5a323b"
+    },
+    {
+      "source": "docs/website/flow-types.mdx",
+      "target": "src/content/docs/flow-types.mdx",
+      "sha256": "d24a1c7f44b596472d726111521968949799605aa3f960f07f584e6bc7048747"
+    },
+    {
+      "source": "docs/website/getting-started.mdx",
+      "target": "src/content/docs/getting-started.mdx",
+      "sha256": "e82e6ccc0cc16217cfd56e630739d75a0d3114dbe973f554a9ae6e006b16f8b3"
+    },
+    {
+      "source": "docs/website/installation.mdx",
+      "target": "src/content/docs/installation.mdx",
+      "sha256": "31d0af0411233e21e15ddd2a2bab40b875da3689f451e35a78dc9e59a449939c"
+    },
+    {
+      "source": "docs/website/javascript-api.mdx",
+      "target": "src/content/docs/javascript-api.mdx",
+      "sha256": "0c3a9cd27904b820bec70eda20464c79672aa8a1513ac90e572644b5bfd85722"
+    },
+    {
+      "source": "docs/website/security.mdx",
+      "target": "src/content/docs/security.mdx",
+      "sha256": "775f67a7ea6de9ed507e86f7172306b16bf2bdf8c8b8c91af67fcb8f95cbf21b"
+    },
+    {
+      "source": "docs/website/self-hosting.mdx",
+      "target": "src/content/docs/self-hosting.mdx",
+      "sha256": "1242592bad8bc382b5b11ee3f40b92e226d97978825786cb5edfeb10b8f641a9"
+    },
+    {
+      "source": "docs/website/styling.mdx",
+      "target": "src/content/docs/styling.mdx",
+      "sha256": "41202872f5b2f45e2bb0c89c161c50f87d13ea4e0a8fe1ec1047a25d01f67b5c"
+    },
+    {
+      "source": "docs/website/version-pinning.mdx",
+      "target": "src/content/docs/version-pinning.mdx",
+      "sha256": "ee8ad3ef5f49b5c66d4a8ebd8284082cd42033deae89c1ded2f3ac4e64a0b260"
+    },
+    {
+      "source": "docs/website/flow-capabilities.ts",
+      "target": "src/lib/flow-capabilities.ts",
+      "sha256": "924380cacb44e1535a2078b10ce46293e7deb0d4a9b8db989418566274377db9"
+    }
+  ]
+}

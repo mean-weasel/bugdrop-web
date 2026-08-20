@@ -48,7 +48,28 @@ jobs:
       - name: Test homepage feedback experiences
         env:
           NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "true"
-          NEXT_PUBLIC_BUGDROP_WIDGET_URL: /vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js
+          NEXT_PUBLIC_BUGDROP_WIDGET_URL: /vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js
         run: >-
           npx playwright test e2e/homepage-flow-demo.spec.ts
+          --project=desktop-chromium --project=mobile-chromium --retries=0
+
+  flow-capability-documentation:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Test flow capability documentation
+        run: >-
+          npx playwright test e2e/flow-capability-docs.spec.ts
           --project=desktop-chromium --project=mobile-chromium --retries=0

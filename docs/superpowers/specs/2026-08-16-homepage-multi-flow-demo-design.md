@@ -6,16 +6,16 @@
 
 ## Summary
 
-The BugDrop landing page will let visitors try four real feedback experiences from the familiar floating launcher and the existing “Try BugDrop” section:
+The BugDrop landing page keeps a familiar, single-purpose floating Classic feedback launcher and lets visitors explore four real feedback experiences in a dedicated “Design your flow” section:
 
 1. General Feedback · Classic
 2. Bug Report
-3. Product Triage
-4. Customer Pulse
+3. Quick Rating
+4. Feature Request
 
-Classic remains the initial/default experience. The three composable examples are additive and use the same shared recipe definitions already covered by BugDrop SDK tests. Every completed demo creates a real GitHub Issue in `mean-weasel/bugdrop-widget-test` and links the visitor to it. A separate nightly workflow closes demo Issues older than 24 hours rather than deleting them.
+Classic remains the initial selection in the comparison section and is also what the floating launcher opens, without presenting a choice menu. The three composable examples are additive. Bug Report retains the mechanically pinned canonical SDK recipe contract; Quick Rating and Feature Request deliberately combine the same public FlowConfig primitives into more diverse use cases. All three use a homepage-only 500ms horizontal screen transition while the SDK-wide default remains immediate. Every completed public demo creates a real GitHub Issue in `mean-weasel/bugdrop-widget-test` and links the visitor to it. A separate nightly workflow closes demo Issues older than 24 hours rather than deleting them.
 
-The experience chooser is website-only orchestration. It does not change the public BugDrop widget, the default classic flow, or existing customer installations.
+The customization showcase is website-only orchestration. It does not change the public BugDrop widget, the default classic flow, or existing customer installations.
 
 ## Goals
 
@@ -40,28 +40,26 @@ The experience chooser is website-only orchestration. It does not change the pub
 
 ### Floating launcher
 
-The existing bottom-right BugDrop icon remains available throughout the homepage. Clicking it opens a compact, homepage-only experience menu rather than immediately opening Classic.
+The existing bottom-right affordance remains available throughout the homepage as a simple “Feedback” button. It directly opens the established Classic workflow and never presents the four-example chooser. On narrow viewports it yields while the in-page customization section is visible, preventing it from covering content, then returns after the section leaves the viewport.
 
-The menu lists all four experiences with short, use-case-oriented descriptions. General Feedback · Classic is highlighted on first use. After a visitor tries another experience, that option remains highlighted for convenience, but each subsequent launcher click still opens the menu so every variation remains discoverable.
-
-Selecting an experience closes the menu and opens its real feedback UI. Completing or closing the experience returns the launcher to its normal state. Only one menu or feedback surface may be active at a time.
+Completing or closing Classic returns focus to the floating launcher. Only one feedback surface may be active at a time.
 
 ### In-page demo section
 
-The existing “Try BugDrop” section becomes a compact experience picker that mirrors the launcher menu. It contains:
+The existing “Try BugDrop” section becomes a customization showcase titled “Design your flow.” It contains:
 
-- A short headline explaining that one widget can support different feedback experiences.
-- Four compact selectors.
+- A short explanation that BugDrop flows can be composed for different jobs.
+- Four compact examples, each with a distinct icon and concise description.
 - A description of the currently selected experience.
-- One launch button whose label and target follow the selection.
+- One launch button whose icon, label, and target follow the selection.
 - Clear copy that completion creates a real Issue in `mean-weasel/bugdrop-widget-test`.
 - A secondary “Explore the building blocks” link.
 
-Selection state is shared between the floating menu and the in-page picker. Changing one updates the other.
+The examples are intentionally contained in this section so the floating feedback action remains focused and unobtrusive. A navigation link and hero action scroll directly to the section.
 
 ### Mobile behavior
 
-On narrow screens, the four choices form a compact two-column grid or an equivalently readable wrapped layout. The launch action is full width. The menu and every flow must avoid horizontal overflow, preserve scroll locking correctly, and restore focus to the initiating control.
+On narrow screens, the five choices form a compact two-column grid or an equivalently readable wrapped layout. The launch action is full width. While the in-page showcase is visible, the floating launcher moves out of view and leaves the content unobscured without changing selection, launch, or focus ownership. The section and every flow must avoid horizontal overflow, preserve scroll locking correctly, and restore focus to the initiating control.
 
 ### Deeper playground
 
@@ -73,10 +71,9 @@ The “Explore the building blocks” link points toward the deeper composabilit
 
 A website-owned client controller coordinates:
 
-- Lazy loading one current, pinned BugDrop runtime.
-- The floating menu’s open/closed state.
+- Lazy loading one current, pinned BugDrop runtime. Enabled builds require an explicit runtime through the shared source/CSP allowlist: exact public v1.56.3 or the approved strict local fixture forms. Missing, mutable, wrong-version, unsafe, and normalized-alias values fail closed; feature-off/unset Classic retains its established mutable Worker default.
 - The selected experience.
-- Synchronization with the in-page picker.
+- Direct floating Classic invocation.
 - Classic invocation.
 - Registration and invocation of the three composable flows.
 - Active modal ownership and stale-instance cleanup.
@@ -92,13 +89,13 @@ Classic has an independent regression path throughout local and preview verifica
 
 ### Composable paths
 
-Bug Report, Product Triage, and Customer Pulse register through `registerFlow`. Their configurations come from the shared representative recipes used by SDK conformance and browser coverage, or from a versioned website package/module mechanically synchronized with those definitions. Homepage-specific forks of the recipes are not acceptable.
+Bug Report, Quick Rating, and Feature Request register through `registerFlow`. Bug Report preserves the canonical representative recipe's fields, screens, Issue mapping, and evidence contract. The two additional configurations are small website-owned compositions of public, versioned FlowConfig primitives. Every homepage Flow explicitly opts into `slide-horizontal` at 500ms; reduced motion remains immediate and no SDK or customer default changes.
 
 The controller must ensure that repeated clicks, flow switching, navigation, and component unmounting cannot leave multiple dialogs, stale result handlers, body scroll locks, or orphaned capture UI.
 
 ### Loading
 
-The runtime remains lazy-loaded. Initial landing-page rendering must not download or initialize the widget before a visitor interacts with the launcher or demo section. Concurrent load requests share one in-flight operation and reach one registered runtime.
+The runtime remains lazy-loaded. Initial landing-page rendering must not download or initialize the widget before a visitor interacts with the launcher or demo section. Concurrent load requests share one in-flight operation and reach one registered runtime. Source selection and CSP derive from the same enabled-showcase policy: `NEXT_PUBLIC_BUGDROP_WIDGET_URL` is mandatory when the flag is true and accepts only `https://bugdrop.neonwatty.workers.dev/widget.v1.56.3.js`, the exact authenticated root-relative fixture, or its exact named-localhost absolute form with hostname case equivalence only.
 
 ## Submission and GitHub Issue Behavior
 
@@ -110,8 +107,13 @@ Each created Issue identifies its source experience in deterministic metadata, l
 
 - General Feedback demonstrates the established Classic Issue.
 - Bug Report emphasizes evidence and debugging detail.
-- Product Triage demonstrates conditional branching and omission of irrelevant answers.
-- Customer Pulse demonstrates rating and follow-up feedback.
+- Quick Rating demonstrates a one-screen 1–5 star signal.
+- Feature Request demonstrates structured product discovery paced across compact idea, context, and priority screens. Priority uses labeled Nice to have, Important, and Transformative cards rather than a star scale.
+
+Bug Report retains the canonical field IDs/types, screen IDs/order, conditions,
+Issue/evidence mapping, accepted files, limits, and serialized payload. Its only
+form refinement is layout: attachments and logs span the available columns,
+while name and email share a desktop row and stack naturally on mobile.
 
 The success surface links directly to the real GitHub Issue. The landing page tells visitors before launch that their submission will be public in the demo repository and must not include sensitive information.
 
@@ -138,27 +140,27 @@ The website must not advertise automatic cleanup until the workflow has passed b
 - Registration failure affects only the relevant composable experience and does not silently fall back to Classic.
 - Preflight and submission failures remain visible in the selected flow’s normal retry surface.
 - A busy or already-owned modal returns a visible, recoverable state rather than opening a second surface.
-- Route changes and component unmounts close active website-owned menu/flow handles and restore document scrolling.
+- Route changes and component unmounts close active website-owned flow handles and restore document scrolling.
 - A GitHub submission is never reported as successful unless the SDK returns a valid Issue result for `mean-weasel/bugdrop-widget-test`.
 
 ## Accessibility
 
-- The launcher menu follows a documented accessible menu/listbox or dialog pattern appropriate to its final interaction.
+- The floating launcher is a semantic button with a concise accessible name.
 - All experience choices have descriptive accessible names and clear selected state.
-- Keyboard users can open the menu, traverse all four choices, select one, close it, and return focus to the launcher.
+- Keyboard users can open and close the direct feedback flow and return focus to the launcher.
 - The in-page picker uses appropriate tabs or radio-group semantics rather than clickable generic containers.
 - Loading and error changes are announced without stealing focus.
-- Reduced-motion preferences apply to the menu, flow surfaces, and success transitions.
+- Reduced-motion preferences apply to the launcher, flow surfaces, and success transitions.
 - Focus restoration is correct after cancellation, submission, route navigation, and repeated use.
 
 ## Verification Strategy
 
 ### Local automated coverage
 
-- Unit/component coverage for selection, synchronization, lazy loading, registration, repeated opens, error/retry, and unmount cleanup.
+- Unit/component coverage for selection, direct launch, lazy loading, registration, repeated opens, error/retry, and unmount cleanup.
 - Browser coverage for opening and completing all four experiences independently.
 - Explicit Classic assertions for existing styling, navigation, screenshots, submission, and success behavior.
-- Shared-recipe identity checks for the three composable examples.
+- Canonical Bug Report identity plus explicit invariant checks for all three composable examples.
 - Accessibility, reduced-motion, focus, mobile overflow, console, and external-request privacy checks.
 
 Local browser work uses a named `.localhost` subdomain.
@@ -169,22 +171,24 @@ Before a PR is declared ready, the implementation is run locally and reviewed ma
 
 - Desktop and mobile viewports.
 - Launcher placement and hierarchy.
-- Menu open/close and repeated-use behavior.
-- All four selected states and descriptions.
-- Synchronization between launcher and section.
+- Direct floating launch and repeated-use behavior.
+- All five selected states and descriptions.
+- Clear separation between the direct launcher and customization section.
 - Each flow’s first screen and representative subsequent screens.
 - Modal size, typography, scroll behavior, focus, and close/reopen transitions.
 - Classic styling parity with the existing homepage demo.
 
 Visual QA findings are corrected and rechecked before PR review.
 
-### Merge-queue preview coverage
+### Merge-queue localhost candidate coverage
 
-Preview coverage remains additive:
+The merge-queue lane runs additively against the exact candidate website and
+authenticated runtime fixture at `http://bugdrop.localhost:3000`; it does not
+exercise a deployed preview:
 
 - Classic runs independently against the exact candidate website/runtime.
-- Bug Report, Product Triage, and Customer Pulse each run independently against the exact candidate website/runtime.
-- Existing Classic preview and styling protections are not replaced or inferred from composable-flow results.
+- Bug Report, Quick Rating, and Feature Request each run independently against the exact candidate website/runtime.
+- Existing Classic candidate and styling protections are not replaced or inferred from composable-flow results.
 - Each lane has exact artifact/provenance checks and fail-closed result handling.
 - Ordinary PR/merge-queue runs validate Issue-shaped results without creating public Issues.
 
@@ -197,24 +201,24 @@ The cleanup workflow receives separate dry-run and bounded live authorization.
 ## Rollout
 
 1. Implement and verify the nightly cleanup workflow in the demo repository.
-2. Implement the website controller, menu, synchronized section, and shared recipes on a dedicated branch.
+2. Implement the website controller, direct floating launcher, customization section, and shared recipes on a dedicated branch.
 3. Pass local automated verification and collaborative visual QA.
-4. Pass pull-request review and exact merge-queue preview coverage for Classic plus all three composable flows.
+4. Pass pull-request review and exact merge-queue localhost candidate coverage for Classic plus all three composable flows, then record the separate deployed-preview walkthrough required before enablement.
 5. Run separately authorized real-Issue canaries.
 6. Enable the homepage experience without changing SDK defaults or customer configuration.
 
-If the composable experiences fail after launch, the website can hide those three entries while preserving the established Classic homepage demo. This website-only fallback does not alter SDK behavior.
+If the composable experiences fail after launch, disable the homepage flow-demo flag to hide all three composable entries and return to the established Classic-only homepage demo. This website-only fallback does not alter SDK behavior.
 
 ## Acceptance Criteria
 
-- The floating homepage launcher always opens the four-option demo menu.
+- The floating homepage launcher directly opens Classic and yields only while the customization section is visible on a narrow viewport.
 - General Feedback · Classic is the initial selection.
 - All four experiences launch, submit, and link to real Issues in the existing demo repository.
-- The launcher menu and in-page picker stay synchronized.
-- Reopening the launcher always returns to the menu with the last experience highlighted.
+- “Design your flow” navigation scrolls directly to the five-example customization section.
+- Closing the direct floating flow restores focus to its launcher.
 - Classic behavior and styling remain independently proven.
-- The three composable experiences use shared representative recipes.
+- The three composable experiences use only the public FlowConfig primitives described above.
 - Local desktop/mobile visual QA is approved.
-- Exact preview tests run Classic plus all three composable flows additively.
+- Exact localhost candidate tests run Classic plus all three composable flows additively; a separate deployed-preview walkthrough is recorded before enablement.
 - Nightly cleanup safely closes only marked Issues older than 24 hours.
 - No public SDK behavior or existing customer installation changes.

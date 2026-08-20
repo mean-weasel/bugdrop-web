@@ -1,0 +1,24 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T013",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "changed_files": ["src/lib/links.ts","test/homepage-demo-runtime.test.ts","e2e/homepage-flow-demo.spec.ts"],
+    "commands": [
+      {"cmd":"focused runtime/integration tests","status":"pass"},
+      {"cmd":"npm test","status":"pass"},
+      {"cmd":"npm run lint","status":"pass","details":"0 errors; existing vendored warnings only."},
+      {"cmd":"root-relative feature build","status":"pass"},
+      {"cmd":"uppercase-host absolute-local feature build","status":"pass"},
+      {"cmd":"uppercase-host actual local Classic browser proof","status":"pass"},
+      {"cmd":"full root-relative desktop/mobile browser suite","status":"pass","details":"18 passed, 20 expected skips."},
+      {"cmd":"exact runtime identity","status":"pass","details":"238591 bytes; SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."},
+      {"cmd":"git diff --check","status":"pass"}
+    ],
+    "summary": "URL-semantic classification now recognizes the exact root-relative runtime and equivalent uppercase-host same-origin absolute URL as private. Wrong scheme, port, path, query, fragment, credentials, malformed values, and external origins remain public. Focused browser proof confirms the uppercase configured runtime retains truthful private disclosure. All required tests, builds, browser suites, runtime identity, lint, and diff checks passed.",
+    "deviations": [],
+    "remaining_blockers": [],
+    "verification_attempts": 2,
+    "stopped_because": null
+  }
+}

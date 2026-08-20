@@ -1,0 +1,86 @@
+.gallery {
+  --gallery-border: #3b4261;
+  margin: 2.25rem 0;
+  overflow: hidden;
+  border: 1px solid var(--gallery-border);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(circle at 85% 0%, rgb(125 211 252 / 12%), transparent 28rem),
+    #171924;
+  color: #f5f7ff;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 22%);
+}
+
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 2rem; padding: 1.5rem 1.5rem 1.25rem; }
+.kicker { color: #7dd3fc; font-size: .68rem; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
+.header h2 { margin: .45rem 0 .5rem; color: #f8faff; font-size: clamp(1.4rem, 4vw, 2rem); line-height: 1.12; }
+.header p { max-width: 45rem; margin: 0; color: #aab1cc; font-size: .83rem; line-height: 1.65; }
+.header code { color: #d7c5ff; }
+.safety { display: flex; flex: none; align-items: center; gap: .45rem; border: 1px solid rgb(52 211 153 / 30%); border-radius: 999px; background: rgb(52 211 153 / 8%); padding: .5rem .7rem; color: #8ee7bf; font-size: .68rem; font-weight: 750; }
+.safety svg { width: 1rem; }
+
+.composer { border-block: 1px solid var(--gallery-border); background: rgb(10 12 20 / 42%); padding: 1.4rem 1.5rem; }
+.group { margin: 0; border: 0; padding: 0; }
+.group + .group { margin-top: 1.55rem; }
+.group legend { margin-bottom: .75rem; color: #dce2f7; font-size: .75rem; font-weight: 800; letter-spacing: .02em; }
+.recipeGrid, .presetGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; }
+.recipeGrid button, .preset, .choiceRow button { min-width: 0; border: 1px solid #3c425d; color: inherit; font: inherit; cursor: pointer; transition: border-color 150ms ease, transform 150ms ease, background 150ms ease; }
+.recipeGrid button { display: flex; flex-direction: column; align-items: flex-start; border-radius: .8rem; background: #202332; padding: .9rem; text-align: left; }
+.recipeGrid button > span { color: #7dd3fc; font-size: .58rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.recipeGrid strong, .preset strong { margin-top: .35rem; color: #f7f8ff; font-size: .86rem; }
+.recipeGrid small, .preset small { display: block; margin-top: .28rem; color: #9ca4c0; font-size: .67rem; line-height: 1.5; }
+.recipeGrid button:hover, .preset:hover, .choiceRow button:hover { transform: translateY(-1px); border-color: #7781a7; }
+.recipeGrid button.selected, .preset.selected, .choiceRow button.selected { border-color: #7dd3fc; box-shadow: inset 0 0 0 1px rgb(125 211 252 / 28%); }
+.choiceRow { display: flex; flex-wrap: wrap; gap: .48rem; }
+.choiceRow button { min-height: 2.35rem; border-radius: 999px; background: #202332; padding: .48rem .76rem; font-size: .68rem; font-weight: 750; }
+.choiceRow button.selected { background: rgb(125 211 252 / 13%); color: #dff5ff; }
+.motionNote, .boundary { margin: .7rem 0 0; color: #919ab7; font-size: .66rem; line-height: 1.55; }
+.motionNote[data-reduced-motion="true"] { display: flex; align-items: center; gap: .38rem; color: #8ee7bf; }
+.motionNote svg { width: .9rem; }
+.boundary code { color: #cdb7ff; }
+
+.preset { position: relative; overflow: hidden; border-radius: .85rem; padding: .75rem; text-align: left; }
+.mockNav { display: flex; gap: .25rem; width: 100%; border-bottom: 1px solid currentColor; padding-bottom: .5rem; opacity: .42; }
+.mockNav i { display: block; width: .38rem; height: .38rem; border-radius: 50%; background: currentColor; }
+.presetContract { display: block; margin-top: .55rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .56rem; opacity: .75; }
+.productDark { background: #172033; color: #cbd5e1; }
+.editorialLight { background: #fbf4e8; color: #4b3621; }
+.editorialLight strong { color: #3b291a; font-family: Georgia, serif; }
+.editorialLight small { color: #725c45; }
+.compactConsole { background: #101915; color: #a7f3d0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.compactConsole strong { color: #d1fae5; }
+.compactConsole small { color: #8aaf9d; }
+
+.launchPanel { display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; margin: 1.5rem; border: 1px solid rgb(255 255 255 / 12%); border-radius: 1rem; padding: 1.15rem; }
+.launchEyebrow { display: flex; align-items: center; gap: .4rem; font-size: .6rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+.launchEyebrow svg { width: .9rem; }
+.launchPanel h3 { margin: .32rem 0 .25rem; color: inherit; font-size: 1.1rem; }
+.launchPanel p { margin: 0; color: inherit; font-size: .69rem; opacity: .72; }
+.selectionSummary { margin-top: .3rem !important; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .58rem !important; }
+.launch { display: inline-flex; min-height: 2.85rem; flex: none; align-items: center; justify-content: center; gap: .48rem; border: 1px solid currentColor; border-radius: .7rem; background: rgb(255 255 255 / 8%); padding: .62rem .9rem; color: inherit; font: inherit; font-size: .72rem; font-weight: 850; cursor: pointer; }
+.launch svg { width: 1rem; }
+.launch svg:first-child:is(.gallery *) { flex: none; }
+.launch:disabled { cursor: wait; opacity: .58; }
+.launch:disabled svg { animation: spin 1s linear infinite; }
+.status, .provenance { margin: 0 1.5rem .6rem; color: #9aa3bf; font-size: .65rem; }
+.provenance { margin-bottom: 1.4rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .56rem; opacity: .78; }
+.localResult { display: inline-block; margin: 0 1.5rem .7rem; color: #8ee7bf; font-size: .7rem; font-weight: 750; text-underline-offset: .2rem; }
+.gallery button:focus-visible, .localResult:focus-visible { outline: 3px solid #7dd3fc; outline-offset: 3px; }
+.gallery button:disabled { cursor: wait; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 760px) {
+  .header { flex-direction: column; gap: 1rem; padding: 1.15rem; }
+  .safety { align-self: flex-start; white-space: normal; }
+  .composer { padding: 1.1rem; }
+  .recipeGrid, .presetGrid { grid-template-columns: 1fr; }
+  .launchPanel { flex-direction: column; align-items: stretch; margin: 1.1rem; }
+  .launch { width: 100%; }
+  .status, .provenance { margin-inline: 1.1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recipeGrid button, .preset, .choiceRow button { transition: none; }
+  .recipeGrid button:hover, .preset:hover, .choiceRow button:hover { transform: none; }
+  .launch:disabled svg { animation: none; }
+}

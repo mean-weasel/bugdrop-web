@@ -1,0 +1,35 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T002",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "changed_files": [
+      "src/components/landing/homepage-widget.tsx",
+      "src/components/landing/homepage-demo-launcher.tsx",
+      "src/components/landing/homepage-demo-model.ts",
+      "src/components/landing/homepage-flow-demo-recipes.ts",
+      "test/homepage-demo-model.test.ts",
+      "test/homepage-flow-demo-recipes.test.ts",
+      "e2e/homepage-flow-demo.spec.ts",
+      "docs/homepage-flow-demo-operations.md",
+      "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md"
+    ],
+    "commands": [
+      {"cmd": "npm test", "status": "pass"},
+      {"cmd": "npm run lint", "status": "pass"},
+      {"cmd": "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build", "status": "pass"},
+      {"cmd": "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0", "status": "pass"},
+      {"cmd": "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0", "status": "pass"},
+      {"cmd": "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0", "status": "pass"},
+      {"cmd": "git diff --check", "status": "pass"}
+    ],
+    "summary": "Polished both chooser surfaces with shared distinct icons/descriptions and a selected CTA icon. The mobile launcher now yields while the in-page chooser is visible without changing menu, launch, or focus ownership. Bug Report retains its canonical contracts while using full-width attachments/logs and paired desktop contact fields. Feature Request now uses compact idea, context, and labeled priority-card screens. Onboarding help copy is neutral. Unit, browser, and documentation coverage were updated; exact runtime, local-only submission safety, mobile overlap, focus, Classic unset/false isolation, build, lint, and tests pass.",
+    "deviations": [
+      "The first enabled Playwright invocation was blocked before tests started by a stale same-worktree next dev process on port 3000. After terminating exact PIDs 40579 and 40593, the unchanged command passed.",
+      "Lint emitted 862 warnings from the unchanged vendored v1.56.3 widget; it reported zero errors."
+    ],
+    "remaining_blockers": [],
+    "verification_attempts": 1,
+    "stopped_because": null
+  }
+}

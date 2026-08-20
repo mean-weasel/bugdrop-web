@@ -1,0 +1,18 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result":"done","task_id":"T999","board_path":"/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml","decision":"complete","full_outcome_complete":true,
+    "rationale":"The website/configuration tranche satisfies its full oracle. All Worker packages, independent UX review, final corrected-head PR Review Toolkit, exact-runtime/build/browser/Classic-off/local-only proofs, and separate SDK handoff are complete.",
+    "evidence":[
+      "GoalBuddy state check passed with 21 tasks and no queued Worker work.",
+      "Independent desktop and 390x844 review covers all five differentiated experiences.",
+      "Final PR Review Toolkit found no accepted issue across all required roles and validation.",
+      "Fresh final verification passed 170 tests, zero-error lint, exact enabled build, desktop/mobile journeys, reduced motion, branching, focus, cleanup, request isolation, and both Classic-off controls.",
+      "Exact runtime remains 238591 bytes SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e.",
+      "Enabled missing/unapproved runtime fails closed; exact approved runtime builds.",
+      "Public showcase remains disabled by default; deployed-preview proof remains separately required before future enablement.",
+      "Exact SDK next step: run docs/goals/sdk-showcase-attachment-accessibility-polish/goal.md in the SDK repo with fresh commit/PR, merge, release, and repin authorities."
+    ],
+    "subgoal_contract":null,"parallel_safety":null,"blocked_tasks":[],"missing_evidence":[],
+    "required_board_updates":["Record T999 done.","Set goal.status done and active_task null.","Record fresh final verification/fingerprints.","Run GoalBuddy state and stop checks."]
+  }
+}

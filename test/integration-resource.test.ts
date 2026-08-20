@@ -3,11 +3,17 @@ import { describe, expect, it } from "vitest";
 import { shouldLoadBugDropInPreview } from "@/components/integrations/vercel-preview-bugdrop";
 import { resourceNav } from "@/lib/resource-nav";
 import { portableResourceText } from "@/lib/resources/portable-text";
-import { widgetScriptTag } from "@/lib/links";
+import {
+  CLASSIC_WIDGET_URL,
+  HOMEPAGE_DOGFOOD_RUNTIME_PATH,
+  HOMEPAGE_SHOWCASE_WIDGET_URL,
+  resolveWidgetUrl,
+  widgetScriptTag,
+} from "@/lib/links";
 import { widgetCspSource } from "../next.config";
 
 const homepageCiRuntime =
-  "/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js";
+  "/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js";
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -137,16 +143,42 @@ function assertHomepageCiContract(workflow: string) {
 }
 
 describe("T012 integration and resource contracts", () => {
+  it("shares the fail-closed enabled-showcase runtime policy with CSP", () => {
+    const localAbsolute =
+      `http://BUGDROP.LOCALHOST:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`;
+    const dotSegmentRuntime =
+      "http://bugdrop.localhost:3000/vendor/bugdrop/./47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js";
+
+    expect(widgetCspSource(resolveWidgetUrl("true", HOMEPAGE_SHOWCASE_WIDGET_URL)))
+      .toBe("https://bugdrop.neonwatty.workers.dev");
+    expect(widgetCspSource(resolveWidgetUrl("true", HOMEPAGE_DOGFOOD_RUNTIME_PATH)))
+      .toBe("'self'");
+    expect(widgetCspSource(resolveWidgetUrl("true", localAbsolute)))
+      .toBe("http://bugdrop.localhost:3000");
+    expect(widgetCspSource(resolveWidgetUrl("false", undefined))).toBe(
+      "https://bugdrop.neonwatty.workers.dev",
+    );
+    expect(resolveWidgetUrl("false", undefined)).toBe(CLASSIC_WIDGET_URL);
+
+    expect(() => resolveWidgetUrl("true", undefined)).toThrow();
+    expect(() => resolveWidgetUrl("true", CLASSIC_WIDGET_URL)).toThrow();
+    expect(() => resolveWidgetUrl("true", "https://example.com/widget.v1.56.3.js"))
+      .toThrow();
+    expect(() => widgetCspSource(resolveWidgetUrl("true", dotSegmentRuntime))).toThrow(
+      "Enabled homepage showcase requires the exact v1.56.3 public runtime or an approved local fixture",
+    );
+  });
+
   it("uses the external origin for an absolute widget runtime URL", () => {
     expect(
-      widgetCspSource("https://bugdrop.neonwatty.workers.dev/widget.js"),
+      widgetCspSource(HOMEPAGE_SHOWCASE_WIDGET_URL),
     ).toBe("https://bugdrop.neonwatty.workers.dev");
   });
 
   it("allows a root-relative widget runtime as a same-origin CSP source", () => {
     expect(
       widgetCspSource(
-        "/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js",
+        "/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js",
       ),
     ).toBe("'self'");
   });
@@ -194,7 +226,8 @@ describe("T012 integration and resource contracts", () => {
     expect(runtime).toContain('script.async = false');
     expect(runtime).toContain('document.body.append(script)');
     expect(runtime).toContain('button: "false"');
-    expect(runtime).toContain('showIssueLink: "always"');
+    expect(runtime).toContain('showIssueLink: "public"');
+    expect(runtime).not.toContain('showIssueLink: "always"');
   });
 
   it("keeps homepage feedback experiences as an additive, local-only browser gate", async () => {
@@ -250,6 +283,10 @@ describe("T012 integration and resource contracts", () => {
       workflow.replace("--project=mobile-chromium", "--project=webkit"),
       workflow.replace("--retries=0", "--retries=1"),
       workflow.replace(homepageCiRuntime, "/vendor/bugdrop/latest/widget.js"),
+      workflow.replace(
+        homepageCiRuntime,
+        "/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js",
+      ),
       workflow.replace(
         'NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "true"',
         'NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "false"',

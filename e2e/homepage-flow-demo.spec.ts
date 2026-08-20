@@ -7,7 +7,7 @@ import {
 
 const origin = process.env.HOMEPAGE_E2E_ORIGIN ?? "http://bugdrop.localhost:3000";
 const runtimePath =
-  "/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d";
+  "/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d";
 const repo = "mean-weasel/bugdrop-widget-test";
 
 type Submission = Readonly<{
@@ -17,7 +17,7 @@ type Submission = Readonly<{
 
 function installLocalBugDropHarness(
   page: Page,
-  options: { failOnceForTitle?: string; issueBase?: number } = {},
+  options: { failOnceForTitle?: string; issueBase?: number; publicResult?: boolean } = {},
 ) {
   const submissions: Submission[] = [];
   const rejectedRequests: string[] = [];
@@ -66,7 +66,7 @@ function installLocalBugDropHarness(
           success: true,
           issueNumber,
           issueUrl: `https://github.com/${repo}/issues/${issueNumber}`,
-          isPublic: true,
+          isPublic: options.publicResult ?? false,
         }),
       });
       return;
@@ -120,25 +120,33 @@ async function chooseInPage(page: Page, name: string) {
   return launch;
 }
 
-test("exposes the homepage feedback experience picker", async ({ page }, testInfo) => {
+test("separates the simple floating feedback action from the flow showcase", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   test.skip(process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED !== "true");
 
   await page.goto("/");
-  await page.getByRole("button", { name: "Try BugDrop experiences" }).click();
-
-  const menu = page.getByRole("menu", { name: "Feedback experience" });
-  await expect(menu.getByRole("menuitemradio")).toHaveCount(4);
-  await expect(menu).toContainText("The familiar screenshot-first feedback widget.");
-  await expect(menu).toContainText("Capture a reproducible problem with evidence.");
-  await expect(menu).toContainText("Route product signals with conditional follow-up.");
-  await expect(menu).toContainText("Ask a focused customer satisfaction question.");
+  await expect(page.getByRole("button", { name: "Open BugDrop feedback" })).toBeVisible();
+  await expect(page.getByRole("menu", { name: "Feedback experience" })).toHaveCount(0);
   await expect(
-    menu.getByRole("menuitemradio", { name: /General Feedback.*Classic/ }),
-  ).toHaveAttribute("aria-checked", "true");
+    page.getByRole("heading", { name: "One widget for every feedback moment." }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("navigation").getByRole("link", { name: "Design your flow" }),
+  ).toHaveAttribute("href", "/#try-bugdrop");
   await expect(
     page.getByRole("link", { name: "Explore the building blocks" }),
   ).toHaveAttribute("href", "/labs/variants");
+  await expect(page.getByText(/Local dogfood submissions stay in this development process/))
+    .toContainText("they do not create a public GitHub Issue");
+  await expect(page.getByText(/Demo submissions create a real public GitHub Issue/)).toHaveCount(0);
+  const picker = page.getByRole("group", { name: "Feedback experience" });
+  await expect(picker.getByRole("radio")).toHaveCount(4);
+  await expect(picker).toContainText("The familiar screenshot-first feedback widget.");
+  await expect(picker).toContainText("Reproduce a bug and attach proof.");
+  await expect(picker).toContainText("Share a 1–5 star rating in one step.");
+  await expect(picker).toContainText("Shape and prioritize a product idea.");
+  await page.getByRole("radio", { name: "Feature Request" }).check();
+  await expect(page.getByRole("button", { name: "Open Feature Request" })).toContainText("💡");
 });
 
 test("fails visibly after a client navigation leaves a foreign runtime active", async ({
@@ -149,7 +157,7 @@ test("fails visibly after a client navigation leaves a foreign runtime active", 
 
   await page.goto("/labs/variants");
   await expect(page.getByRole("button", { name: "Run default-shaped flow" })).toBeEnabled();
-  await page.getByRole("link", { name: "BugDrop", exact: true }).click();
+  await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
   await expect(page).toHaveURL(`${origin}/`);
 
   await page.getByRole("button", { name: "Open General Feedback" }).click();
@@ -185,7 +193,7 @@ test("keeps the pinned homepage API across homepage to lab to homepage navigatio
 
   await page.getByRole("link", { name: "Explore the building blocks" }).click();
   await expect(page.getByRole("button", { name: "Run default-shaped flow" })).toBeEnabled();
-  await page.getByRole("link", { name: "BugDrop", exact: true }).click();
+  await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
   await expect(page).toHaveURL(`${origin}/`);
   await expect
     .poll(() =>
@@ -206,6 +214,355 @@ test("keeps the pinned homepage API across homepage to lab to homepage navigatio
     `${runtimePath}/api/check/${repo}`,
     `${runtimePath}/api/check/${repo}`,
   ]);
+});
+
+test("borrows the pinned runtime across enabled home to docs to home navigation", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  enabledOnly(testInfo);
+  const harness = installLocalBugDropHarness(page);
+
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  const classicHost = page.locator("#bugdrop-host");
+  await expect(classicHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await classicHost.getByRole("button", { name: "×" }).click();
+  await expect(classicHost.getByRole("heading", { name: "Send Feedback" })).toHaveCount(0);
+  expect(
+    await page.evaluate(() => {
+      const runtimeWindow = window as Window & {
+        BugDrop?: unknown;
+        __homepageDocsOwnerProof?: {
+          script: Element | null;
+          api: unknown;
+          host: Element | null;
+        };
+      };
+      runtimeWindow.__homepageDocsOwnerProof = {
+        script: document.getElementById("bugdrop-homepage-demo"),
+        api: runtimeWindow.BugDrop,
+        host: document.getElementById("bugdrop-host"),
+      };
+      return {
+        script: runtimeWindow.__homepageDocsOwnerProof.script !== null,
+        api: runtimeWindow.__homepageDocsOwnerProof.api !== undefined,
+        host: runtimeWindow.__homepageDocsOwnerProof.host !== null,
+      };
+    }),
+  ).toEqual({ script: true, api: true, host: true });
+
+  await page.locator('a[href="/docs"]').first().click();
+  await page.waitForURL("**/docs");
+  await page.locator('a[href="/docs/flow-examples"]').first().click();
+  await expect(page.getByRole("button", { name: "Launch live example" })).toBeEnabled();
+  await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(1);
+  await expect(page.locator("#bugdrop-flow-capability-docs-runtime")).toHaveCount(0);
+  await expect(page.locator("#bugdrop-host")).toHaveCount(1);
+  expect(
+    await page.evaluate(() => {
+      const runtimeWindow = window as Window & {
+        BugDrop?: unknown;
+        __homepageDocsOwnerProof?: {
+          script: Element | null;
+          api: unknown;
+          host: Element | null;
+        };
+      };
+      const identity = runtimeWindow.__homepageDocsOwnerProof;
+      return {
+        script: identity?.script === document.getElementById("bugdrop-homepage-demo"),
+        api: identity?.api === runtimeWindow.BugDrop,
+        host: identity?.host === document.getElementById("bugdrop-host"),
+      };
+    }),
+  ).toEqual({ script: true, api: true, host: true });
+
+  await page.getByRole("button", { name: "Launch live example" }).click();
+  await expect(page.locator('[data-bugdrop-flow^="docs-incident-triage"]')).toHaveCount(1);
+  await page.keyboard.press("Escape");
+  await expect(page.locator('[data-bugdrop-flow^="docs-"]')).toHaveCount(0);
+  await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
+  await expect(page).toHaveURL(`${origin}/`);
+
+  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await expect(classicHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await classicHost.getByRole("button", { name: "×" }).click();
+
+  await page.locator('a[href="/docs"]').first().click();
+  await page.waitForURL("**/docs");
+  await page.locator('a[href="/docs/flow-examples"]').first().click();
+  const revisitedLauncher = page.getByRole("button", { name: "Launch live example" });
+  await expect(revisitedLauncher).toBeEnabled();
+  await revisitedLauncher.click();
+  await expect(page.locator('[data-bugdrop-flow^="docs-incident-triage"]')).toHaveCount(1);
+  await page.keyboard.press("Escape");
+  await expect(page.locator('[data-bugdrop-flow^="docs-"]')).toHaveCount(0);
+  await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
+  await expect(page).toHaveURL(`${origin}/`);
+
+  await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(1);
+  await expect(page.locator("#bugdrop-flow-capability-docs-runtime")).toHaveCount(0);
+  await expect(page.locator("#bugdrop-host")).toHaveCount(1);
+  await expect(page.locator("[data-bugdrop-flow]")).toHaveCount(0);
+  expect(
+    await page.evaluate(() => {
+      const runtimeWindow = window as Window & {
+        BugDrop?: unknown;
+        __homepageDocsOwnerProof?: {
+          script: Element | null;
+          api: unknown;
+          host: Element | null;
+        };
+      };
+      const identity = runtimeWindow.__homepageDocsOwnerProof;
+      return {
+        script: identity?.script === document.getElementById("bugdrop-homepage-demo"),
+        api: identity?.api === runtimeWindow.BugDrop,
+        host: identity?.host === document.getElementById("bugdrop-host"),
+      };
+    }),
+  ).toEqual({ script: true, api: true, host: true });
+  harness.assertClean();
+});
+
+test("isolates the lab API across enabled home to lab to docs to home navigation", async ({
+  page,
+}, testInfo) => {
+  enabledOnly(testInfo);
+  const harness = installLocalBugDropHarness(page);
+
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  const homepageHost = page.locator("#bugdrop-host");
+  await expect(homepageHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await homepageHost.getByRole("button", { name: "×" }).click();
+  expect(
+    await page.evaluate(() => {
+      const runtimeWindow = window as Window & {
+        BugDrop?: unknown;
+        __mixedRuntimeOwnerProof?: { script: Element | null; api: unknown; host: Element | null };
+      };
+      runtimeWindow.__mixedRuntimeOwnerProof = {
+        script: document.getElementById("bugdrop-homepage-demo"),
+        api: runtimeWindow.BugDrop,
+        host: document.getElementById("bugdrop-host"),
+      };
+      return runtimeWindow.__mixedRuntimeOwnerProof.api !== undefined;
+    }),
+  ).toBe(true);
+
+  await page.getByRole("link", { name: "Explore the building blocks" }).click();
+  await expect(page).toHaveURL(/\/labs\/variants$/);
+  await expect(page.getByRole("button", { name: "Run default-shaped flow" })).toBeEnabled();
+  expect(
+    await page.evaluate(() => {
+      const runtimeWindow = window as Window & {
+        BugDrop?: unknown;
+        __mixedRuntimeOwnerProof?: { api: unknown };
+      };
+      return runtimeWindow.BugDrop !== runtimeWindow.__mixedRuntimeOwnerProof?.api;
+    }),
+  ).toBe(true);
+
+  await page.getByRole("navigation").getByRole("link", { name: "Docs", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/docs`);
+  await page.locator('a[href="/docs/flow-examples"]').first().click();
+  const galleryLauncher = page.getByRole("button", { name: "Launch live example" });
+  await expect(galleryLauncher).toBeEnabled();
+  await galleryLauncher.click();
+  await expect(page.locator('[data-bugdrop-flow^="docs-incident-triage"]')).toHaveCount(1);
+  await page.keyboard.press("Escape");
+  await expect(page.locator('[data-bugdrop-flow^="docs-"]')).toHaveCount(0);
+
+  await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
+  await expect(page).toHaveURL(`${origin}/`);
+  await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(1);
+  await expect(page.locator("#bugdrop-flow-capability-docs-runtime")).toHaveCount(0);
+  await expect(page.locator("#bugdrop-host")).toHaveCount(1);
+  expect(
+    await page.evaluate(() => {
+      const runtimeWindow = window as Window & {
+        BugDrop?: unknown;
+        __mixedRuntimeOwnerProof?: { script: Element | null; api: unknown; host: Element | null };
+      };
+      const owner = runtimeWindow.__mixedRuntimeOwnerProof;
+      const script = document.getElementById("bugdrop-homepage-demo");
+      const bound = script &&
+        (script as HTMLScriptElement & { [key: symbol]: unknown })[
+          Symbol.for("bugdrop.homepage-demo.exact-api")
+        ];
+      return {
+        script: owner?.script === script,
+        api: owner?.api === runtimeWindow.BugDrop,
+        bound: bound === runtimeWindow.BugDrop,
+        host: owner?.host === document.getElementById("bugdrop-host"),
+      };
+    }),
+  ).toEqual({ script: true, api: true, bound: true, host: true });
+
+  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await expect(homepageHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await homepageHost.getByRole("button", { name: "×" }).click();
+  expect(harness.submissions).toHaveLength(0);
+  harness.assertClean();
+});
+
+test("reclaims a delayed detached docs runtime without deleting the enabled homepage owner", async ({
+  page,
+}, testInfo) => {
+  enabledOnly(testInfo);
+  const harness = installLocalBugDropHarness(page);
+  let requestCount = 0;
+  let releaseDocsResponse!: () => void;
+  let noteDocsRequest!: () => void;
+  let noteDocsCompletion!: () => void;
+  const docsRequest = new Promise<void>((resolve) => {
+    noteDocsRequest = resolve;
+  });
+  const docsResponseGate = new Promise<void>((resolve) => {
+    releaseDocsResponse = resolve;
+  });
+  const docsCompletion = new Promise<void>((resolve) => {
+    noteDocsCompletion = resolve;
+  });
+  await page.route(`**${runtimePath}/widget.js`, async (route) => {
+    requestCount += 1;
+    if (requestCount === 1) {
+      noteDocsRequest();
+      await docsResponseGate;
+      try {
+        await route.fallback();
+      } finally {
+        noteDocsCompletion();
+      }
+      return;
+    }
+    await route.fallback();
+  });
+
+  await page.goto("/docs/flow-examples");
+  await docsRequest;
+  await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
+  await expect(page).toHaveURL(`${origin}/`);
+
+  const launcher = page.getByRole("button", { name: "Open General Feedback" });
+  await launcher.click();
+  await expect(page.getByRole("button", { name: "Loading Feedback…" })).toBeDisabled();
+
+  releaseDocsResponse();
+  await docsCompletion;
+  const homepageHost = page.locator("#bugdrop-host");
+  await expect(homepageHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  const ownerAfterRelease = await page.evaluate(() => {
+    const runtimeWindow = window as Window & { BugDrop?: unknown };
+    const script = document.getElementById("bugdrop-homepage-demo");
+    const host = document.getElementById("bugdrop-host");
+    (runtimeWindow as typeof runtimeWindow & {
+      __delayedEnabledOwner?: { script: Element | null; api: unknown; host: Element | null };
+    }).__delayedEnabledOwner = { script, api: runtimeWindow.BugDrop, host };
+    return { script: script !== null, api: runtimeWindow.BugDrop !== undefined, host: host !== null };
+  });
+  expect(ownerAfterRelease).toEqual({ script: true, api: true, host: true });
+  await homepageHost.getByRole("button", { name: "×" }).click();
+
+  await expect(page.locator("#bugdrop-flow-capability-docs-runtime")).toHaveCount(0);
+  await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(1);
+  await expect(page.locator("#bugdrop-host")).toHaveCount(1);
+  await expect(page.locator('[data-bugdrop-flow^="docs-"]')).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => {
+    const runtimeWindow = window as Window & {
+      BugDrop?: unknown;
+      __delayedEnabledOwner?: { script: Element | null; api: unknown; host: Element | null };
+    };
+    const owner = runtimeWindow.__delayedEnabledOwner;
+    return {
+      script: owner?.script === document.getElementById("bugdrop-homepage-demo"),
+      api: owner?.api === runtimeWindow.BugDrop,
+      host: owner?.host === document.getElementById("bugdrop-host"),
+    };
+  })).toEqual({ script: true, api: true, host: true });
+
+  await launcher.click();
+  await expect(homepageHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await homepageHost.getByRole("button", { name: "×" }).click();
+  harness.assertClean();
+});
+
+test("waits for a delayed exact runtime instead of resolving a foreign lab API", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  enabledOnly(testInfo);
+  const harness = installLocalBugDropHarness(page, { issueBase: 9500 });
+  let releaseExactScript!: () => void;
+  let noteExactScriptRequested!: () => void;
+  const exactScriptRequested = new Promise<void>((resolve) => {
+    noteExactScriptRequested = resolve;
+  });
+  const exactScriptGate = new Promise<void>((resolve) => {
+    releaseExactScript = resolve;
+  });
+  await page.route(`**${runtimePath}/widget.js`, async (route) => {
+    noteExactScriptRequested();
+    await exactScriptGate;
+    await route.fallback();
+  });
+  await page.goto("/");
+
+  await page.getByRole("radio", { name: "Quick Rating" }).check();
+  await page.getByRole("button", { name: "Open Quick Rating" }).click();
+  await exactScriptRequested;
+  await page.getByRole("link", { name: "Explore the building blocks" }).click();
+  await expect(page).toHaveURL(/\/labs\/variants$/);
+  await expect(page.getByRole("button", { name: "Run default-shaped flow" })).toBeEnabled();
+  await page.evaluate(() => {
+    (window as Window & { __homepageRaceForeignApi?: unknown }).__homepageRaceForeignApi =
+      window.BugDrop;
+  });
+
+  await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
+  await expect(page).toHaveURL(`${origin}/`);
+  await page.getByRole("radio", { name: "Quick Rating" }).check();
+  const secondLaunch = page.getByRole("button", { name: "Open Quick Rating" });
+  await secondLaunch.click();
+  await expect(page.getByRole("button", { name: "Loading Feedback…" })).toBeDisabled();
+  await expect(page.locator('[data-bugdrop-flow="quick-rating"]')).toHaveCount(0);
+  expect(harness.submissions).toHaveLength(0);
+  expect(
+    await page.evaluate(() => (window as Window & { BugDrop?: unknown }).BugDrop),
+  ).toBeUndefined();
+
+  releaseExactScript();
+  const rating = page.locator('[data-bugdrop-flow="quick-rating"]');
+  await expect(rating.getByRole("dialog", { name: "How was this experience?" })).toBeVisible();
+  expect(
+    await page.evaluate(() => {
+      const runtimeWindow = window as Window & {
+        BugDrop?: unknown;
+        __homepageRaceForeignApi?: unknown;
+      };
+      const script = document.querySelector<HTMLScriptElement>("#bugdrop-homepage-demo");
+      const bound = script &&
+        (script as HTMLScriptElement & { [key: symbol]: unknown })[
+          Symbol.for("bugdrop.homepage-demo.exact-api")
+        ];
+      return {
+        replacedForeign: runtimeWindow.BugDrop !== runtimeWindow.__homepageRaceForeignApi,
+        boundExact: bound === runtimeWindow.BugDrop,
+      };
+    }),
+  ).toEqual({ replacedForeign: true, boundExact: true });
+
+  await rating.getByRole("radio", { name: "4 stars" }).click();
+  await rating.getByRole("button", { name: "Send rating", exact: true }).click();
+  await expect(rating.getByRole("heading", { name: "Rating received" })).toBeVisible();
+  expect(harness.submissions).toHaveLength(1);
+  expect(harness.submissions[0]).toMatchObject({
+    url: `${origin}${runtimePath}/api/feedback`,
+    body: { repo, title: "Experience rating 4/5" },
+  });
+  harness.assertClean();
 });
 
 test("settles Classic when the runtime opens and closes before the first poll", async ({
@@ -240,7 +597,7 @@ test("keeps the Classic-only launcher when the feature flag is unset", async ({ 
   });
   await page.goto("/");
 
-  await expect(page.getByRole("button", { name: "Try BugDrop experiences" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Open BugDrop feedback" })).toHaveCount(0);
   await page.getByRole("button", { name: "Open Feedback demo" }).click();
   await expect(page.locator("body")).toHaveAttribute("data-classic-demo-opened", "true");
 });
@@ -252,12 +609,9 @@ test("submits the independent Classic journey through the local mock", async ({ 
   const harness = installLocalBugDropHarness(page);
   await page.goto("/");
 
-  const floatingLauncher = page.getByRole("button", { name: "Try BugDrop experiences" });
-  await floatingLauncher.click();
-  await page
-    .getByRole("menu", { name: "Feedback experience" })
-    .getByRole("menuitemradio", { name: /General Feedback.*Classic/ })
-    .click();
+  await page.getByRole("radio", { name: /General Feedback.*Classic/ }).check();
+  const classicLauncher = page.getByRole("button", { name: "Open General Feedback" });
+  await classicLauncher.click();
 
   const classicHost = page.locator("#bugdrop-host");
   await expect(classicHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
@@ -300,10 +654,9 @@ test("submits the independent Classic journey through the local mock", async ({ 
   await classicCapture.getByRole("button", { name: "Submit Feedback" }).click();
 
   await expect(classicHost.getByRole("heading", { name: "Feedback Submitted!" })).toBeVisible();
-  await expect(classicHost.getByRole("link", { name: "View on GitHub" })).toHaveAttribute(
-    "href",
-    `https://github.com/${repo}/issues/9101`,
-  );
+  await expect(classicHost).toContainText("Your feedback has been submitted successfully.");
+  await expect(classicHost.getByRole("link", { name: "View on GitHub" })).toHaveCount(0);
+  await expect(classicHost).not.toContainText(/Issue #\d+ has been created\./);
   expect(harness.submissions).toHaveLength(1);
   expect(harness.submissions[0]).toMatchObject({
     url: `${origin}${runtimePath}/api/feedback`,
@@ -315,18 +668,139 @@ test("submits the independent Classic journey through the local mock", async ({ 
     },
   });
   await classicHost.getByRole("button", { name: "Done" }).click();
-  await expect(floatingLauncher).toBeFocused();
-  await floatingLauncher.click();
-  await expect(
-    page
-      .getByRole("menu", { name: "Feedback experience" })
-      .getByRole("menuitemradio", { name: /General Feedback.*Classic/ }),
-  ).toHaveAttribute("aria-checked", "true");
+  await expect(classicLauncher).toBeFocused();
+  await expect(page.getByRole("radio", { name: /General Feedback.*Classic/ })).toBeChecked();
   await expect(page.locator("[data-bugdrop-flow]")).toHaveCount(0);
   harness.assertClean();
 });
 
-test("opens one selected Flow and restores the floating launcher focus", async ({ page }, testInfo) => {
+test("keeps the actual local Classic result private and truthful", async ({ page }, testInfo) => {
+  test.setTimeout(90_000);
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  enabledOnly(testInfo);
+  const externalRequests: string[] = [];
+  const feedbackResponses: Array<Record<string, unknown>> = [];
+
+  await page.route("**/*", async (route) => {
+    const url = new URL(route.request().url());
+    if (
+      (url.protocol === "http:" || url.protocol === "https:") &&
+      url.origin !== origin
+    ) {
+      externalRequests.push(route.request().url());
+      await route.abort("blockedbyclient");
+      return;
+    }
+    await route.continue();
+  });
+  page.on("response", async (response) => {
+    if (
+      response.request().method() === "POST" &&
+      response.url() === `${origin}${runtimePath}/api/feedback`
+    ) {
+      feedbackResponses.push(await response.json() as Record<string, unknown>);
+    }
+  });
+  await page.goto("/");
+
+  await expect(page.getByText(/Local dogfood submissions stay in this development process/))
+    .toContainText("they do not create a public GitHub Issue");
+  await expect(page.getByText(/Demo submissions create a real public GitHub Issue/)).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  const configuredRuntime = process.env.NEXT_PUBLIC_BUGDROP_WIDGET_URL;
+  if (configuredRuntime?.includes("BUGDROP.LOCALHOST")) {
+    await expect(page.locator("script#bugdrop-homepage-demo")).toHaveAttribute(
+      "src",
+      configuredRuntime,
+    );
+  }
+  const classicHost = page.locator("#bugdrop-host");
+  await classicHost.getByLabel("Title").fill("Private local Classic proof");
+  await classicHost.getByLabel("Description").fill("This result stays in local memory.");
+  await classicHost.getByLabel(/Include a screenshot/).uncheck();
+  await classicHost.getByRole("button", { name: "Continue", exact: true }).click();
+
+  await expect(classicHost.getByRole("heading", { name: "Feedback Submitted!" })).toBeVisible();
+  await expect(classicHost).toContainText("Your feedback has been submitted successfully.");
+  await expect(classicHost.getByRole("link", { name: "View on GitHub" })).toHaveCount(0);
+  await expect(classicHost).not.toContainText(/Issue #\d+ has been created\./);
+  await expect.poll(() => feedbackResponses).toHaveLength(1);
+  expect(feedbackResponses[0]).toMatchObject({
+    success: true,
+    issueUrl: expect.stringMatching(
+      new RegExp(`^https://github\\.com/${repo}/issues/\\d+$`),
+    ),
+    isPublic: false,
+  });
+  expect(externalRequests).toEqual([]);
+});
+
+test("classifies the uppercase-host exact runtime as private", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  enabledOnly(testInfo);
+  const configuredRuntime = process.env.NEXT_PUBLIC_BUGDROP_WIDGET_URL;
+  const uppercaseHostRuntime = `http://BUGDROP.LOCALHOST:3000${runtimePath}/widget.js`;
+  test.skip(
+    configuredRuntime !== uppercaseHostRuntime,
+    "requires the focused uppercase-host runtime",
+  );
+
+  await page.goto("/");
+
+  await expect(page.getByText(/Local dogfood submissions stay in this development process/))
+    .toContainText("they do not create a public GitHub Issue");
+  await expect(page.getByText(/Demo submissions create a real public GitHub Issue/)).toHaveCount(0);
+  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await expect(page.locator("script#bugdrop-homepage-demo")).toHaveAttribute(
+    "src",
+    uppercaseHostRuntime,
+  );
+});
+
+test("discloses the exact public v1.56.3 runtime as public", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  enabledOnly(testInfo);
+  const configuredRuntime = process.env.NEXT_PUBLIC_BUGDROP_WIDGET_URL;
+  const publicRuntime = "https://bugdrop.neonwatty.workers.dev/widget.v1.56.3.js";
+  test.skip(
+    configuredRuntime !== publicRuntime,
+    "requires the focused exact public v1.56.3 runtime",
+  );
+
+  await page.goto("/");
+
+  await expect(page.getByText(/Demo submissions create a real public GitHub Issue/)).toBeVisible();
+  await expect(page.getByText(/Local dogfood submissions stay in this development process/))
+    .toHaveCount(0);
+  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await expect(page.locator("script#bugdrop-homepage-demo")).toHaveAttribute(
+    "src",
+    publicRuntime,
+  );
+});
+
+test("renders a GitHub link only for an explicitly public result", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  enabledOnly(testInfo);
+  const harness = installLocalBugDropHarness(page, { issueBase: 9150, publicResult: true });
+  await page.goto("/");
+
+  await chooseInPage(page, "Quick Rating");
+  const quick = page.locator('[data-bugdrop-flow="quick-rating"]');
+  await quick.getByRole("radio", { name: "5 stars" }).click();
+  await quick.getByRole("button", { name: "Send rating", exact: true }).click();
+
+  await expect(quick.getByRole("heading", { name: "Rating received" })).toBeVisible();
+  await expect(quick.getByRole("link", { name: "View GitHub Issue" })).toHaveAttribute(
+    "href",
+    `https://github.com/${repo}/issues/9151`,
+  );
+  expect(harness.submissions).toHaveLength(1);
+  harness.assertClean();
+});
+
+test("opens Classic directly and restores the floating launcher focus", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   test.skip(process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED !== "true");
 
@@ -336,19 +810,59 @@ test("opens one selected Flow and restores the floating launcher focus", async (
   await page.route("**/feedback", (route) => route.abort());
   await page.goto("/");
 
-  const launcher = page.getByRole("button", { name: "Try BugDrop experiences" });
+  const launcher = page.getByRole("button", { name: "Open BugDrop feedback" });
   await launcher.click();
-  await page
-    .getByRole("menu", { name: "Feedback experience" })
-    .getByRole("menuitemradio", { name: "Bug Report" })
-    .click();
 
-  const flow = page.locator('[data-bugdrop-instance]');
-  await expect(flow).toHaveCount(1);
+  const classic = page.locator("#bugdrop-host");
+  await expect(classic.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await expect(page.locator("[data-bugdrop-flow]")).toHaveCount(0);
   await expect(launcher).toBeDisabled();
-  await page.getByRole("button", { name: "Close" }).click();
-  await expect(flow).toHaveCount(0);
+  await classic.getByRole("button", { name: "×" }).click();
+  await expect(classic.getByRole("heading", { name: "Send Feedback" })).toHaveCount(0);
   await expect(launcher).toBeFocused();
+});
+
+test("animates Feature Request forward and back for 500 ms and honors reduced motion", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium");
+  enabledOnly(testInfo);
+  const harness = installLocalBugDropHarness(page);
+  await page.goto("/");
+
+  await chooseInPage(page, "Feature Request");
+  let feature = page.locator('[data-bugdrop-flow="feature-request"]');
+  await expect(feature.getByRole("dialog", { name: "Request a feature" })).toBeVisible();
+  await feature.getByRole("button", { name: "Shape idea" }).click();
+
+  const transition = feature.locator(".bdf-transitioning");
+  await expect(transition).toHaveCount(1);
+  await expect(feature.locator(".bdf-slide-forward-exit")).toHaveCount(1);
+  await expect(feature.locator(".bdf-slide-forward-enter")).toHaveCount(1);
+  await expect(transition).toHaveCSS("--bdf-screen-transition-duration", "500ms");
+  await expect(transition).toHaveCount(0, { timeout: 2_000 });
+  await expect(feature.getByRole("heading", { name: "Shape the opportunity" })).toBeVisible();
+
+  await feature.getByRole("button", { name: "Back" }).click();
+  await expect(feature.locator(".bdf-slide-backward-exit")).toHaveCount(1);
+  await expect(feature.locator(".bdf-slide-backward-enter")).toHaveCount(1);
+  await expect(transition).toHaveCount(0, { timeout: 2_000 });
+  await expect(feature.getByRole("heading", { name: "Request a feature" })).toBeVisible();
+  await feature.getByRole("button", { name: "Close" }).click();
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await chooseInPage(page, "Feature Request");
+  feature = page.locator('[data-bugdrop-flow="feature-request"]');
+  await feature.getByRole("button", { name: "Shape idea" }).click();
+  await expect(feature.locator(".bdf-transitioning")).toHaveCount(0);
+  await expect(feature.locator('[class*="bdf-slide-"]')).toHaveCount(0);
+  await expect(feature.getByRole("heading", { name: "Shape the opportunity" })).toBeVisible();
+  await feature.getByRole("button", { name: "Back" }).click();
+  await expect(feature.locator(".bdf-transitioning")).toHaveCount(0);
+  await expect(feature.getByRole("heading", { name: "Request a feature" })).toBeVisible();
+  await feature.getByRole("button", { name: "Close" }).click();
+  expect(harness.submissions).toHaveLength(0);
+  harness.assertClean();
 });
 
 test("enforces evidence and submits Bug Report through its isolated mock", async ({ page }, testInfo) => {
@@ -363,8 +877,8 @@ test("enforces evidence and submits Bug Report through its isolated mock", async
 
   const launcher = await chooseInPage(page, "Bug Report");
   const bug = page.locator('[data-bugdrop-flow="bug-report"]');
-  await expect(bug.getByRole("dialog", { name: "Report a problem" })).toBeVisible();
-  await bug.getByRole("button", { name: "Start report" }).click();
+  await expect(bug.getByRole("dialog", { name: "Report a bug" })).toBeVisible();
+  await bug.getByRole("button", { name: "Describe bug" }).click();
   await bug.getByLabel("Summary").fill("Settings save is broken");
   await bug.getByLabel("Steps to reproduce").fill("Open settings, change a value, then save.");
   await bug.getByRole("button", { name: "Add evidence" }).click();
@@ -372,7 +886,7 @@ test("enforces evidence and submits Bug Report through its isolated mock", async
   const evidenceAdvance = bug.getByRole("button", { name: /Continue|Submit/ });
   await evidenceAdvance.click();
   await expect(bug.getByText("Select at least one attachment.")).toBeVisible();
-  await expect(bug.getByRole("heading", { name: "Evidence and contact" })).toBeVisible();
+  await expect(bug.getByRole("heading", { name: "Attach proof" })).toBeVisible();
   expect(harness.submissions).toHaveLength(0);
 
   await bug.locator('input[type="file"]').setInputFiles({
@@ -382,7 +896,7 @@ test("enforces evidence and submits Bug Report through its isolated mock", async
   });
   await bug.getByLabel("Your name").fill("Homepage QA");
   await evidenceAdvance.click();
-  await expect(bug.getByRole("heading", { name: "Show us the problem" })).toBeVisible();
+  await expect(bug.getByRole("heading", { name: "Capture the breakage" })).toBeVisible();
   await bug.getByRole("button", { name: /Continue|Submit/ }).click();
 
   const capture = page.locator("#bugdrop-host .bd-overlay");
@@ -390,11 +904,11 @@ test("enforces evidence and submits Bug Report through its isolated mock", async
   await expect(capture.getByRole("button", { name: "Skip Screenshot" })).toHaveCount(0);
   expect(harness.submissions).toHaveLength(0);
   await capture.getByRole("button", { name: "×" }).click();
-  await expect(bug.getByRole("heading", { name: "Evidence and contact" })).toBeVisible();
+  await expect(bug.getByRole("heading", { name: "Attach proof" })).toBeVisible();
   await expect(bug.getByText("settings-proof.png")).toBeVisible();
   expect(harness.submissions).toHaveLength(0);
   await bug.getByRole("button", { name: /Continue|Submit/ }).click();
-  await expect(bug.getByRole("heading", { name: "Show us the problem" })).toBeVisible();
+  await expect(bug.getByRole("heading", { name: "Capture the breakage" })).toBeVisible();
   await bug.getByRole("button", { name: /Continue|Submit/ }).click();
   await capture.getByRole("button", { name: "Full Page" }).click();
   await expect(capture.getByRole("heading", { name: "Review Screenshot" })).toBeVisible({
@@ -416,11 +930,9 @@ test("enforces evidence and submits Bug Report through its isolated mock", async
   ]);
   expect(firstAttempt.screenshot).toEqual(expect.stringMatching(/^data:image\/png;base64,/));
   await bug.getByRole("button", { name: "Try Again" }).click();
-  await expect(bug.getByRole("heading", { name: "Report received" })).toBeVisible();
-  await expect(bug.getByRole("link", { name: "View GitHub Issue" })).toHaveAttribute(
-    "href",
-    `https://github.com/${repo}/issues/9202`,
-  );
+  await expect(bug.getByRole("heading", { name: "Bug captured" })).toBeVisible();
+  await expect(bug.getByRole("link", { name: "View GitHub Issue" })).toHaveCount(0);
+  await expect(bug).not.toContainText(/Issue #\d+/);
   expect(harness.submissions).toHaveLength(2);
   expect(harness.submissions[1]?.body).toMatchObject({
     title: firstAttempt.title,
@@ -433,98 +945,74 @@ test("enforces evidence and submits Bug Report through its isolated mock", async
   harness.assertClean();
 });
 
-test("prunes hidden Product Triage answers in an isolated journey", async ({ page }, testInfo) => {
+test("submits a structured Feature Request in an isolated journey", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   enabledOnly(testInfo);
   const harness = installLocalBugDropHarness(page, { issueBase: 9300 });
   await page.goto("/");
 
-  const launcher = await chooseInPage(page, "Product Triage");
-  const triage = page.locator('[data-bugdrop-flow="product-triage"]');
-  await expect(triage.getByRole("dialog", { name: "Triage product feedback" })).toBeVisible();
-  await triage.getByRole("button", { name: "Continue" }).click();
-  await triage.getByLabel("Bug").click();
-  await triage.getByRole("radio", { name: "2 stars" }).click();
-  await triage.getByLabel("Summary").fill("Stale diagnostics must disappear");
-  await triage.getByRole("button", { name: "Continue" }).click();
-  await triage.getByLabel("What happened?").fill("hidden-diagnostics-sentinel");
-  await triage.getByLabel("Chromium").click();
-  await triage.getByRole("button", { name: "Continue" }).click();
-  await triage.getByRole("button", { name: "Back" }).click();
-  await expect(triage.getByLabel("What happened?")).toHaveValue("hidden-diagnostics-sentinel");
-  await triage.getByRole("button", { name: "Back" }).click();
-  await triage.getByRole("radio", { name: "5 stars" }).click();
-  await triage.getByLabel("Summary").fill("A high-signal product idea");
-  await triage.getByRole("button", { name: "Continue" }).click();
-  await expect(triage.getByLabel("What happened?")).toHaveCount(0);
-  const includeScreenshot = triage.getByLabel("Include a screenshot", { exact: true });
-  await expect(includeScreenshot).toBeChecked();
-  await includeScreenshot.uncheck();
-  await triage.getByRole("button", { name: "Submit" }).click();
+  const launcher = await chooseInPage(page, "Feature Request");
+  const feature = page.locator('[data-bugdrop-flow="feature-request"]');
+  await feature.getByRole("button", { name: "Shape idea" }).click();
+  await feature.getByLabel("Integration").click();
+  await feature.getByLabel("Idea in one sentence").fill("Connect release notes to Slack");
+  await feature.getByRole("button", { name: "Add context" }).click();
+  await feature.getByLabel("Why would this help?").fill("Keep customer teams current without copying updates.");
+  await feature.getByRole("button", { name: "Set priority" }).click();
+  await feature.getByLabel("Important").click();
+  await feature.getByRole("button", { name: "Send idea" }).click();
 
-  await expect(triage.getByRole("heading", { name: "Thanks for your feedback!" })).toBeVisible();
-  await expect(triage.getByRole("link", { name: "View GitHub Issue" })).toHaveAttribute(
-    "href",
-    `https://github.com/${repo}/issues/9301`,
-  );
+  await expect(feature.getByRole("heading", { name: "Idea shared" })).toBeVisible();
+  await expect(feature.getByRole("link", { name: "View GitHub Issue" })).toHaveCount(0);
+  await expect(feature).not.toContainText(/Issue #\d+/);
   expect(harness.submissions).toHaveLength(1);
-  const body = harness.submissions[0]?.body;
-  expect(body).toMatchObject({
+  expect(harness.submissions[0]?.body).toMatchObject({
     repo,
-    title: "Triage: A high-signal product idea",
-    description: "## Type\n\nBug\n\n## Experience\n\n★★★★★ (5/5)",
-    screenshot: null,
+    title: "Feature: Connect release notes to Slack",
+    category: "feature",
+    description:
+      "## Area\n\nIntegration\n\n## Opportunity\n\nKeep customer teams current without copying updates.\n\n## Potential impact\n\nImportant",
   });
-  expect(JSON.stringify(body)).not.toContain("hidden-diagnostics-sentinel");
-  expect(JSON.stringify(body)).not.toContain("Chromium");
-  await triage.getByRole("button", { name: "Done" }).click();
+  await feature.getByRole("button", { name: "Done" }).click();
   await expect(launcher).toBeFocused();
   harness.assertClean();
 });
 
-test("submits Customer Pulse with cumulative rating behavior in isolation", async ({ page }, testInfo) => {
+test("submits a one-step Quick Rating with cumulative stars", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   enabledOnly(testInfo);
   const harness = installLocalBugDropHarness(page, { issueBase: 9400 });
   await page.goto("/");
 
-  const launcher = await chooseInPage(page, "Customer Pulse");
-  const pulse = page.locator('[data-bugdrop-flow="customer-pulse"]');
-  const rating = pulse.getByRole("radiogroup", { name: "Ease score" });
-  await rating.getByRole("radio", { name: "7 stars" }).hover();
-  for (let value = 1; value <= 7; value += 1) {
+  const launcher = await chooseInPage(page, "Quick Rating");
+  const quick = page.locator('[data-bugdrop-flow="quick-rating"]');
+  const rating = quick.getByRole("radiogroup", { name: "Overall rating" });
+  await rating.getByRole("radio", { name: "4 stars" }).hover();
+  for (let value = 1; value <= 4; value += 1) {
     await expect(rating.getByRole("radio", { name: `${value} ${value === 1 ? "star" : "stars"}` }))
       .toHaveClass(/bdv-rating-option--preview/);
   }
-  await expect(rating.getByRole("radio", { name: "8 stars" }))
+  await expect(rating.getByRole("radio", { name: "5 stars" }))
     .not.toHaveClass(/bdv-rating-option--preview/);
-  await rating.getByRole("radio", { name: "3 stars" }).click();
-  for (let value = 1; value <= 3; value += 1) {
+  await rating.getByRole("radio", { name: "4 stars" }).click();
+  for (let value = 1; value <= 4; value += 1) {
     await expect(rating.getByRole("radio", { name: `${value} ${value === 1 ? "star" : "stars"}` }))
       .toHaveClass(/bdv-rating-option--active/);
   }
-  await expect(rating.getByRole("radio", { name: "4 stars" }))
+  await expect(rating.getByRole("radio", { name: "5 stars" }))
     .not.toHaveClass(/bdv-rating-option--active/);
-  await pulse.getByRole("button", { name: "Continue" }).click();
-  await pulse.getByLabel("What made this difficult?").fill("Invoice controls were hard to find.");
-  await pulse.getByLabel("Yes").click();
-  await pulse.getByLabel("I consent to a product follow-up").check();
-  await pulse.getByRole("button", { name: "Send pulse" }).click();
-
-  await expect(pulse.getByRole("heading", { name: "Pulse recorded" })).toBeVisible();
-  await expect(pulse.getByRole("link", { name: "View GitHub Issue" })).toHaveAttribute(
-    "href",
-    `https://github.com/${repo}/issues/9401`,
-  );
+  await quick.getByRole("button", { name: "Send rating" }).click();
+  await expect(quick.getByRole("heading", { name: "Rating received" })).toBeVisible();
+  await expect(quick.getByRole("link", { name: "View GitHub Issue" })).toHaveCount(0);
+  await expect(quick).not.toContainText(/Issue #\d+/);
   expect(harness.submissions).toHaveLength(1);
   expect(harness.submissions[0]?.body).toMatchObject({
     repo,
-    title: "Billing pulse 3/10",
+    title: "Experience rating 4/5",
     category: "question",
-    description:
-      "## Score\n\n3\n\n## Follow-up\n\nInvoice controls were hard to find.\n\n## Contact\n\nYes\n\n## Consent\n\ntrue",
+    description: "## Rating\n\n★★★★☆ (4/5)",
   });
-  await pulse.getByRole("button", { name: "Done" }).click();
+  await quick.getByRole("button", { name: "Done" }).click();
   await expect(launcher).toBeFocused();
   harness.assertClean();
 });
@@ -673,14 +1161,18 @@ test("keeps one active owner and tears capture down on client navigation", async
   await bug.getByRole("button", { name: "Close" }).click();
   await expect(bug).toHaveCount(0);
 
-  await chooseInPage(page, "Product Triage");
-  const triage = page.locator('[data-bugdrop-flow="product-triage"]');
-  await triage.getByRole("button", { name: "Continue" }).click();
-  await triage.getByLabel("Bug").click();
-  await triage.getByRole("radio", { name: "5 stars" }).click();
-  await triage.getByLabel("Summary").fill("Capture navigation teardown");
-  await triage.getByRole("button", { name: "Continue" }).click();
-  await triage.getByRole("button", { name: "Submit" }).click();
+  await chooseInPage(page, "Bug Report");
+  await bug.getByRole("button", { name: "Describe bug" }).click();
+  await bug.getByLabel("Summary").fill("Capture navigation teardown");
+  await bug.getByLabel("Steps to reproduce").fill("Open the flow and navigate during capture.");
+  await bug.getByRole("button", { name: "Add evidence" }).click();
+  await bug.locator('input[type="file"]').setInputFiles({
+    name: "capture-proof.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("capture teardown proof"),
+  });
+  await bug.getByRole("button", { name: /Continue|Submit/ }).click();
+  await bug.getByRole("button", { name: /Continue|Submit/ }).click();
   const capture = page.locator("#bugdrop-host .bd-overlay");
   await expect(capture.getByRole("heading", { name: "Capture Screenshot" })).toBeVisible();
   await page.locator('a[href="/docs"]').first().evaluate((link: HTMLAnchorElement) => link.click());
@@ -702,11 +1194,11 @@ test("tears down a submitted Flow on client navigation", async ({ page }, testIn
   const harness = installLocalBugDropHarness(page);
   await page.goto("/");
   const initialOverflow = await page.evaluate(() => document.body.style.overflow);
-  await chooseInPage(page, "Customer Pulse");
-  const pulse = page.locator('[data-bugdrop-flow="customer-pulse"]');
-  await pulse.getByRole("radio", { name: "8 stars" }).click();
-  await pulse.getByRole("button", { name: "Continue" }).click();
-  await expect(pulse.getByRole("heading", { name: "Pulse recorded" })).toBeVisible();
+  await chooseInPage(page, "Quick Rating");
+  const quick = page.locator('[data-bugdrop-flow="quick-rating"]');
+  await quick.getByRole("radio", { name: "4 stars" }).click();
+  await quick.getByRole("button", { name: "Send rating", exact: true }).click();
+  await expect(quick.getByRole("heading", { name: "Rating received" })).toBeVisible();
   expect(harness.submissions).toHaveLength(1);
   await page.locator('a[href="/docs"]').first().evaluate((link: HTMLAnchorElement) => link.click());
   await page.waitForURL("**/docs");
@@ -716,7 +1208,7 @@ test("tears down a submitted Flow on client navigation", async ({ page }, testIn
   harness.assertClean();
 });
 
-test("supports keyboard menu and mobile focus containment without overflow", async ({ page }, testInfo) => {
+test("supports the direct keyboard launcher and mobile focus containment without overflow", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium");
   enabledOnly(testInfo);
   const harness = installLocalBugDropHarness(page);
@@ -725,28 +1217,20 @@ test("supports keyboard menu and mobile focus containment without overflow", asy
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 
-  const floating = page.getByRole("button", { name: "Try BugDrop experiences" });
+  const floating = page.getByRole("button", { name: "Open BugDrop feedback" });
   await floating.focus();
   await page.keyboard.press("Enter");
-  const menu = page.getByRole("menu", { name: "Feedback experience" });
-  await expect(menu).toBeVisible();
-  await expect(menu.getByRole("menuitemradio")).toHaveCount(4);
-  const bugItem = menu.getByRole("menuitemradio", { name: "Bug Report" });
-  await page.keyboard.press("ArrowDown");
-  await expect(bugItem).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(menu).toBeHidden();
-  await expect(page.getByRole("radio", { name: "Bug Report" })).toBeChecked();
-  const keyboardFlow = page.locator('[data-bugdrop-flow="bug-report"]');
-  await expect(keyboardFlow.getByRole("dialog", { name: "Report a problem" })).toBeVisible();
-  await keyboardFlow.getByRole("button", { name: "Close" }).click();
-  await expect(keyboardFlow).toHaveCount(0);
+  await expect(page.getByRole("radio", { name: /General Feedback.*Classic/ })).toBeChecked();
+  const keyboardClassic = page.locator("#bugdrop-host");
+  await expect(keyboardClassic.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await keyboardClassic.getByRole("button", { name: "×" }).click();
+  await expect(keyboardClassic.getByRole("heading", { name: "Send Feedback" })).toHaveCount(0);
   await expect(floating).toBeFocused();
 
   await page.keyboard.press("Enter");
-  await expect(menu).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(menu).toBeHidden();
+  await expect(keyboardClassic.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await keyboardClassic.getByRole("button", { name: "×" }).click();
+  await expect(keyboardClassic.getByRole("heading", { name: "Send Feedback" })).toHaveCount(0);
   await expect(floating).toBeFocused();
   expect(await floating.evaluate((element) => ({
     reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -754,12 +1238,18 @@ test("supports keyboard menu and mobile focus containment without overflow", asy
     transform: getComputedStyle(element).transform,
   }))).toEqual({ reduced: true, transitionProperty: "none", transform: "none" });
 
-  const inPageLauncher = await chooseInPage(page, "Customer Pulse");
-  const pulse = page.locator('[data-bugdrop-flow="customer-pulse"]');
-  const dialog = pulse.getByRole("dialog", { name: "How easy was this?" });
+  const picker = page.getByRole("group", { name: "Feedback experience" });
+  await picker.scrollIntoViewIfNeeded();
+  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "true");
+  await expect(floating).toHaveCSS("opacity", "0");
+  await expect(floating).toHaveCSS("pointer-events", "none");
+
+  const inPageLauncher = await chooseInPage(page, "Quick Rating");
+  const quick = page.locator('[data-bugdrop-flow="quick-rating"]');
+  const dialog = quick.getByRole("dialog", { name: "How was this experience?" });
   await expect(dialog).toBeVisible();
   const close = dialog.getByRole("button", { name: "Close" });
-  const submit = dialog.getByRole("button", { name: "Continue" });
+  const submit = dialog.getByRole("button", { name: "Send rating", exact: true });
   await close.focus();
   await expectComposedShadowFocus(close);
   await close.press("Shift+Tab");
@@ -769,9 +1259,52 @@ test("supports keyboard menu and mobile focus containment without overflow", asy
   const bounds = await dialog.boundingBox();
   expect(bounds?.width).toBeLessThanOrEqual(390);
   await page.keyboard.press("Escape");
-  await expect(pulse).toHaveCount(0);
+  await expect(quick).toHaveCount(0);
   await expect(inPageLauncher).toBeFocused();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect(harness.submissions).toHaveLength(0);
   harness.assertClean();
+});
+
+test("keeps the floating launcher concealed while an in-page mobile launch loads", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+  enabledOnly(testInfo);
+
+  let releaseRuntime: (() => void) | undefined;
+  let noteRuntimeRequested: () => void;
+  const runtimeRequested = new Promise<void>((resolve) => {
+    noteRuntimeRequested = resolve;
+  });
+  await page.route(`**${runtimePath}/widget.js`, async (route) => {
+    noteRuntimeRequested();
+    await new Promise<void>((resolve) => {
+      releaseRuntime = resolve;
+    });
+    await route.continue();
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const picker = page.getByRole("group", { name: "Feedback experience" });
+  const floating = page.getByRole("button", { name: "Open BugDrop feedback" });
+  await picker.scrollIntoViewIfNeeded();
+  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "true");
+  await page.getByRole("radio", { name: "Quick Rating" }).check();
+  await page.getByRole("button", { name: "Open Quick Rating" }).click();
+  await runtimeRequested;
+
+  await expect(floating).toBeDisabled();
+  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "true");
+  await expect(floating).toHaveCSS("opacity", "0");
+  await expect(floating).toHaveCSS("pointer-events", "none");
+
+  if (!releaseRuntime) throw new Error("The delayed homepage runtime was not requested.");
+  releaseRuntime();
+  const quick = page.locator('[data-bugdrop-flow="quick-rating"]');
+  await expect(quick.getByRole("dialog", { name: "How was this experience?" })).toBeVisible();
+  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "true");
+  await page.keyboard.press("Escape");
+  await expect(quick).toHaveCount(0);
 });

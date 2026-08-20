@@ -1,0 +1,32 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T006",
+    "board_path": "docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "decision": "not_complete",
+    "full_outcome_complete": false,
+    "rationale": "Full toolkit review accepted two high-confidence defects: Customer Pulse's static Share context label submits on terminal branches, and approved design/plan text incorrectly forbids the bounded homepage overlay now used at runtime. One correction package and corrected-head review are required.",
+    "worker_package": {
+      "objective": "Remove the misleading static Customer Pulse first-screen label so v1.56.3 renders terminal-aware Continue versus Submit; prove score 3 opens follow-up and score 8 requires an explicitly labeled submit; amend approved design/plan text to document the bounded overlay and preserved canonical invariants.",
+      "allowed_files": [
+        "src/components/landing/homepage-flow-demo-recipes.ts",
+        "test/homepage-flow-demo-recipes.test.ts",
+        "e2e/homepage-flow-demo.spec.ts",
+        "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md",
+        "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+      ],
+      "verify": ["Exact v1.56.3 identity","Canonical generator check","Focused Vitest","npm test","npm run lint","npm run build","Enabled exact-runtime desktop/mobile E2E","Unset Classic control","False Classic control","git diff --check"],
+      "stop_if": ["Any canonical source/identity/route, Classic, flag, transition, condition, Issue/evidence mapping, payload, or pruning behavior must change.","Score 3 does not open follow-up or score 8 lacks an explicit terminal Submit action.","Docs imply an unrestricted fork.","Any request escapes locally.","Verification remains red after two bounded corrections."]
+    },
+    "evidence": [
+      "Correctness candidate accepted at 0.98 for static Share context terminal submission.",
+      "Comments/docs candidate accepted at 0.98 for stale no-overlay claims.",
+      "Tests, silent-failures, and contracts/types returned no candidates; native untracked-file warnings were rejected at 0.99."
+    ],
+    "subgoal_contract": null,
+    "parallel_safety": {"safe":false,"reason":"Coupled overlay contract and shared browser proof require one writer."},
+    "blocked_tasks": ["T008 and T999 pending correction and fresh review."],
+    "missing_evidence": ["Corrected CTA branches, corrected docs, full rerun, corrected-head review."],
+    "required_board_updates": ["Record T006 done, populate and activate T007."]
+  }
+}

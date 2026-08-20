@@ -1,9 +1,11 @@
 import {
-  homepageFlowRecipeList,
-  homepageFlowRecipes,
   type HomepageFlowOpenOptions,
-  type HomepageFlowRecipeId,
 } from "./homepage-flow-recipes.generated";
+import {
+  homepageFlowDemoRecipeList,
+  homepageFlowDemoRecipes,
+  type HomepageDemoFlowRecipeId,
+} from "./homepage-flow-demo-recipes";
 import type { HomepageExperienceId } from "./homepage-demo-model";
 import { SAMPLE_DEMO_REPO, WIDGET_URL } from "@/lib/links";
 
@@ -40,7 +42,7 @@ export type HomepageActiveExperience =
       close(): void;
     }
   | {
-      readonly id: HomepageFlowRecipeId;
+      readonly id: HomepageDemoFlowRecipeId;
       close(): void;
       readonly result: HomepageOpenedFlow["result"];
     };
@@ -49,7 +51,7 @@ let homepageLoadPromise: Promise<HomepageBugDropApi> | undefined;
 let homepageExactApi: HomepageBugDropApi | undefined;
 const flowHandleCache = new WeakMap<
   HomepageBugDropApi,
-  Map<HomepageFlowRecipeId, HomepageFlowHandle>
+  Map<HomepageDemoFlowRecipeId, HomepageFlowHandle>
 >();
 
 export function homepageRuntimeAttributes(): Readonly<Record<string, string>> {
@@ -68,7 +70,7 @@ export function homepageRuntimeAttributes(): Readonly<Record<string, string>> {
     font: "inherit",
     label: "Feedback",
     welcome: WELCOME,
-    showIssueLink: "always",
+    showIssueLink: "public",
   });
 }
 
@@ -90,6 +92,15 @@ function homepageApiFromWindow(): HomepageBugDropApi | undefined {
 function hasBugDropGlobal(): boolean {
   return typeof window !== "undefined" &&
     (window as Window & { BugDrop?: unknown }).BugDrop !== undefined;
+}
+
+function clearBugDropGlobal(): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    return delete (window as Window & { BugDrop?: unknown }).BugDrop;
+  } catch {
+    return false;
+  }
 }
 
 function homepageScriptFromDocument(): HTMLScriptElement | undefined {
@@ -152,12 +163,20 @@ export function loadHomepageBugDrop(): Promise<HomepageBugDropApi> {
       homepageExactApi = boundApi;
       return Promise.resolve(boundApi);
     }
+    if (homepageLoadPromise) {
+      if (hasBugDropGlobal() && !clearBugDropGlobal()) {
+        return Promise.reject(foreignRuntimeError());
+      }
+      return homepageLoadPromise;
+    }
   }
   const readyApi = homepageApiFromWindow();
   if (readyApi) {
-    return existing && isExactHomepageScript(existing)
-      ? Promise.resolve(readyApi)
-      : Promise.reject(foreignRuntimeError());
+    if (!existing || !isExactHomepageScript(existing)) {
+      return Promise.reject(foreignRuntimeError());
+    }
+    bindHomepageApi(existing, readyApi);
+    return Promise.resolve(readyApi);
   }
   if (hasBugDropGlobal() && (!existing || !isExactHomepageScript(existing))) {
     return Promise.reject(foreignRuntimeError());
@@ -272,7 +291,7 @@ function openCancellableClassic(api: HomepageBugDropApi): HomepageActiveExperien
 
 export function registerHomepageFlow(
   api: HomepageBugDropApi,
-  id: HomepageFlowRecipeId,
+  id: HomepageDemoFlowRecipeId,
 ): HomepageFlowHandle {
   let handles = flowHandleCache.get(api);
   if (!handles) {
@@ -282,7 +301,7 @@ export function registerHomepageFlow(
   const cached = handles.get(id);
   if (cached) return cached;
 
-  const recipe = homepageFlowRecipeList.find((candidate) => candidate.id === id);
+  const recipe = homepageFlowDemoRecipeList.find((candidate) => candidate.id === id);
   if (!recipe) throw new Error(`Unknown homepage Flow recipe: ${id}`);
   const handle = api.registerFlow(recipe.config);
   if (handle.id !== recipe.id) {
@@ -305,7 +324,7 @@ export function openHomepageExperience(
     throw new Error(`Missing homepage Flow handle: ${id}`);
   }
   const opened = handle.open(
-    homepageFlowRecipes[id].openOptions as HomepageFlowOpenOptions | undefined,
+    homepageFlowDemoRecipes[id].openOptions as HomepageFlowOpenOptions | undefined,
   );
   return Object.freeze({
     id,

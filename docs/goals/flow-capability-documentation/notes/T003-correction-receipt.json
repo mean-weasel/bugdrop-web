@@ -1,0 +1,27 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T003",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/flow-capability-documentation/state.yaml",
+    "changed_files": [
+      "src/lib/flow-capabilities.ts",
+      "test/fixtures/flow-capabilities/v1.56.3/screen-transition-config.ts.txt",
+      "test/fixtures/flow-capabilities/v1.56.3/screen-transition.ts.txt",
+      "test/fixtures/flow-capabilities/v1.56.3/PROVENANCE.json",
+      "test/helpers/flow-capability-parity.ts",
+      "test/flow-capabilities.test.ts"
+    ],
+    "commands": [
+      {"cmd":"npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts","status":"pass"},
+      {"cmd":"npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts","status":"pass"},
+      {"cmd":"npm run build","status":"pass"},
+      {"cmd":"git diff --check","status":"pass"},
+      {"cmd":"Runtime snapshot SHA-256/Git blob audit and duplicate-contract search","status":"pass"}
+    ],
+    "summary": "Corrected T003 with authenticated runtime-source snapshots matching the exact release commit, removed the duplicated provenance runtime contract, and source-derived motion bounds, defaults, directions, immediate cases, and easing behavior. Expanded AST parity to exact required/optional contracts, nested options, conditions, transitions, registration, lifecycle, outcomes, and all literal domains. Added negative mutation proof for missing/extra properties, runtime drift, and provenance drift. All required verification passed.",
+    "deviations": [],
+    "remaining_blockers": [],
+    "verification_attempts": 1,
+    "stopped_because": null
+  }
+}

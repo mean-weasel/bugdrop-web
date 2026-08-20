@@ -1,0 +1,63 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T006",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "decision": "not_complete",
+    "full_outcome_complete": false,
+    "rationale": "The corrected-head gate found two independently validated defects. Local Classic submissions return isPublic:false with a synthetic GitHub URL, but showIssueLink=always exposes a misleading View on GitHub action. Separately, the design calls the merge-group localhost Playwright lane preview-deployment coverage even though no deployed preview is exercised. The complete desktop/mobile browser oracle otherwise passed, including all five experiences, reduced motion, branching, cleanup, request safety, exact runtime identity, and false/unset Classic isolation. A bounded website-only correction and corrected-head review rerun are required.",
+    "worker_package": {
+      "objective": "Correct local Classic result truthfulness and preview-coverage documentation: use the public-only issue-link policy so the actual local isPublic:false response exposes neither a GitHub link nor an Issue-created implication while public results retain their link; add focused unit and actual-route browser proof; rewrite merge-queue preview claims to describe the localhost candidate lane accurately while retaining separate preview-deployment verification as pre-enable evidence.",
+      "allowed_files": [
+        "src/components/landing/homepage-demo-runtime.ts",
+        "test/homepage-demo-runtime.test.ts",
+        "test/integration-resource.test.ts",
+        "test/homepage-local-flow-routes.test.ts",
+        "e2e/homepage-flow-demo.spec.ts",
+        "docs/homepage-flow-demo-operations.md",
+        "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md",
+        "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md"
+      ],
+      "verify_commands": [
+        "npm test",
+        "npm run lint",
+        "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npm run build",
+        "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0",
+        "npx playwright test e2e/homepage-flow-demo.spec.ts --project=classic-unset-chromium --retries=0",
+        "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false npx playwright test e2e/homepage-flow-demo.spec.ts --project=classic-false-chromium --retries=0",
+        "wc -c public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js && shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js",
+        "git diff --check"
+      ],
+      "stop_if": [
+        "The correction requires changing SDK or immutable vendored runtime bytes.",
+        "The correction requires changing the local feedback route response schema.",
+        "A public isPublic:true result loses its valid GitHub issue link.",
+        "False or unset feature-flag Classic behavior changes.",
+        "Any test makes a real external request or creates a real GitHub Issue.",
+        "The documentation correction expands into implementing preview-deployment infrastructure or workflow behavior.",
+        "Verification remains red after two bounded correction attempts."
+      ]
+    },
+    "evidence": [
+      {"kind":"review_target","result":"verified","details":"Reviewed origin/main at merge-base 77b2b4ac0b1b17834e266dd6f69be36ff28a7b4c against the complete intended dirty worktree, including every tracked modification and untracked addition."},
+      {"kind":"pr_review_toolkit","result":"completed","details":"Ran native codex review plus independent correctness, tests, contracts/types, silent-failures, and comments/docs discovery. Every candidate received fresh validation."},
+      {"kind":"validated_finding","id":"SF-001","confidence":0.99,"location":"src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/feedback/route.ts:133","details":"Local isPublic:false results could expose a misleading GitHub destination through showIssueLink=always."},
+      {"kind":"validated_finding","id":"merge-queue-preview-coverage","confidence":0.99,"location":"docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md:188","details":"The specification described deployed-preview coverage although the CI lane targets bugdrop.localhost:3000."},
+      {"kind":"browser_oracle","result":"passed","details":"Feature-enabled desktop and exact 390x844 mobile coverage passed for all five experiences with reduced motion, branching, focus, cleanup, request safety, and Classic isolation."},
+      {"kind":"runtime_identity","result":"verified","details":"Pinned widget is 238591 bytes with SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."}
+    ],
+    "subgoal_contract": null,
+    "parallel_safety": null,
+    "blocked_tasks": ["T999"],
+    "missing_evidence": [
+      "The bounded Classic-link and documentation corrections are not implemented.",
+      "PR Review Toolkit and the browser oracle have not been rerun against the corrected head.",
+      "Final T999 outcome audit remains pending."
+    ],
+    "required_board_updates": [
+      "Record T006 as not_complete.",
+      "Create and activate one bounded Worker correction task using the exact worker package.",
+      "After correction verification, rerun T006 on the corrected complete worktree before T999."
+    ]
+  }
+}

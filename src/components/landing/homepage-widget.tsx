@@ -15,7 +15,12 @@ import {
   registerHomepageFlow,
   type HomepageActiveExperience,
 } from "./homepage-demo-runtime";
-import { BUILDING_BLOCKS_PATH, SAMPLE_DEMO_REPO, WIDGET_URL } from "@/lib/links";
+import {
+  BUILDING_BLOCKS_PATH,
+  isLocalHomepageDogfoodRuntime,
+  SAMPLE_DEMO_REPO,
+  WIDGET_URL,
+} from "@/lib/links";
 
 declare global {
   interface Window {
@@ -26,6 +31,7 @@ declare global {
 }
 
 const SCRIPT_ID = "bugdrop-homepage-demo";
+const IS_LOCAL_DOGFOOD_RUNTIME = isLocalHomepageDogfoodRuntime();
 const WELCOME =
   "This is the BugDrop landing page demo. Send a test report to see what your users would experience.";
 
@@ -174,6 +180,8 @@ function waitForFlowClose(flowId: string, onClose: () => void): () => void {
 
 function FlowHomepageWidget() {
   const [state, dispatch] = useReducer(reduceHomepageDemo, initialHomepageDemoState);
+  const [inPageChooserVisible, setInPageChooserVisible] = useState(false);
+  const chooserSectionRef = useRef<HTMLElement | null>(null);
   const activeExperience = useRef<HomepageActiveExperience | null>(null);
   const activeLaunchRef = useRef<HTMLElement | null>(null);
   const launchInFlight = useRef(false);
@@ -259,37 +267,54 @@ function FlowHomepageWidget() {
     activeLaunchRef.current?.focus();
   }, [state.activeId]);
 
+  useEffect(() => {
+    const section = chooserSectionRef.current;
+    const narrowViewport = window.matchMedia("(max-width: 767px)");
+    if (!section) return;
+
+    let sectionVisible = false;
+    const updateVisibility = () => {
+      setInPageChooserVisible(sectionVisible && narrowViewport.matches);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        sectionVisible = entry.isIntersecting;
+        updateVisibility();
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(section);
+    narrowViewport.addEventListener("change", updateVisibility);
+    return () => {
+      observer.disconnect();
+      narrowViewport.removeEventListener("change", updateVisibility);
+    };
+  }, []);
+
   const selected = homepageExperiences.find(({ id }) => id === state.selectedId)!;
   const launchDisabled = state.runtimeState === "loading" || state.activeId !== null;
 
   return (
     <>
       <HomepageDemoLauncher
-        experiences={homepageExperiences}
-        selectedId={state.selectedId}
-        menuOpen={state.menuOpen}
         disabled={launchDisabled}
-        onMenuOpenChange={(open) => dispatch({ type: open ? "open-menu" : "close-menu" })}
-        onSelect={(id) => dispatch({ type: "select", id })}
-        onLaunch={(id) => {
-          const trigger = document.querySelector<HTMLElement>(
-            '[aria-label="Try BugDrop experiences"]',
-          );
-          void launch(id, trigger);
-        }}
+        inPageChooserVisible={inPageChooserVisible}
+        onLaunch={(trigger) => void launch("classic", trigger)}
       />
       <section
+        ref={chooserSectionRef}
         id="try-bugdrop"
         className="mb-20 rounded-2xl border border-accent-cyan/25 bg-accent-cyan/10 px-8 py-7"
         aria-labelledby="homepage-experience-heading"
       >
         <div className="max-w-3xl">
-          <p className="mb-2 text-sm font-medium text-accent-cyan">Try it on this page</p>
+          <p className="mb-2 text-sm font-medium text-accent-cyan">Use BugDrop your way</p>
           <h2 id="homepage-experience-heading" className="text-2xl font-semibold text-text-primary">
-            One widget, four feedback experiences.
+            One widget for every feedback moment.
           </h2>
           <p className="mt-2 text-text-subtle">
-            Choose a complete feedback experience, then try the exact widget your users would see.
+            Place and customize BugDrop wherever and whenever you need feedback throughout your app.
           </p>
         </div>
         <fieldset className="mt-6 grid gap-3 sm:grid-cols-2" aria-label="Feedback experience">
@@ -297,7 +322,7 @@ function FlowHomepageWidget() {
           {homepageExperiences.map((experience) => (
             <label
               key={experience.id}
-              className="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-bg-surface/80 p-4 text-text-primary has-[:checked]:border-accent-cyan has-[:checked]:bg-accent-cyan/10"
+              className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-bg-surface/80 p-4 text-text-primary has-[:checked]:border-accent-cyan has-[:checked]:bg-accent-cyan/10"
             >
               <input
                 type="radio"
@@ -305,10 +330,23 @@ function FlowHomepageWidget() {
                 value={experience.id}
                 checked={state.selectedId === experience.id}
                 disabled={launchDisabled}
+                aria-label={homepageExperienceLabel(experience)}
+                aria-describedby={`homepage-experience-${experience.id}-description`}
                 onChange={() => dispatch({ type: "select", id: experience.id })}
-                className="size-4 accent-accent-cyan"
+                className="mt-1 size-4 shrink-0 accent-accent-cyan"
               />
-              <span>{homepageExperienceLabel(experience)}</span>
+              <span aria-hidden="true" className="text-xl leading-6">
+                {experience.icon}
+              </span>
+              <span className="min-w-0">
+                <span className="block font-medium">{homepageExperienceLabel(experience)}</span>
+                <span
+                  id={`homepage-experience-${experience.id}-description`}
+                  className="mt-1 block text-sm leading-5 text-text-subtle"
+                >
+                  {experience.description}
+                </span>
+              </span>
             </label>
           ))}
         </fieldset>
@@ -325,13 +363,14 @@ function FlowHomepageWidget() {
             aria-describedby="homepage-widget-status"
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent-cyan px-5 py-3 font-semibold text-bg-deep shadow-[0_12px_32px_rgba(125,207,255,0.28)] transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(125,207,255,0.36)] disabled:cursor-wait disabled:opacity-75 max-sm:w-full max-sm:rounded-[10px] motion-reduce:transform-none motion-reduce:transition-none"
           >
-            <span aria-hidden="true">🐛</span>
+            <span aria-hidden="true">{selected.icon}</span>
             {state.runtimeState === "loading" ? "Loading Feedback…" : selected.launchLabel}
           </button>
         </div>
         <p className="mt-5 text-sm text-text-subtle">
-          Demo submissions create a real public GitHub Issue in our test repository. Please do not
-          include sensitive information.
+          {IS_LOCAL_DOGFOOD_RUNTIME
+            ? "Local dogfood submissions stay in this development process; they do not create a public GitHub Issue. Please do not include sensitive information."
+            : "Demo submissions create a real public GitHub Issue in our test repository. Please do not include sensitive information."}
         </p>
         <Link href={BUILDING_BLOCKS_PATH} className="mt-3 inline-flex text-sm font-medium text-accent-cyan underline-offset-4 hover:underline">
           Explore the building blocks

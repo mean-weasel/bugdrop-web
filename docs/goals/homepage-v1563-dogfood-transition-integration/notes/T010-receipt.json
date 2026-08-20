@@ -1,0 +1,31 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T010",
+    "board_path": "docs/goals/homepage-v1563-dogfood-transition-integration/state.yaml",
+    "changed_files": [
+      "src/components/landing/homepage-demo-runtime.ts",
+      "test/homepage-demo-runtime.test.ts",
+      "e2e/homepage-flow-demo.spec.ts"
+    ],
+    "commands": [
+      {"cmd":"Exact v1.56.3 identity","status":"pass"},
+      {"cmd":"Canonical generator check","status":"pass"},
+      {"cmd":"Focused Vitest","status":"pass","detail":"21 tests"},
+      {"cmd":"npm test","status":"pass","detail":"164 tests"},
+      {"cmd":"npm run lint","status":"pass"},
+      {"cmd":"npm run build","status":"pass"},
+      {"cmd":"Enabled exact-runtime desktop/mobile E2E","status":"pass","detail":"16 passed, 18 intentional skips, zero retries"},
+      {"cmd":"Unset Classic control","status":"pass"},
+      {"cmd":"False Classic control","status":"pass"},
+      {"cmd":"Delayed exact/foreign lab provenance falsification","status":"pass"},
+      {"cmd":"git diff --check","status":"pass"},
+      {"cmd":"Fresh corrected-head PR Review Toolkit","status":"pass","detail":"no accepted findings"}
+    ],
+    "summary": "Pending exact-runtime loads now take precedence over foreign globals, clearing the foreign API and binding only after exact v1.56.3 completion. Unit and real-browser regressions cover delayed exact script, foreign lab runtime, return-home second launch, exact binding, and exact-route submission. Full gates and fresh toolkit review pass.",
+    "deviations": ["Two in-scope stale-name E2E locator corrections were required before the final browser run passed."],
+    "remaining_blockers": [],
+    "verification_attempts": 3,
+    "stopped_because": null
+  }
+}

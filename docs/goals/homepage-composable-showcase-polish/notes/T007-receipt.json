@@ -1,0 +1,31 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T007",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/homepage-composable-showcase-polish/state.yaml",
+    "changed_files": [
+      "src/components/landing/homepage-demo-runtime.ts",
+      "test/homepage-demo-runtime.test.ts",
+      "test/integration-resource.test.ts",
+      "e2e/homepage-flow-demo.spec.ts",
+      "docs/homepage-flow-demo-operations.md",
+      "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md",
+      "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md"
+    ],
+    "commands": [
+      {"cmd":"npm test","status":"pass","details":"19 files, 167 tests passed."},
+      {"cmd":"npm run lint","status":"pass","details":"Zero errors; 862 warnings from unchanged vendored runtime."},
+      {"cmd":"feature-enabled exact-v1.56.3 npm run build","status":"pass"},
+      {"cmd":"feature-enabled desktop/mobile Playwright, retries=0","status":"pass","details":"18 passed, 20 project-inapplicable tests skipped after two bounded locator corrections."},
+      {"cmd":"unset Classic desktop control","status":"pass","details":"1 passed."},
+      {"cmd":"false Classic desktop control","status":"pass","details":"1 passed."},
+      {"cmd":"exact runtime size and SHA-256","status":"pass","details":"238591 bytes; 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."},
+      {"cmd":"git diff --check","status":"pass"}
+    ],
+    "summary": "Classic now uses the public-only Issue-link policy. Focused unit/integration assertions pin that configuration; browser proof exercises the actual local private route, verifies no GitHub action or Issue-created message, blocks external requests, and separately proves public results retain their valid link. Documentation now identifies merge-queue coverage as a localhost candidate lane and retains deployed-preview walkthrough evidence as a separate pre-enable requirement. Full tests, lint, build, enabled desktop/mobile browser coverage, false/unset Classic controls, runtime identity, and diff checks pass.",
+    "deviations": ["The new actual-route test required two bounded locator corrections before the full enabled browser command passed."],
+    "remaining_blockers": [],
+    "verification_attempts": 2,
+    "stopped_because": null
+  }
+}

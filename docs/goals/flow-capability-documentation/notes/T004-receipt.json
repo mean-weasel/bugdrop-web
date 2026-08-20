@@ -1,0 +1,28 @@
+{
+  "goalbuddy_receipt_v1": {
+    "result": "done",
+    "task_id": "T004",
+    "board_path": "/Users/neonwatty/Desktop/bugdrop-web/.worktrees/homepage-flow-demo-design/docs/goals/flow-capability-documentation/state.yaml",
+    "decision": "rejected",
+    "full_outcome_complete": false,
+    "rationale": "Required commands pass and declaration hashes match, but the drift contract does not authenticate runtime facts. Both recorded runtime-source SHA-256 values are wrong; the helper never reads those sources and only compares the manifest with a duplicated runtimeContract in provenance. It also omits exact FlowConfig, presentation, issue, condition, transition-branch, registration, and required/optional property contracts, plus immediate-default and custom-easing defaults. Source or option drift can therefore pass while documentation becomes stale. Replace the proxy contract with authenticated runtime snapshots and source-derived parity before documentation depends on it.",
+    "evidence": [
+      "Fresh focused verification passed: 24 Vitest tests, focused ESLint, production build, and git diff --check.",
+      "Exact-commit raw declaration snapshots match recorded SHA-256 and Git blob SHAs.",
+      "Exact-commit screen-transition-config.ts hashes to SHA-256 c50100c0cc713c947c8d5e617d32fca4ec17bf9ff565887391e9a157486614f8, not recorded 786cb0a16405329a92f3f79b3b76a8f71109ecd72b0276ddbe4ee38f06c0babd.",
+      "Exact-commit screen-transition.ts hashes to SHA-256 b74a94dcfc1913c0d1e5f83603ac49376a5ad9238facaf63d9d0d74be66272a1, not recorded 9fbfbd0a8c81544460ba8aeff0f408a1a1b541dcc78dc6b94e83f8512bf0a06a.",
+      "test/helpers/flow-capability-parity.ts reads only declarations and provenance; runtimeSources are neither typed, read, hashed, nor parsed. Lines 295-305 merely deep-compare two hand-maintained runtimeContract copies.",
+      "The parity helper queries selected FlowConfig members but never exact-compares FlowConfig, presentation, or issue property sets; presentation.screenTransition and BugDropPublicAPI.registerFlow are absent from the manifest.",
+      "Condition coverage extracts only each branch's first member, so equals/recursive-array shape drift is undetected. Transition coverage extracts kinds/easing but not exact branch properties or requiredness.",
+      "The released implementation proves omitted/none transitions and first render replace immediately, while custom easing defaults to standard; neither default is represented or source-derived in the manifest."
+    ],
+    "subgoal_contract": null,
+    "parallel_safety": {"safe":false,"reason":"T005 documentation and all later example/CI work depend on the canonical inventory. Proceeding would harden incomplete and unauthenticated claims."},
+    "blocked_tasks": ["T005 until corrected T003 receives a fresh T004 approval","T006 until T005 completes","T007 until T006 completes"],
+    "missing_evidence": ["Authenticated checked-in runtime-source snapshots with locally verified SHA-256 and Git blob SHAs","Source-derived proof for transition bounds, duration/frame/easing defaults, direction, initial/immediate behavior, and reduced motion","Exact parity for complete FlowConfig/presentation/issue/condition/transition branch property sets and requiredness","Canonical registrationMethod/registerFlow and single-choice option-shape coverage","Negative mutation proof that added/removed properties, changed runtime values, and provenance drift fail"],
+    "required_board_updates": [
+      {"task_id":"T003","status":"queued","objective":"Correct the canonical v1.56.3 inventory so every public property/discriminator/value/default and every runtime-only motion fact is authenticated and source-derived, without a duplicate runtime contract.","allowed_files":["src/lib/flow-capabilities.ts","test/fixtures/flow-capabilities/v1.56.3/screen-transition-config.ts.txt","test/fixtures/flow-capabilities/v1.56.3/screen-transition.ts.txt","test/fixtures/flow-capabilities/v1.56.3/PROVENANCE.json","test/helpers/flow-capability-parity.ts","test/flow-capabilities.test.ts"],"verify":["npm test -- --run test/flow-capabilities.test.ts test/integration-resource.test.ts","npm run lint -- src/lib/flow-capabilities.ts test/helpers/flow-capability-parity.ts test/flow-capabilities.test.ts","npm run build","git diff --check"],"stop_if":["Runtime snapshots do not byte-match exact commit 47a392d1e7b1a8d8adeff1692f6bbbd84696280d and their recorded Git blob/SHA-256 values.","Any bound/default/behavior remains proved only by a duplicated hand-maintained provenance object rather than authenticated source.","Any released FlowConfig, component option, condition, transition branch, lifecycle/registration property, literal domain, or requiredness remains outside executable parity.","The correction requires SDK behavior changes, unreleased capabilities, or files outside this allowlist.","Verification fails twice after bounded corrections."]},
+      {"task_id":"T004","status":"queued","note":"Re-audit corrected T003 before unblocking T005."}
+    ]
+  }
+}

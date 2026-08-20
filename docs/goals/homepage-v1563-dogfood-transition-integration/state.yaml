@@ -1,0 +1,841 @@
+version: 2
+
+goal:
+  title: "Homepage v1.56.3 Dogfood and Transition Integration"
+  slug: "homepage-v1563-dogfood-transition-integration"
+  kind: existing_plan
+  tranche: "Repin the hidden homepage dogfood to exact v1.56.3, integrate and prove one 500 ms horizontal transition example, preserve Classic, and finish local QA and review without public exposure."
+  status: done
+  oracle:
+    signal: "Exact-runtime feature-enabled local walkthrough proves transition, diversity, Classic preservation, reduced motion, and flag isolation."
+    cadence: "after each Worker package and at final audit"
+    final_proof: "Receipt-backed exact hash, desktop/mobile/keyboard/reduced-motion browser evidence, false/unset Classic controls, relevant repository gates, and final high-confidence review."
+  intake:
+    original_request: "Create the plan for the v1.56.3 website repin and transition-enabled local dogfood work."
+    interpreted_outcome: "The hidden homepage demo uses exact SDK v1.56.3, Product Triage demonstrates the 500 ms horizontal transition, experiences are tighter and more diverse, and Classic remains unchanged under repeatable local proof."
+    input_shape: existing_plan
+    audience: "BugDrop maintainers and prospective users"
+    authority: requested
+    proof_type: demo
+    completion_proof: "Exact-runtime local visual and automated evidence satisfies the goal oracle with no high-confidence review finding."
+    likely_misfire: "Change or expose Classic/public homepage behavior while optimizing only the new composable demos, or prove against fake/stale runtime bytes."
+    blind_spots_considered:
+      - "Exact v1.56.3 runtime identity and provenance"
+      - "Classic behavior and styling preservation"
+      - "Feature-flag false/unset isolation"
+      - "Reduced motion, focus, keyboard, cleanup, and capture lifecycle"
+      - "Same-page foreign-runtime conflicts and real-request prevention"
+      - "Experience copy density and meaningful diversity"
+      - "PR, merge, and deployment authority boundaries"
+    existing_plan_facts:
+      - "SDK target 47a392d1e7b1a8d8adeff1692f6bbbd84696280d released as v1.56.3."
+      - "Exact widget SHA-256 is 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+      - "Immediate replacement remains the SDK default."
+      - "Product Triage opts into slide-horizontal at 500ms as the first website example."
+      - "Classic remains unchanged and the homepage feature stays disabled publicly."
+      - "Local visual QA precedes PR handoff; release-operator simplification is separate."
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+  continuous_until_full_outcome: true
+  missing_input_or_credentials_do_not_stop_goal: true
+  exact_human_approval_can_terminal_wait: true
+  preserve_and_validate_existing_plan: true
+  intake_misfire_must_be_audited: true
+  goal_pressure_requires_oracle: true
+  no_completion_on_weak_proof: true
+  slice_policy:
+    max_consecutive_tiny_tasks: 2
+    prefer_vertical_slices: true
+    judge_picks_largest_safe_slice: true
+    worker_completes_whole_slice: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+visual_board:
+  selected: local
+  local:
+    status: live
+    url: "http://goalbuddy.localhost:41737/homepage-v1563-dogfood-transition-integration/"
+    command: "node /Users/neonwatty/.codex/plugins/cache/goalbuddy/goalbuddy/0.4.3/skills/goal-prep/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal docs/goals/homepage-v1563-dogfood-transition-integration"
+
+active_task: null
+
+tasks:
+  - id: T001
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Validate the preserved plan against the existing dogfood branch and define the first largest safe Worker package."
+    inputs:
+      - "goal.md existing plan facts"
+      - "Current codex/homepage-flow-demo-design branch and receipts"
+      - "Exact v1.56.3 release identity"
+    constraints:
+      - "Read-only."
+      - "Do not implement or change product files."
+      - "Preserve Classic and public feature-flag isolation as hard constraints."
+    expected_output:
+      - "Validated or corrected sequencing"
+      - "Exact first Worker objective"
+      - "allowed_files"
+      - "verify"
+      - "stop_if"
+      - "Known inherited-diff and server-state risks"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The preserved sequence is sound: isolate the immutable runtime repin before UX changes, audit it, then integrate transition/copy, complete browser QA, review, corrections, and handoff. T002 is one coherent vertical repin covering released bytes, provenance, exact routes, generated identity, CI/browser bindings, focused tests, and operations documentation. Classic, recipes, flag behavior, and runtime ownership code remain outside the write allowlist."
+      worker_package:
+        objective: "Repin the hidden homepage dogfood end-to-end from v1.56.2 to the exact released v1.56.3 asset and prove wrong/stale identity fails closed without changing recipes, Classic, or false/unset flag behavior."
+        allowed_files:
+          - .github/workflows/ci.yml
+          - docs/homepage-flow-demo-operations.md
+          - e2e/homepage-flow-demo.spec.ts
+          - public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/PROVENANCE.json
+          - public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js
+          - public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/PROVENANCE.json
+          - public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js
+          - scripts/vendor-homepage-flow-recipes.mjs
+          - "src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/check/[...repo]/route.ts"
+          - src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/feedback/route.ts
+          - "src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/check/[...repo]/route.ts"
+          - src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/feedback/route.ts
+          - src/components/landing/homepage-flow-recipes.generated.ts
+          - test/homepage-flow-recipes.test.ts
+          - test/homepage-local-flow-routes.test.ts
+          - test/integration-resource.test.ts
+        verify:
+          - "Exact hash/size, generator check, focused Vitest, focused ESLint, production build, enabled desktop/mobile E2E, false/unset Classic controls, and absence of old namespace."
+        stop_if:
+          - "Identity drift, overlapping user changes, out-of-scope runtime/Classic/recipe edits, nonlocal requests, false/unset exposure, or verification still failing after two corrections."
+      evidence:
+        - "GitHub release v1.56.3 resolves to target 47a392d1e7b1a8d8adeff1692f6bbbd84696280d, widget SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e, and 238591 bytes."
+        - "Current bindings consistently identify v1.56.2 across generator, generated manifest, local routes, CI, E2E, tests, and operations documentation."
+        - "origin/main is an ancestor of HEAD; tracked worktree was clean before GoalBuddy controls."
+        - "No local server listens on 3000 or 8787; stale build output must not be treated as proof."
+      blocked_tasks: []
+      missing_evidence:
+        - "No v1.56.3 implementation or fresh browser proof exists yet."
+      required_board_updates:
+        - "Record T001 done, activate T002 as sole writer, and keep downstream work queued."
+  - id: T002
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Repin the hidden homepage dogfood end-to-end from v1.56.2 to the exact released v1.56.3 asset: vendor the authenticated 238591-byte widget, record immutable provenance, move local check/feedback routes to the 47a392d1 namespace, update generated runtime identity plus CI/E2E/test/operations bindings, remove the superseded homepage-only v1.56.2 artifact and routes, and prove wrong/stale identity fails closed without changing recipes, Classic, or false/unset flag behavior."
+    inputs:
+      - "T001 validated Worker package"
+      - "Exact target 47a392d1e7b1a8d8adeff1692f6bbbd84696280d"
+      - "Exact widget SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e"
+    constraints:
+      - "Do not change Classic behavior or expose the homepage chooser."
+      - "Use the exact released artifact; do not rebuild or substitute preview bytes."
+      - "Preserve same-origin CSP and exact-SHA route isolation."
+    expected_output:
+      - "Exact v1.56.3 pin and provenance"
+      - "Updated local dogfood routes and runtime binding where required"
+      - "Fail-closed identity regression proof"
+      - "Worker receipt with strongest falsification"
+    allowed_files:
+      - ".github/workflows/ci.yml"
+      - "docs/homepage-flow-demo-operations.md"
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/PROVENANCE.json"
+      - "public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js"
+      - "public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/PROVENANCE.json"
+      - "public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js"
+      - "scripts/vendor-homepage-flow-recipes.mjs"
+      - "src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/check/[...repo]/route.ts"
+      - "src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/feedback/route.ts"
+      - "src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/check/[...repo]/route.ts"
+      - "src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/feedback/route.ts"
+      - "src/components/landing/homepage-flow-recipes.generated.ts"
+      - "test/homepage-flow-recipes.test.ts"
+      - "test/homepage-local-flow-routes.test.ts"
+      - "test/integration-resource.test.ts"
+    verify:
+      - "test \"$(shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | awk '{print $1}')\" = \"338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e\" && test \"$(wc -c < public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | tr -d ' ')\" = \"238591\""
+      - "node scripts/vendor-homepage-flow-recipes.mjs --check --source src/components/landing/flow-recipes-source/a100e69976ce0a5912df8f07af1b2e53029663b2/flow-recipes.ts.txt --source-sha a100e69976ce0a5912df8f07af1b2e53029663b2"
+      - "npx vitest run test/homepage-flow-recipes.test.ts test/homepage-local-flow-routes.test.ts test/homepage-demo-runtime.test.ts test/integration-resource.test.ts"
+      - "npx eslint scripts/vendor-homepage-flow-recipes.mjs src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d src/components/landing/homepage-flow-recipes.generated.ts test/homepage-flow-recipes.test.ts test/homepage-local-flow-routes.test.ts test/integration-resource.test.ts e2e/homepage-flow-demo.spec.ts"
+      - "npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "test ! -e public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d && test ! -e src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d"
+    stop_if:
+      - "GitHub release v1.56.3 no longer resolves to the exact target, 238591-byte size, and approved SHA-256."
+      - "Any pre-existing user change overlaps the allowlist when the Worker starts."
+      - "Repinning requires changes to homepage-demo-runtime.ts, homepage-widget.tsx, homepage-demo-model.ts, recipe source/copy, Classic styling/behavior, or another file outside the allowlist."
+      - "The old 81293491 namespace serves a non-homepage consumer that cannot be migrated in this package."
+      - "Any browser request reaches a nonlocal feedback/check endpoint or can create a real Issue."
+      - "False or unset configuration exposes the chooser, or Classic behavior/style changes."
+      - "A verification still fails after two bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - .github/workflows/ci.yml
+        - docs/homepage-flow-demo-operations.md
+        - e2e/homepage-flow-demo.spec.ts
+        - public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/PROVENANCE.json
+        - public/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/widget.js
+        - public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/PROVENANCE.json
+        - public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js
+        - scripts/vendor-homepage-flow-recipes.mjs
+        - "src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/check/[...repo]/route.ts"
+        - src/app/vendor/bugdrop/81293491bf9924879465c668a391a5e4aeae912d/api/feedback/route.ts
+        - "src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/check/[...repo]/route.ts"
+        - src/app/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/api/feedback/route.ts
+        - src/components/landing/homepage-flow-recipes.generated.ts
+        - test/homepage-flow-recipes.test.ts
+        - test/homepage-local-flow-routes.test.ts
+        - test/integration-resource.test.ts
+      commands:
+        - cmd: "Exact v1.56.3 widget SHA-256 and 238591-byte size check"
+          status: pass
+        - cmd: "node scripts/vendor-homepage-flow-recipes.mjs --check --source src/components/landing/flow-recipes-source/a100e69976ce0a5912df8f07af1b2e53029663b2/flow-recipes.ts.txt --source-sha a100e69976ce0a5912df8f07af1b2e53029663b2"
+          status: pass
+        - cmd: "npx vitest run test/homepage-flow-recipes.test.ts test/homepage-local-flow-routes.test.ts test/homepage-demo-runtime.test.ts test/integration-resource.test.ts"
+          status: pass
+        - cmd: "Focused ESLint for repin scope"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "Feature-enabled desktop/mobile homepage E2E against exact v1.56.3"
+          status: pass
+        - cmd: "Unset homepage flag Classic-only E2E"
+          status: pass
+        - cmd: "False homepage flag Classic-only E2E"
+          status: pass
+        - cmd: "Old 81293491 homepage namespace absence"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "Temporary stale-generated-identity probe"
+          status: pass
+      summary: "Repinned the hidden homepage dogfood to authenticated v1.56.3 bytes and immutable provenance, moved SHA-scoped local routes, regenerated runtime identity, updated CI/E2E/tests/docs, and removed the old homepage namespace. Exact hash/size, 43 focused tests, ESLint, production build, enabled desktop/mobile E2E, false/unset Classic controls, namespace absence, stale-identity rejection, and nonlocal-request rejection passed."
+      deviations:
+        - "The first build read stale generated .next/dev route types; the cache was moved to /tmp and the clean production build passed."
+        - "The first namespace-absence check found only empty old route directories; they were removed and the exact check passed."
+      remaining_blockers: []
+      verification_attempts: 2
+  - id: T003
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit the exact v1.56.3 repin and activate the largest safe UX/transition Worker package."
+    inputs:
+      - "T002 receipt and diff"
+      - "Exact release identity"
+      - "Classic and feature-flag contracts"
+    constraints:
+      - "Read-only."
+      - "Reject any repin that can silently load stale, foreign, or non-v1.56.3 runtime bytes."
+    expected_output:
+      - "Repin accepted | correction required"
+      - "Exact UX Worker objective"
+      - "allowed_files"
+      - "verify"
+      - "stop_if"
+    receipt:
+      result: done
+      decision: approved
+      full_outcome_complete: false
+      rationale: "The repin is exact and fail-closed: authenticated v1.56.3 release bytes, provenance, generated identity, CI binding, routes, and tests agree. Classic and flag behavior were untouched. Proceed with a local overlay that differentiates copy and adds only Product Triage's 500 ms horizontal transition."
+      worker_package:
+        objective: "Create a local homepage demo recipe overlay that keeps canonical recipes immutable while making Bug Report, Product Triage, and Customer Pulse succinct and distinct; configure only Product Triage with presentation.screenTransition={kind:'slide-horizontal',durationMs:500}; preserve IDs, paths, conditions, Issue/evidence mappings, Classic, and flag isolation; add unit and exact-v1.56.3 browser proof."
+        allowed_files:
+          - src/components/landing/homepage-flow-demo-recipes.ts
+          - src/components/landing/homepage-demo-runtime.ts
+          - src/components/landing/homepage-demo-model.ts
+          - src/components/landing/homepage-widget.tsx
+          - test/homepage-flow-demo-recipes.test.ts
+          - test/homepage-demo-runtime.test.ts
+          - test/homepage-demo-model.test.ts
+          - e2e/homepage-flow-demo.spec.ts
+        verify:
+          - "Exact v1.56.3 widget SHA-256 and byte-size check"
+          - "Canonical recipe generator identity check"
+          - "Focused recipe/runtime/model/route/resource Vitest suite"
+          - "Focused ESLint"
+          - "Production build"
+          - "Feature-enabled desktop/mobile exact-v1.56.3 E2E with zero retries"
+          - "Unset Classic-only control"
+          - "False Classic-only control"
+          - "git diff --check"
+        stop_if:
+          - "Implementation requires any file outside allowed_files."
+          - "Any canonical ID, field path, condition, Issue/evidence mapping, payload, or pruning behavior changes."
+          - "Any flow other than Product Triage receives a transition, or its transition is not slide-horizontal at 500 ms."
+          - "Exact-runtime proof cannot observe forward/back behavior or reduced-motion safety."
+          - "Classic or flag isolation changes, or any request can reach a nonlocal endpoint."
+          - "Verification remains red after two bounded corrections."
+      evidence:
+        - "Release v1.56.3, annotated tag, local artifact, provenance, generated identity, routes, and tests agree on target 47a392d1e7b1a8d8adeff1692f6bbbd84696280d and SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+        - "Focused Vitest passed 43/43 and git diff --check passed."
+        - "Classic implementation, canonical recipe source, and flag behavior were not modified."
+      subgoal_contract: null
+      parallel_safety: null
+      blocked_tasks: []
+      missing_evidence:
+        - "T004 implementation and browser proof remain."
+      required_board_updates:
+        - "Record T003 done, populate T004 from worker_package, and activate T004."
+  - id: T004
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Make the hidden composable experiences more succinct and distinct, with Product Triage explicitly demonstrating the 500 ms horizontal transition."
+    inputs:
+      - "T003 approved package"
+      - "Existing Bug Report, Product Triage, and Customer Pulse recipes"
+      - "SDK v1.56.3 transition contract"
+    constraints:
+      - "Only Product Triage opts into slide-horizontal at 500ms unless fresh evidence and owner direction approve another choice."
+      - "Immediate replacement remains the default."
+      - "Classic behavior, styling, and entry point remain unchanged."
+      - "Keep the chooser behind the disabled public feature flag."
+      - "Prefer meaningful UX diversity over cosmetic renaming."
+    expected_output:
+      - "Succinct, differentiated composable recipes"
+      - "Visible forward/back 500 ms Product Triage transition"
+      - "Reduced-motion-safe behavior"
+      - "Focused unit/browser proof and strongest falsification"
+    allowed_files:
+      - "src/components/landing/homepage-flow-demo-recipes.ts"
+      - "src/components/landing/homepage-demo-runtime.ts"
+      - "src/components/landing/homepage-demo-model.ts"
+      - "src/components/landing/homepage-widget.tsx"
+      - "test/homepage-flow-demo-recipes.test.ts"
+      - "test/homepage-demo-runtime.test.ts"
+      - "test/homepage-demo-model.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+    verify:
+      - "test \"$(shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | awk '{print $1}')\" = \"338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e\" && test \"$(wc -c < public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | tr -d ' ')\" = \"238591\""
+      - "node scripts/vendor-homepage-flow-recipes.mjs --check --source src/components/landing/flow-recipes-source/a100e69976ce0a5912df8f07af1b2e53029663b2/flow-recipes.ts.txt --source-sha a100e69976ce0a5912df8f07af1b2e53029663b2"
+      - "npx vitest run test/homepage-flow-recipes.test.ts test/homepage-flow-demo-recipes.test.ts test/homepage-demo-runtime.test.ts test/homepage-demo-model.test.ts test/homepage-local-flow-routes.test.ts test/integration-resource.test.ts"
+      - "npx eslint src/components/landing/homepage-flow-demo-recipes.ts src/components/landing/homepage-demo-runtime.ts src/components/landing/homepage-demo-model.ts src/components/landing/homepage-widget.tsx test/homepage-flow-demo-recipes.test.ts test/homepage-demo-runtime.test.ts test/homepage-demo-model.test.ts e2e/homepage-flow-demo.spec.ts"
+      - "npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "The implementation requires modifying the canonical recipe source, generated canonical recipe file, vendored widget/provenance, SHA-scoped routes, CI workflow, or any file outside allowed_files."
+      - "Any recipe ID, field path, condition, Issue title/section mapping, evidence mapping, submission payload, or hidden-answer pruning behavior changes."
+      - "Any flow other than Product Triage receives a screen transition, or Product Triage is not exactly slide-horizontal at 500 ms."
+      - "Exact-v1.56.3 browser proof cannot observe forward and backward transition behavior or reduced motion disables animation safely."
+      - "Classic behavior or styling changes, the chooser appears with the feature flag false/unset, or any request can reach a nonlocal feedback/check endpoint."
+      - "A UX choice materially changes the original Issue payload contract without owner direction."
+      - "Classic, flag isolation, focus, cleanup, or reduced-motion behavior regresses."
+      - "The coherent change requires files outside the Judge-approved allowlist."
+      - "Any verification fails after two bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - e2e/homepage-flow-demo.spec.ts
+        - src/components/landing/homepage-demo-model.ts
+        - src/components/landing/homepage-demo-runtime.ts
+        - src/components/landing/homepage-flow-demo-recipes.ts
+        - test/homepage-demo-model.test.ts
+        - test/homepage-demo-runtime.test.ts
+        - test/homepage-flow-demo-recipes.test.ts
+      commands:
+        - cmd: "Exact v1.56.3 widget identity"
+          status: pass
+        - cmd: "Canonical recipe generator identity"
+          status: pass
+        - cmd: "Focused Vitest"
+          status: pass
+          detail: "52 tests"
+        - cmd: "Focused ESLint"
+          status: pass
+        - cmd: "Production build"
+          status: pass
+        - cmd: "Feature-enabled exact-runtime desktop/mobile E2E"
+          status: pass
+          detail: "15 passed, 17 intentional skips"
+        - cmd: "Unset Classic-only control"
+          status: pass
+        - cmd: "False Classic-only control"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "Transition leakage and payload/condition drift falsification"
+          status: pass
+      summary: "Added a deeply frozen local overlay that preserves canonical recipe contracts while giving all three composable examples concise, distinct copy. Only Product Triage receives slide-horizontal at exactly 500 ms. Exact-runtime browser proof covered forward/back animation, reduced-motion bypass, unchanged payloads and pruning, nonlocal-request blocking, and Classic false/unset isolation."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Complete repeatable exact-runtime local visual and automated QA for all homepage experiences without creating real Issues."
+    inputs:
+      - "T002 and T004 receipts"
+      - "Goal oracle"
+      - "Existing local check/feedback inspector and browser harness"
+    constraints:
+      - "Use named .localhost origins."
+      - "No nonlocal feedback request or real GitHub Issue creation."
+      - "Exercise desktop, mobile, keyboard, focus restoration, reduced motion, capture cleanup, and false/unset controls."
+      - "Treat visual QA observations as evidence requiring automated coverage when stable and material."
+    expected_output:
+      - "Exact-runtime desktop and mobile walkthrough evidence"
+      - "Keyboard and reduced-motion evidence"
+      - "Classic false/unset controls"
+      - "No-real-request ledger"
+      - "Relevant full repository gates"
+    allowed_files:
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "docs/homepage-flow-demo-operations.md"
+      - "test/integration-resource.test.ts"
+    verify:
+      - "test \"$(shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | awk '{print $1}')\" = \"338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e\" && test \"$(wc -c < public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | tr -d ' ')\" = \"238591\""
+      - "npm test"
+      - "npm run lint"
+      - "npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "The browser loads a runtime whose response hash is not the approved v1.56.3 digest."
+      - "Any real or unauthorized external feedback request is observed."
+      - "A required visual decision is ambiguous and materially changes the UX direction."
+      - "Any verification fails after two bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - docs/homepage-flow-demo-operations.md
+      commands:
+        - cmd: "Exact v1.56.3 SHA-256 and byte-size check"
+          status: pass
+        - cmd: "npm test"
+          status: pass
+          detail: "19 files, 162 tests"
+        - cmd: "npm run lint"
+          status: pass
+          detail: "0 errors; vendored-runtime warnings only"
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "Feature-enabled exact-runtime desktop/mobile Playwright"
+          status: pass
+          detail: "15 passed, 17 intentional skips, zero retries"
+        - cmd: "Unset Classic-only control"
+          status: pass
+        - cmd: "False Classic-only control"
+          status: pass
+        - cmd: "Named-origin desktop/mobile visual walkthrough"
+          status: pass
+          detail: "10 screenshots; exact hash/size; zero unauthorized requests"
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Documented and completed repeatable exact-runtime QA at bugdrop.localhost across desktop and mobile. The procedure covers exact URL/hash/size, chooser and all four experiences, keyboard/focus, 500 ms forward/back transition, reduced motion, capture cleanup, payload isolation, overflow, false/unset Classic controls, and the zero-real-request ledger. Served bytes matched v1.56.3 and no real Issue or nonlocal request occurred."
+      deviations: []
+      remaining_blockers: []
+      verification_attempts: 1
+      stopped_because: null
+  - id: T006
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Run the repository-required PR Review Toolkit against the complete local change and decide whether corrections are required."
+    inputs:
+      - "Complete diff including new files"
+      - "T002, T004, and T005 receipts"
+      - "Exact branch base"
+    constraints:
+      - "Read-only discovery and independent validation."
+      - "Use codex-pr-review-toolkit:review-pull-request during execution."
+      - "Do not report missing tests alone without a demonstrated defect."
+    expected_output:
+      - "Accepted high-confidence findings or clean review"
+      - "Independent validation receipts"
+      - "Exact correction package if needed"
+    receipt:
+      result: done
+      decision: not_complete
+      full_outcome_complete: false
+      rationale: "Full toolkit review accepted two high-confidence defects: Customer Pulse's static Share context label submits on terminal branches, and approved design/plan text incorrectly forbids the bounded homepage overlay now used at runtime. One correction package and corrected-head review are required."
+      worker_package:
+        objective: "Remove the misleading static Customer Pulse first-screen label so v1.56.3 renders terminal-aware Continue versus Submit; prove score 3 opens follow-up and score 8 requires an explicitly labeled submit; amend approved design/plan text to document the bounded overlay and preserved canonical invariants."
+        allowed_files:
+          - src/components/landing/homepage-flow-demo-recipes.ts
+          - test/homepage-flow-demo-recipes.test.ts
+          - e2e/homepage-flow-demo.spec.ts
+          - docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md
+          - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+        verify:
+          - "Exact v1.56.3 identity"
+          - "Canonical generator check"
+          - "Focused Vitest"
+          - "npm test"
+          - "npm run lint"
+          - "npm run build"
+          - "Enabled exact-runtime desktop/mobile E2E"
+          - "Unset Classic control"
+          - "False Classic control"
+          - "git diff --check"
+        stop_if:
+          - "Any canonical source/identity/route, Classic, flag, transition, condition, Issue/evidence mapping, payload, or pruning behavior must change."
+          - "Score 3 does not open follow-up or score 8 lacks an explicit terminal Submit action."
+          - "Docs imply an unrestricted fork."
+          - "Any request escapes locally."
+          - "Verification remains red after two bounded corrections."
+      evidence:
+        - "Correctness candidate accepted at 0.98 for static Share context terminal submission."
+        - "Comments/docs candidate accepted at 0.98 for stale no-overlay claims."
+        - "Tests, silent-failures, and contracts/types returned no candidates; native untracked-file warnings were rejected at 0.99."
+      subgoal_contract: null
+      parallel_safety:
+        safe: false
+        reason: "Coupled overlay contract and shared browser proof require one writer."
+      blocked_tasks:
+        - "T008 and T999 pending correction and fresh review."
+      missing_evidence:
+        - "Corrected CTA branches, corrected docs, full rerun, corrected-head review."
+      required_board_updates:
+        - "Record T006 done, populate and activate T007."
+  - id: T007
+    type: worker
+    assignee: Worker
+    status: blocked
+    reasoning_hint: medium
+    objective: "Remove Customer Pulse's misleading static first-screen label so v1.56.3 renders terminal-aware Continue versus Submit; prove both branches; and update the approved design/plan to document the bounded homepage overlay and preserved canonical invariants."
+    inputs:
+      - "T006 accepted findings"
+    constraints:
+      - "No speculative cleanup."
+      - "Do not weaken assertions or authority boundaries."
+      - "Preserve exact v1.56.3 identity, Classic, and disabled public flag."
+    expected_output:
+      - "Validated corrections"
+      - "Fresh affected and full verification"
+      - "Clean corrected-head review handoff"
+    allowed_files:
+      - "src/components/landing/homepage-flow-demo-recipes.ts"
+      - "test/homepage-flow-demo-recipes.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md"
+      - "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+    verify:
+      - "test \"$(shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | awk '{print $1}')\" = \"338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e\" && test \"$(wc -c < public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | tr -d ' ')\" = \"238591\""
+      - "node scripts/vendor-homepage-flow-recipes.mjs --check --source src/components/landing/flow-recipes-source/a100e69976ce0a5912df8f07af1b2e53029663b2/flow-recipes.ts.txt --source-sha a100e69976ce0a5912df8f07af1b2e53029663b2"
+      - "npx vitest run test/homepage-flow-recipes.test.ts test/homepage-flow-demo-recipes.test.ts test/homepage-demo-runtime.test.ts test/homepage-demo-model.test.ts test/homepage-local-flow-routes.test.ts test/integration-resource.test.ts"
+      - "npm test"
+      - "npm run lint"
+      - "npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "Any canonical recipe/generated source, identity, route, Classic, feature-flag, transition, condition, Issue/evidence mapping, payload, or pruning behavior must change."
+      - "Score 3 does not open the follow-up or score 8 lacks an explicitly labeled terminal Submit action."
+      - "Documentation implies an unrestricted homepage fork."
+      - "Any request escapes the local environment."
+      - "T006 has no accepted finding; PM should mark this task not needed and advance."
+      - "A correction requires scope beyond the validated finding."
+      - "Any verification fails after two bounded corrections."
+    receipt:
+      result: blocked
+      changed_files:
+        - src/components/landing/homepage-flow-demo-recipes.ts
+        - test/homepage-flow-demo-recipes.test.ts
+        - e2e/homepage-flow-demo.spec.ts
+        - docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md
+        - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+      commands:
+        - cmd: "Exact v1.56.3 identity"
+          status: pass
+        - cmd: "Canonical generator check"
+          status: pass
+        - cmd: "Focused Vitest"
+          status: pass
+          detail: "53 tests"
+        - cmd: "npm test"
+          status: pass
+          detail: "163 tests"
+        - cmd: "npm run lint"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "Stale-v1.56.2 plan falsification"
+          status: pass
+        - cmd: "Enabled exact-v1.56.3 E2E"
+          status: fail
+          detail: "Released rating control rendered Submit for score 3 before routing to follow-up"
+      summary: "Corrected the original misleading label and stale overlay documentation, but the final strict terminal-aware label proof exposed an unachievable released-v1.56.3 contract: rating changes do not refresh conditional-route previews before advance. GoalBuddy approved a fresh neutral-Continue package rather than weakening proof or patching Shadow DOM."
+      deviations:
+        - "The accepted test candidate's terminal-aware label premise was falsified by exact released-runtime behavior and source tracing."
+      remaining_blockers:
+        - "T009 neutral-label correction and fresh review."
+      verification_attempts: 2
+      stopped_because: "Final exact-runtime verification falsified the strict score-3 Continue expectation; the package exhausted its two corrections."
+  - id: T008
+    type: pm
+    assignee: PM
+    status: done
+    reasoning_hint: default
+    objective: "Prepare the local dogfood handoff and identify the exact approval required for commit, push, and PR creation without performing external mutations."
+    inputs:
+      - "All implementation and review receipts"
+      - "Final local diff and verification"
+    constraints:
+      - "Do not push, open a PR, merge, deploy, or enable the public homepage without explicit authority."
+      - "Keep release-operator simplification as a separate follow-up."
+    expected_output:
+      - "Concise owner-facing dogfood summary"
+      - "Exact local URL and QA checklist"
+      - "Commit/PR scope"
+      - "Required approval phrase if external handoff is desired"
+    receipt:
+      result: done
+      summary: "Prepared the local dogfood handoff with live named-origin URL, exact runtime identity, manual QA checklist, proven scope, complete-staging warning, and the precise commit/push/PR authorization boundary. No external mutation or public enablement occurred."
+      evidence:
+        - "Feature-enabled server is live at http://bugdrop.localhost:3000/."
+        - "Served widget hashes to 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+        - "T010 corrected-head PR Review Toolkit accepted no findings."
+        - "T008-handoff.md records the exact manual checklist and approval phrase."
+      facts:
+        - "Public feature flag remains disabled by default."
+        - "No real Issue, deployment, push, PR, or merge action occurred."
+        - "All intended untracked files must be included in any later complete staging."
+      contradictions: []
+      ambiguity_requiring_judge: []
+      commands:
+        - cmd: "Start feature-enabled named-origin local server"
+          status: pass
+        - cmd: "Fetch homepage and hash served exact widget"
+          status: pass
+        - cmd: "Inspect complete worktree status and diff scope"
+          status: pass
+      note_needed: false
+  - id: T009
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Use the canonical neutral Continue label for Customer Pulse and prove exact v1.56.3 routes score 3 to follow-up without submission while score 8 submits exactly once."
+    inputs:
+      - "T007 blocker receipt"
+      - "GoalBuddy false-contract audit"
+      - "Exact released v1.56.3 rating and conditional-route behavior"
+    constraints:
+      - "Do not patch runtime or Shadow DOM labels."
+      - "Preserve canonical IDs, paths, conditions, mappings, payloads, Classic, flag isolation, and Product Triage transition."
+      - "Retain the bounded-overlay and v1.56.3 implementation-plan documentation corrections."
+    expected_output:
+      - "Neutral Continue on both Customer Pulse first-screen branches"
+      - "Score 3 follow-up without submission"
+      - "Score 8 exactly one submission"
+      - "Full verification and corrected-head review handoff"
+    allowed_files:
+      - "src/components/landing/homepage-flow-demo-recipes.ts"
+      - "test/homepage-flow-demo-recipes.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+      - "docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md"
+      - "docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md"
+    verify:
+      - "test \"$(shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | awk '{print $1}')\" = \"338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e\" && test \"$(wc -c < public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | tr -d ' ')\" = \"238591\""
+      - "node scripts/vendor-homepage-flow-recipes.mjs --check --source src/components/landing/flow-recipes-source/a100e69976ce0a5912df8f07af1b2e53029663b2/flow-recipes.ts.txt --source-sha a100e69976ce0a5912df8f07af1b2e53029663b2"
+      - "npx vitest run test/homepage-flow-recipes.test.ts test/homepage-flow-demo-recipes.test.ts test/homepage-demo-runtime.test.ts test/homepage-demo-model.test.ts test/homepage-local-flow-routes.test.ts test/integration-resource.test.ts"
+      - "npm test"
+      - "npm run lint"
+      - "npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "Correction requires changing vendored SDK bytes, canonical/generated recipes, routes, Classic, feature flag, Product Triage transition, conditions, mappings, payloads, or pruning."
+      - "Implementation attempts runtime DOM or Shadow DOM label patching."
+      - "Score 3 submits before follow-up, score 8 does not submit exactly once, or either branch lacks Continue on the first screen."
+      - "Any request escapes locally or can create a real Issue."
+      - "Verification remains red after two bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/landing/homepage-flow-demo-recipes.ts
+        - test/homepage-flow-demo-recipes.test.ts
+        - e2e/homepage-flow-demo.spec.ts
+        - docs/superpowers/specs/2026-08-16-homepage-multi-flow-demo-design.md
+        - docs/superpowers/plans/2026-08-16-homepage-multi-flow-demo.md
+      commands:
+        - cmd: "Exact v1.56.3 identity"
+          status: pass
+        - cmd: "Canonical generator check"
+          status: pass
+        - cmd: "Focused Vitest"
+          status: pass
+          detail: "53 tests"
+        - cmd: "npm test"
+          status: pass
+          detail: "163 tests"
+        - cmd: "npm run lint"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "Enabled exact-runtime desktop/mobile E2E"
+          status: pass
+          detail: "15 passed, 17 intentional skips"
+        - cmd: "Unset Classic control"
+          status: pass
+        - cmd: "False Classic control"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+      summary: "Preserved Customer Pulse's canonical neutral Continue label without DOM patching. Exact v1.56.3 proves score 3 reaches follow-up with zero submissions and score 8 submits exactly once. Canonical contracts, Classic isolation, Product Triage transition, and corrected v1.56.3 plan/spec remain intact."
+      deviations: []
+      remaining_blockers:
+        - "T010 exact-runtime loader race correction and clean rereview."
+      verification_attempts: 1
+      stopped_because: null
+  - id: T010
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: medium
+    objective: "Make exact-runtime provenance fail closed during concurrent cross-route loading so a foreign lab API cannot satisfy a second homepage launch while the exact script remains pending."
+    inputs:
+      - "T009 corrected-head review finding SF-1"
+      - "Existing runtime ownership and cross-route E2E contracts"
+    constraints:
+      - "Do not alter vendored bytes, routes, recipes, copy, Classic, public flag, or Product Triage transition."
+      - "The exact pending runtime must still initialize cleanly after the interleaving."
+    expected_output:
+      - "Fail-closed exact runtime binding"
+      - "Unit and real-browser regression for delayed exact script plus foreign lab runtime"
+      - "Full verification and clean rereview handoff"
+    allowed_files:
+      - "src/components/landing/homepage-demo-runtime.ts"
+      - "test/homepage-demo-runtime.test.ts"
+      - "e2e/homepage-flow-demo.spec.ts"
+    verify:
+      - "test \"$(shasum -a 256 public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | awk '{print $1}')\" = \"338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e\" && test \"$(wc -c < public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js | tr -d ' ')\" = \"238591\""
+      - "node scripts/vendor-homepage-flow-recipes.mjs --check --source src/components/landing/flow-recipes-source/a100e69976ce0a5912df8f07af1b2e53029663b2/flow-recipes.ts.txt --source-sha a100e69976ce0a5912df8f07af1b2e53029663b2"
+      - "npx vitest run test/homepage-demo-runtime.test.ts test/homepage-flow-demo-recipes.test.ts test/homepage-demo-model.test.ts"
+      - "npm test"
+      - "npm run lint"
+      - "npm run build"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0"
+      - "env -u NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=false env -u NEXT_PUBLIC_BUGDROP_WIDGET_URL npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep 'Classic-only launcher when the feature flag is unset' --retries=0"
+      - "git diff --check"
+    stop_if:
+      - "Correction requires changing vendored SDK bytes, routes, canonical/generated recipes, overlay copy, Customer Pulse behavior, Classic, public flag, or Product Triage transition."
+      - "Second launch can resolve the foreign API or send check/feedback through the lab runtime."
+      - "The exact pending runtime cannot subsequently initialize cleanly after the foreign interleaving."
+      - "Verification remains red after two bounded corrections."
+    receipt:
+      result: done
+      changed_files:
+        - src/components/landing/homepage-demo-runtime.ts
+        - test/homepage-demo-runtime.test.ts
+        - e2e/homepage-flow-demo.spec.ts
+      commands:
+        - cmd: "Exact v1.56.3 identity"
+          status: pass
+        - cmd: "Canonical generator check"
+          status: pass
+        - cmd: "Focused Vitest"
+          status: pass
+          detail: "21 tests"
+        - cmd: "npm test"
+          status: pass
+          detail: "164 tests"
+        - cmd: "npm run lint"
+          status: pass
+        - cmd: "npm run build"
+          status: pass
+        - cmd: "Enabled exact-runtime desktop/mobile E2E"
+          status: pass
+          detail: "16 passed, 18 intentional skips, zero retries"
+        - cmd: "Unset Classic control"
+          status: pass
+        - cmd: "False Classic control"
+          status: pass
+        - cmd: "Delayed exact/foreign lab provenance falsification"
+          status: pass
+        - cmd: "git diff --check"
+          status: pass
+        - cmd: "Fresh corrected-head PR Review Toolkit"
+          status: pass
+          detail: "no accepted findings"
+      summary: "Pending exact-runtime loads now take precedence over foreign globals, clearing the foreign API and binding only after exact v1.56.3 completion. Unit and real-browser regressions cover delayed exact script, foreign lab runtime, return-home second launch, exact binding, and exact-route submission. Full gates and fresh toolkit review pass."
+      deviations:
+        - "Two in-scope stale-name E2E locator corrections were required before the final browser run passed."
+      remaining_blockers: []
+      verification_attempts: 3
+      stopped_because: null
+  - id: T999
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit the completed tranche against the exact-runtime dogfood oracle and authority boundaries."
+    inputs:
+      - "All done task receipts"
+      - "Final local browser evidence"
+      - "Relevant automated verification"
+      - "Final diff and review results"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if Classic, flag isolation, runtime identity, reduced motion, or real-request prevention is unproved."
+      - "Reject completion if required Worker work remains."
+    expected_output:
+      - "complete | not_complete"
+      - "full_outcome_complete: true | false"
+      - "oracle mapping"
+      - "missing evidence"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: complete
+      full_outcome_complete: true
+      rationale: "The full hidden-dogfood tranche is proven: exact v1.56.3, Product Triage-only 500 ms transition and reduced-motion bypass, distinct composable copy, unchanged Classic/flag isolation, safe local submissions, full tests/build/browser/visual QA, fail-closed cross-route runtime identity, and clean corrected-head review. No external integration or public enablement occurred."
+      evidence:
+        - "Live bugdrop.localhost:3000 serves the exact 238591-byte v1.56.3 widget with SHA-256 338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e."
+        - "Canonical recipe invariants pass and only Product Triage uses slide-horizontal at 500 ms; reduced motion bypasses animation."
+        - "Full verification passed 164 tests, lint, build, diff check, 16 exact-runtime desktop/mobile journeys, and false/unset Classic controls."
+        - "Visual QA covered ten desktop/mobile states and all four experiences with no unauthorized requests or real Issues."
+        - "The delayed exact-script plus foreign-lab race now binds only exact v1.56.3 and has unit plus real-browser regression proof."
+        - "Final corrected-head PR Review Toolkit accepted no findings and included all intended untracked files."
+        - "T008-handoff.md records the local URL, QA checklist, complete-staging boundary, and exact authorization phrase."
+      subgoal_contract: null
+      parallel_safety: null
+      blocked_tasks: []
+      missing_evidence: []
+      required_board_updates:
+        - "Preserve the external authority boundary in T008-handoff.md."
+
+checks:
+  dirty_fingerprint: "clean tracked worktree at 1c42ddcbf95fcfee2fdc2cfb3af0eba817176d64 before GoalBuddy control files"
+  last_verification:
+    result: pass
+    task: T999
+    commands:
+      - "Exact served v1.56.3 hash and size"
+      - "164 tests, lint, build, diff check"
+      - "16 exact-runtime desktop/mobile browser journeys plus false/unset Classic controls"
+      - "Fresh corrected-head PR Review Toolkit with no accepted findings"

@@ -115,24 +115,93 @@ function enabledOnly(testInfo: { project: { name: string } }) {
 
 async function chooseInPage(page: Page, name: string) {
   await page.getByRole("radio", { name }).check();
-  const launch = page.getByRole("button", { name: `Open ${name}` });
+  const launch = page.getByRole("button", { name: `Try ${name}` });
   await launch.click();
   return launch;
 }
+
+test("presents four viewport chapters with smooth anchored navigation", async ({
+  page,
+}, testInfo) => {
+  enabledOnly(testInfo);
+  if (testInfo.project.name === "mobile-chromium") {
+    await page.setViewportSize({ width: 390, height: 844 });
+  }
+  await page.goto("/");
+
+  const layout = await page.evaluate(() => {
+    const navHeight = document.querySelector("nav")?.getBoundingClientRect().height ?? 0;
+    return {
+      chapterIds: [...document.querySelectorAll<HTMLElement>("[data-landing-chapter]")]
+        .map(({ id }) => id),
+      chapterHeights: [...document.querySelectorAll<HTMLElement>("[data-landing-chapter]")]
+        .map((chapter) => chapter.getBoundingClientRect().height),
+      chapterBackgrounds: [...document.querySelectorAll<HTMLElement>("[data-landing-chapter]")]
+        .map((chapter) => getComputedStyle(chapter).backgroundImage),
+      navHeight,
+      scrollPaddingTop: Number.parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop),
+      availableHeight: window.innerHeight - navHeight,
+      fitsViewport: document.documentElement.scrollWidth <= window.innerWidth,
+    };
+  });
+
+  expect(layout.chapterIds).toEqual(["overview", "demo", "flows", "get-started"]);
+  expect(layout.chapterHeights.map(Math.round)).toEqual(
+    Array.from({ length: 4 }, () => Math.round(layout.availableHeight)),
+  );
+  expect(new Set(layout.chapterBackgrounds).size).toBe(4);
+  expect(layout.fitsViewport).toBe(true);
+
+  const floating = page.getByRole("button", { name: "Open BugDrop feedback" });
+  await expect(floating).toBeVisible();
+  expect(await floating.evaluate((button) => ({
+    parentIsBody: button.parentElement === document.body,
+    position: getComputedStyle(button).position,
+  }))).toEqual({ parentIsBody: true, position: "fixed" });
+
+  const videoHeight = await page.locator("[data-video-embed-state]").evaluate(
+    (video) => video.getBoundingClientRect().height,
+  );
+  expect(videoHeight).toBeGreaterThan(testInfo.project.name === "mobile-chromium" ? 340 : 500);
+
+  const scrollFrames = await page.evaluate(async () => {
+    window.scrollTo(0, 0);
+    const link = document.querySelector<HTMLAnchorElement>('nav a[href="/#flows"]');
+    if (!link) return [];
+    link.click();
+    const values: number[] = [];
+    const started = performance.now();
+    while (performance.now() - started < 900) {
+      values.push(Math.round(window.scrollY));
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    }
+    return [...new Set(values)];
+  });
+
+  expect(scrollFrames.length).toBeGreaterThan(2);
+  expect(scrollFrames[0]).toBeLessThan(scrollFrames.at(-1) ?? 0);
+  await expect
+    .poll(() => page.locator("#flows").evaluate((element) => Math.round(element.getBoundingClientRect().top)))
+    .toBe(layout.scrollPaddingTop);
+  await expect(floating).toBeVisible();
+});
 
 test("separates the simple floating feedback action from the flow showcase", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   test.skip(process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED !== "true");
 
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "Open BugDrop feedback" })).toBeVisible();
+  const floating = page.getByRole("button", { name: "Open BugDrop feedback" });
+  await expect(floating).toBeVisible();
+  await expect(floating).toHaveText(/Give feedback/);
+  expect(await floating.evaluate((button) => button.parentElement === document.body)).toBe(true);
   await expect(page.getByRole("menu", { name: "Feedback experience" })).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "One widget for every feedback moment." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("navigation").getByRole("link", { name: "Design your flow" }),
-  ).toHaveAttribute("href", "/#try-bugdrop");
+    page.getByRole("navigation").getByRole("link", { name: "Flows" }),
+  ).toHaveAttribute("href", "/#flows");
   await expect(
     page.getByRole("link", { name: "Explore the building blocks" }),
   ).toHaveAttribute("href", "/labs/variants");
@@ -140,13 +209,13 @@ test("separates the simple floating feedback action from the flow showcase", asy
     .toContainText("they do not create a public GitHub Issue");
   await expect(page.getByText(/Demo submissions create a real public GitHub Issue/)).toHaveCount(0);
   const picker = page.getByRole("group", { name: "Feedback experience" });
-  await expect(picker.getByRole("radio")).toHaveCount(4);
-  await expect(picker).toContainText("The familiar screenshot-first feedback widget.");
+  await expect(picker.getByRole("radio")).toHaveCount(3);
+  await expect(page.locator("#flows").getByRole("button", { name: /Classic|General Feedback/ })).toHaveCount(0);
   await expect(picker).toContainText("Reproduce a bug and attach proof.");
   await expect(picker).toContainText("Share a 1–5 star rating in one step.");
   await expect(picker).toContainText("Shape and prioritize a product idea.");
   await page.getByRole("radio", { name: "Feature Request" }).check();
-  await expect(page.getByRole("button", { name: "Open Feature Request" })).toContainText("💡");
+  await expect(page.getByRole("button", { name: "Try Feature Request" })).toContainText("💡");
 });
 
 test("fails visibly after a client navigation leaves a foreign runtime active", async ({
@@ -160,11 +229,11 @@ test("fails visibly after a client navigation leaves a foreign runtime active", 
   await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
   await expect(page).toHaveURL(`${origin}/`);
 
-  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await page.getByRole("button", { name: "Open BugDrop feedback" }).click();
   await expect(
     page.getByRole("alert").filter({ hasText: "The feedback experience" }),
   ).toContainText("could not load");
-  await expect(page.getByRole("button", { name: "Open General Feedback" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Open BugDrop feedback" })).toBeEnabled();
   await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(0);
 });
 
@@ -185,7 +254,7 @@ test("keeps the pinned homepage API across homepage to lab to homepage navigatio
   await page.route("**/api/feedback", (route) => route.abort());
   await page.goto("/");
 
-  const openClassic = page.getByRole("button", { name: "Open General Feedback" });
+  const openClassic = page.getByRole("button", { name: "Open BugDrop feedback" });
   await openClassic.click();
   const classicHost = page.locator("#bugdrop-host").first();
   await expect(classicHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
@@ -208,7 +277,7 @@ test("keeps the pinned homepage API across homepage to lab to homepage navigatio
     )
     .toBe(true);
 
-  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await page.getByRole("button", { name: "Open BugDrop feedback" }).click();
   await expect(classicHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
   expect(checkPaths).toEqual([
     `${runtimePath}/api/check/${repo}`,
@@ -224,7 +293,7 @@ test("borrows the pinned runtime across enabled home to docs to home navigation"
   const harness = installLocalBugDropHarness(page);
 
   await page.goto("/");
-  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await page.getByRole("button", { name: "Open BugDrop feedback" }).click();
   const classicHost = page.locator("#bugdrop-host");
   await expect(classicHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
   await classicHost.getByRole("button", { name: "×" }).click();
@@ -285,7 +354,7 @@ test("borrows the pinned runtime across enabled home to docs to home navigation"
   await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
   await expect(page).toHaveURL(`${origin}/`);
 
-  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await page.getByRole("button", { name: "Open BugDrop feedback" }).click();
   await expect(classicHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
   await classicHost.getByRole("button", { name: "×" }).click();
 
@@ -333,7 +402,7 @@ test("isolates the lab API across enabled home to lab to docs to home navigation
   const harness = installLocalBugDropHarness(page);
 
   await page.goto("/");
-  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await page.getByRole("button", { name: "Open BugDrop feedback" }).click();
   const homepageHost = page.locator("#bugdrop-host");
   await expect(homepageHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
   await homepageHost.getByRole("button", { name: "×" }).click();
@@ -365,7 +434,7 @@ test("isolates the lab API across enabled home to lab to docs to home navigation
     }),
   ).toBe(true);
 
-  await page.getByRole("navigation").getByRole("link", { name: "Docs", exact: true }).click();
+  await page.locator('a[href="/docs"]:visible').first().click();
   await expect(page).toHaveURL(`${origin}/docs`);
   await page.locator('a[href="/docs/flow-examples"]').first().click();
   const galleryLauncher = page.getByRole("button", { name: "Launch live example" });
@@ -401,7 +470,7 @@ test("isolates the lab API across enabled home to lab to docs to home navigation
     }),
   ).toEqual({ script: true, api: true, bound: true, host: true });
 
-  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await page.getByRole("button", { name: "Open BugDrop feedback" }).click();
   await expect(homepageHost.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
   await homepageHost.getByRole("button", { name: "×" }).click();
   expect(harness.submissions).toHaveLength(0);
@@ -446,7 +515,7 @@ test("reclaims a delayed detached docs runtime without deleting the enabled home
   await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
   await expect(page).toHaveURL(`${origin}/`);
 
-  const launcher = page.getByRole("button", { name: "Open General Feedback" });
+  const launcher = page.getByRole("button", { name: "Open BugDrop feedback" });
   await launcher.click();
   await expect(page.getByRole("button", { name: "Loading Feedback…" })).toBeDisabled();
 
@@ -511,7 +580,7 @@ test("waits for a delayed exact runtime instead of resolving a foreign lab API",
   await page.goto("/");
 
   await page.getByRole("radio", { name: "Quick Rating" }).check();
-  await page.getByRole("button", { name: "Open Quick Rating" }).click();
+  await page.getByRole("button", { name: "Try Quick Rating" }).click();
   await exactScriptRequested;
   await page.getByRole("link", { name: "Explore the building blocks" }).click();
   await expect(page).toHaveURL(/\/labs\/variants$/);
@@ -524,7 +593,7 @@ test("waits for a delayed exact runtime instead of resolving a foreign lab API",
   await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
   await expect(page).toHaveURL(`${origin}/`);
   await page.getByRole("radio", { name: "Quick Rating" }).check();
-  const secondLaunch = page.getByRole("button", { name: "Open Quick Rating" });
+  const secondLaunch = page.getByRole("button", { name: "Try Quick Rating" });
   await secondLaunch.click();
   await expect(page.getByRole("button", { name: "Loading Feedback…" })).toBeDisabled();
   await expect(page.locator('[data-bugdrop-flow="quick-rating"]')).toHaveCount(0);
@@ -579,7 +648,7 @@ test("settles Classic when the runtime opens and closes before the first poll", 
   );
   await page.goto("/");
 
-  const launch = page.getByRole("button", { name: "Open General Feedback" });
+  const launch = page.getByRole("button", { name: "Open BugDrop feedback" });
   await launch.click();
   await expect(launch).toBeEnabled();
   await expect(launch).toBeFocused();
@@ -599,12 +668,13 @@ test("keeps the Classic-only launcher when the feature flag is unset", async ({ 
 
   await expect(page.getByRole("button", { name: "Open BugDrop feedback" })).toHaveCount(0);
   await expect(
-    page.getByRole("navigation").getByRole("link", { name: "Try Widget" }),
-  ).toHaveAttribute("href", "/#try-bugdrop");
+    page.getByRole("navigation").getByRole("link", { name: "Demo", exact: true }),
+  ).toHaveAttribute("href", "/#demo");
   await expect(
-    page.locator("header").getByRole("link", { name: "Try it on this page" }),
-  ).toHaveAttribute("href", "#try-bugdrop");
-  await expect(page.getByRole("link", { name: "Design your flow" })).toHaveCount(0);
+    page.getByRole("navigation").getByRole("link", { name: "Flows", exact: true }),
+  ).toHaveAttribute("href", "/#flows");
+  await expect(page.locator("header").getByRole("link", { name: "See BugDrop in action" }))
+    .toHaveAttribute("href", "#demo");
   await page.getByRole("button", { name: "Open Feedback demo" }).click();
   await expect(page.locator("body")).toHaveAttribute("data-classic-demo-opened", "true");
 });
@@ -616,8 +686,7 @@ test("submits the independent Classic journey through the local mock", async ({ 
   const harness = installLocalBugDropHarness(page);
   await page.goto("/");
 
-  await page.getByRole("radio", { name: /General Feedback.*Classic/ }).check();
-  const classicLauncher = page.getByRole("button", { name: "Open General Feedback" });
+  const classicLauncher = page.getByRole("button", { name: "Open BugDrop feedback" });
   await classicLauncher.click();
 
   const classicHost = page.locator("#bugdrop-host");
@@ -676,7 +745,8 @@ test("submits the independent Classic journey through the local mock", async ({ 
   });
   await classicHost.getByRole("button", { name: "Done" }).click();
   await expect(classicLauncher).toBeFocused();
-  await expect(page.getByRole("radio", { name: /General Feedback.*Classic/ })).toBeChecked();
+  await expect(page.getByRole("group", { name: "Feedback experience" }).getByRole("radio"))
+    .toHaveCount(3);
   await expect(page.locator("[data-bugdrop-flow]")).toHaveCount(0);
   harness.assertClean();
 });
@@ -714,7 +784,7 @@ test("keeps the actual local Classic result private and truthful", async ({ page
     .toContainText("they do not create a public GitHub Issue");
   await expect(page.getByText(/Demo submissions create a real public GitHub Issue/)).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await page.getByRole("button", { name: "Open BugDrop feedback" }).click();
   const configuredRuntime = process.env.NEXT_PUBLIC_BUGDROP_WIDGET_URL;
   if (configuredRuntime?.includes("BUGDROP.LOCALHOST")) {
     await expect(page.locator("script#bugdrop-homepage-demo")).toHaveAttribute(
@@ -758,7 +828,7 @@ test("classifies the uppercase-host exact runtime as private", async ({ page }, 
   await expect(page.getByText(/Local dogfood submissions stay in this development process/))
     .toContainText("they do not create a public GitHub Issue");
   await expect(page.getByText(/Demo submissions create a real public GitHub Issue/)).toHaveCount(0);
-  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await page.getByRole("button", { name: "Open BugDrop feedback" }).click();
   await expect(page.locator("script#bugdrop-homepage-demo")).toHaveAttribute(
     "src",
     uppercaseHostRuntime,
@@ -780,7 +850,7 @@ test("discloses the exact public v1.56.3 runtime as public", async ({ page }, te
   await expect(page.getByText(/Demo submissions create a real public GitHub Issue/)).toBeVisible();
   await expect(page.getByText(/Local dogfood submissions stay in this development process/))
     .toHaveCount(0);
-  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await page.getByRole("button", { name: "Open BugDrop feedback" }).click();
   await expect(page.locator("script#bugdrop-homepage-demo")).toHaveAttribute(
     "src",
     publicRuntime,
@@ -827,6 +897,8 @@ test("opens Classic directly and restores the floating launcher focus", async ({
   await classic.getByRole("button", { name: "×" }).click();
   await expect(classic.getByRole("heading", { name: "Send Feedback" })).toHaveCount(0);
   await expect(launcher).toBeFocused();
+  await expect(page.getByRole("radio", { name: "Bug Report" })).toBeChecked();
+  await expect(page.getByRole("button", { name: "Try Bug Report" })).toBeEnabled();
 });
 
 test("animates Feature Request forward and back for 500 ms and honors reduced motion", async ({
@@ -1060,7 +1132,7 @@ test("does not open an orphan Flow after navigation during a delayed runtime loa
   }));
 
   await page.getByRole("radio", { name: "Bug Report" }).check();
-  await page.getByRole("button", { name: "Open Bug Report" }).click();
+  await page.getByRole("button", { name: "Try Bug Report" }).click();
   await scriptRequested;
   await page.getByRole("link", { name: "Explore the building blocks" }).click();
   await expect(page).toHaveURL(/\/labs\/variants$/);
@@ -1131,7 +1203,7 @@ test("does not resume a cancelled Classic modal after delayed preflight navigati
   await page.goto("/");
   const initialOverflow = await page.evaluate(() => document.body.style.overflow);
 
-  await page.getByRole("button", { name: "Open General Feedback" }).click();
+  await page.getByRole("button", { name: "Open BugDrop feedback" }).click();
   await checkStarted;
   await page.getByRole("navigation").getByRole("link", { name: "Docs", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/docs`);
@@ -1156,7 +1228,7 @@ test("keeps one active owner and tears capture down on client navigation", async
   }));
 
   await page.getByRole("radio", { name: "Bug Report" }).check();
-  const openBug = page.getByRole("button", { name: "Open Bug Report" });
+  const openBug = page.getByRole("button", { name: "Try Bug Report" });
   await openBug.evaluate((button: HTMLButtonElement) => {
     button.click();
     button.click();
@@ -1227,7 +1299,6 @@ test("supports the direct keyboard launcher and mobile focus containment without
   const floating = page.getByRole("button", { name: "Open BugDrop feedback" });
   await floating.focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("radio", { name: /General Feedback.*Classic/ })).toBeChecked();
   const keyboardClassic = page.locator("#bugdrop-host");
   await expect(keyboardClassic.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
   await keyboardClassic.getByRole("button", { name: "×" }).click();
@@ -1247,9 +1318,9 @@ test("supports the direct keyboard launcher and mobile focus containment without
 
   const picker = page.getByRole("group", { name: "Feedback experience" });
   await picker.scrollIntoViewIfNeeded();
-  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "true");
-  await expect(floating).toHaveCSS("opacity", "0");
-  await expect(floating).toHaveCSS("pointer-events", "none");
+  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "false");
+  await expect(floating).toHaveCSS("opacity", "1");
+  await expect(floating).toHaveCSS("pointer-events", "auto");
 
   const inPageLauncher = await chooseInPage(page, "Quick Rating");
   const quick = page.locator('[data-bugdrop-flow="quick-rating"]');
@@ -1273,7 +1344,7 @@ test("supports the direct keyboard launcher and mobile focus containment without
   harness.assertClean();
 });
 
-test("keeps the floating launcher concealed while an in-page mobile launch loads", async ({
+test("keeps the floating launcher visible while an in-page mobile launch loads", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium");
@@ -1297,21 +1368,22 @@ test("keeps the floating launcher concealed while an in-page mobile launch loads
   const picker = page.getByRole("group", { name: "Feedback experience" });
   const floating = page.getByRole("button", { name: "Open BugDrop feedback" });
   await picker.scrollIntoViewIfNeeded();
-  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "true");
+  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "false");
+  await expect(floating).toHaveCSS("opacity", "1");
   await page.getByRole("radio", { name: "Quick Rating" }).check();
-  await page.getByRole("button", { name: "Open Quick Rating" }).click();
+  await page.getByRole("button", { name: "Try Quick Rating" }).click();
   await runtimeRequested;
 
   await expect(floating).toBeDisabled();
-  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "true");
-  await expect(floating).toHaveCSS("opacity", "0");
-  await expect(floating).toHaveCSS("pointer-events", "none");
+  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "false");
+  await expect(floating).toHaveCSS("opacity", "0.7");
+  await expect(floating).toHaveCSS("pointer-events", "auto");
 
   if (!releaseRuntime) throw new Error("The delayed homepage runtime was not requested.");
   releaseRuntime();
   const quick = page.locator('[data-bugdrop-flow="quick-rating"]');
   await expect(quick.getByRole("dialog", { name: "How was this experience?" })).toBeVisible();
-  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "true");
+  await expect(floating).toHaveAttribute("data-in-page-chooser-visible", "false");
   await page.keyboard.press("Escape");
   await expect(quick).toHaveCount(0);
 });

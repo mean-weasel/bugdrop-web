@@ -2,20 +2,26 @@
 
 import { useState } from "react";
 import { Play } from "lucide-react";
-import { SectionHeading } from "./section-heading";
 
 export function DemoVideo() {
   const [showVideo, setShowVideo] = useState(false);
 
   return (
-    <section className="mb-20">
-      <SectionHeading>See It In Action</SectionHeading>
-      <div className="bg-bg-surface border border-border rounded-3xl p-12 text-center max-w-[640px] mx-auto max-md:p-8">
-        <p className="mx-auto mb-8 max-w-[460px] text-text-subtle">
-          Watch the report flow from feedback form to GitHub issue.
+    <div className="grid items-center gap-6 md:grid-cols-[minmax(0,0.72fr)_minmax(340px,1.28fr)] md:gap-10 lg:gap-12">
+      <div className="max-w-[620px]">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent-cyan">
+          The Classic experience
         </p>
+        <h2 id="demo-heading" className="text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-tight text-text-primary">
+          See exactly what your users see.
+        </h2>
+        <p className="mt-4 text-lg leading-8 text-text-subtle max-sm:text-base max-sm:leading-6">
+          Watch an example flow in action.
+        </p>
+      </div>
+      <div className="flex flex-col items-center justify-center rounded-3xl border border-border bg-bg-surface/80 p-4 max-sm:p-3">
         <div
-          className="relative mx-auto mb-5 aspect-[9/16] max-h-[400px] max-w-[225px] overflow-hidden rounded-xl bg-bg-deep"
+          className="relative aspect-[9/16] h-[min(75svh,690px)] max-h-[690px] w-auto overflow-hidden rounded-2xl bg-bg-deep shadow-[0_24px_60px_rgba(0,0,0,0.35)] max-sm:h-[min(49svh,420px)] max-sm:rounded-xl"
           data-video-embed-state={showVideo ? "loaded" : "deferred"}
         >
           {showVideo ? (
@@ -41,11 +47,11 @@ export function DemoVideo() {
                 <span className="mt-2 block h-2 w-4/5 rounded bg-accent-cyan/35" />
                 <span className="mt-2 block h-2 w-3/5 rounded bg-accent-warm/30" />
               </span>
-              <span className="relative mt-24 flex size-16 items-center justify-center rounded-full border border-accent-cyan/50 bg-accent-cyan text-bg-deep shadow-[0_12px_35px_rgba(125,207,255,0.25)] transition-transform group-hover:scale-105" aria-hidden="true">
+              <span className="relative mt-24 flex size-16 items-center justify-center rounded-full border border-accent-cyan/50 bg-accent-cyan text-bg-deep shadow-[0_12px_35px_rgba(125,207,255,0.25)] transition-transform group-hover:scale-105 max-sm:size-12" aria-hidden="true">
                 <Play className="ml-1 size-7 fill-current" />
               </span>
-              <span className="relative mt-4 text-sm font-semibold">Play 53-second demo</span>
-              <span className="relative mt-1 text-xs text-text-subtle">Loads YouTube only after activation</span>
+              <span className="relative mt-4 text-sm font-semibold">Play example walkthrough</span>
+              <span className="relative mt-1 text-xs text-text-subtle">Loads YouTube after activation</span>
             </button>
           )}
         </div>
@@ -55,11 +61,11 @@ export function DemoVideo() {
           rel="noopener noreferrer"
           data-analytics-event="demo_video_youtube_click"
           data-analytics-label="Watch BugDrop demo on YouTube"
-          className="text-sm text-accent-cyan underline decoration-accent-cyan/40 underline-offset-4 hover:text-text-primary"
+          className="mt-2 text-xs text-text-subtle underline decoration-border underline-offset-4 hover:text-text-primary"
         >
-          Watch directly on YouTube
+          Watch on YouTube
         </a>
       </div>
-    </section>
+    </div>
   );
 }

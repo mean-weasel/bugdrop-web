@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HomepageDemoLauncher, homepageExperienceLabel } from "./homepage-demo-launcher";
 import {
   homepageExperiences,
+  homepageFlowExperiences,
   initialHomepageDemoState,
   reduceHomepageDemo,
   type HomepageExperienceId,
@@ -99,14 +100,14 @@ export function ClassicHomepageWidget() {
 
   return (
     <section
-      id="try-bugdrop"
-      className="mb-20 rounded-2xl border border-accent-cyan/25 bg-accent-cyan/10 px-8 py-7"
+      className="rounded-3xl border border-accent-cyan/25 bg-accent-cyan/10 px-8 py-8 max-sm:px-5 max-sm:py-6"
+      aria-labelledby="flows-heading"
     >
       <div className="flex items-center justify-between gap-6 max-md:flex-col max-md:items-start">
         <div>
           <p className="mb-2 text-sm font-medium text-accent-cyan">Try it on this page</p>
-          <h2 className="text-2xl font-semibold text-text-primary">
-            This landing page is running BugDrop.
+          <h2 id="flows-heading" className="text-2xl font-semibold text-text-primary">
+            Try the Classic feedback flow.
           </h2>
           <p className="mt-2 max-w-[620px] text-text-subtle">
             Open the Feedback demo to load BugDrop, send a test report, and see the
@@ -180,8 +181,6 @@ function waitForFlowClose(flowId: string, onClose: () => void): () => void {
 
 function FlowHomepageWidget() {
   const [state, dispatch] = useReducer(reduceHomepageDemo, initialHomepageDemoState);
-  const [inPageChooserVisible, setInPageChooserVisible] = useState(false);
-  const chooserSectionRef = useRef<HTMLElement | null>(null);
   const activeExperience = useRef<HomepageActiveExperience | null>(null);
   const activeLaunchRef = useRef<HTMLElement | null>(null);
   const launchInFlight = useRef(false);
@@ -209,8 +208,8 @@ function FlowHomepageWidget() {
     const isCurrent = () => mounted.current && generation === launchGeneration.current;
     launchInFlight.current = true;
     activeLaunchRef.current = initiator;
-    dispatch({ type: "select", id });
-    dispatch({ type: "launch" });
+    if (id !== "classic") dispatch({ type: "select", id });
+    dispatch({ type: "launch", id });
     dispatch({ type: "runtime-loading" });
 
     try {
@@ -267,31 +266,6 @@ function FlowHomepageWidget() {
     activeLaunchRef.current?.focus();
   }, [state.activeId]);
 
-  useEffect(() => {
-    const section = chooserSectionRef.current;
-    const narrowViewport = window.matchMedia("(max-width: 767px)");
-    if (!section) return;
-
-    let sectionVisible = false;
-    const updateVisibility = () => {
-      setInPageChooserVisible(sectionVisible && narrowViewport.matches);
-    };
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        sectionVisible = entry.isIntersecting;
-        updateVisibility();
-      },
-      { threshold: 0.1 },
-    );
-    observer.observe(section);
-    narrowViewport.addEventListener("change", updateVisibility);
-    return () => {
-      observer.disconnect();
-      narrowViewport.removeEventListener("change", updateVisibility);
-    };
-  }, []);
-
   const selected = homepageExperiences.find(({ id }) => id === state.selectedId)!;
   const launchDisabled = state.runtimeState === "loading" || state.activeId !== null;
 
@@ -299,27 +273,27 @@ function FlowHomepageWidget() {
     <>
       <HomepageDemoLauncher
         disabled={launchDisabled}
-        inPageChooserVisible={inPageChooserVisible}
         onLaunch={(trigger) => void launch("classic", trigger)}
       />
       <section
-        ref={chooserSectionRef}
-        id="try-bugdrop"
-        className="mb-20 rounded-2xl border border-accent-cyan/25 bg-accent-cyan/10 px-8 py-7"
-        aria-labelledby="homepage-experience-heading"
+        className="rounded-3xl border border-accent-cyan/25 bg-accent-cyan/10 px-8 py-8 max-sm:px-5 max-sm:py-4"
+        aria-labelledby="flows-heading"
       >
         <div className="max-w-3xl">
-          <p className="mb-2 text-sm font-medium text-accent-cyan">Use BugDrop your way</p>
-          <h2 id="homepage-experience-heading" className="text-2xl font-semibold text-text-primary">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent-cyan">Use BugDrop your way</p>
+          <h2 id="flows-heading" className="text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-tight text-text-primary">
             One widget for every feedback moment.
           </h2>
           <p className="mt-2 text-text-subtle">
             Place and customize BugDrop wherever and whenever you need feedback throughout your app.
           </p>
+          <p className="mt-3 text-sm text-text-subtle">
+            The floating <span className="font-medium text-text-primary">Give feedback</span> button opens the Classic experience. Choose a custom flow below to explore other possibilities.
+          </p>
         </div>
-        <fieldset className="mt-6 grid gap-3 sm:grid-cols-2" aria-label="Feedback experience">
+        <fieldset className="mt-7 grid w-full min-w-0 max-w-full grid-flow-col auto-cols-[minmax(240px,82%)] gap-3 overflow-x-auto pb-2 max-sm:mt-4 md:grid-flow-row md:auto-cols-auto md:grid-cols-3 md:overflow-visible md:pb-0" aria-label="Feedback experience">
           <legend className="sr-only">Feedback experience</legend>
-          {homepageExperiences.map((experience) => (
+          {homepageFlowExperiences.map((experience) => (
             <label
               key={experience.id}
               className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-bg-surface/80 p-4 text-text-primary has-[:checked]:border-accent-cyan has-[:checked]:bg-accent-cyan/10"
@@ -350,11 +324,7 @@ function FlowHomepageWidget() {
             </label>
           ))}
         </fieldset>
-        <div className="mt-5 flex flex-wrap items-center gap-4">
-          <div className="min-w-0 flex-1">
-            <p className="font-medium text-text-primary">{homepageExperienceLabel(selected)}</p>
-            <p className="mt-1 text-text-subtle">{selected.description}</p>
-          </div>
+        <div className="mt-5 flex justify-end">
           <button
             type="button"
             disabled={launchDisabled}

@@ -163,7 +163,7 @@ if (!keyboardReachedTry) failures.push("keyboard sequence did not reach the prim
 if (!keyboardReachedVideo) failures.push("keyboard sequence did not reach the deferred video control");
 if (!keyboardReachedWidget) failures.push("keyboard sequence did not reach the homepage feedback demo");
 
-const coreTouchTargets = await page.locator('[data-analytics-label="Try it on this page"], [data-analytics-label="Install from GitHub Marketplace"], [data-video-consent], [data-homepage-widget-activate]').evaluateAll((elements) =>
+const coreTouchTargets = await page.locator('[data-analytics-event="landing_cta_click"], [data-analytics-label="Install from GitHub Marketplace"], [data-video-consent], [data-homepage-widget-activate]').evaluateAll((elements) =>
   elements.map((element) => {
     const rect = element.getBoundingClientRect();
     return {
@@ -177,12 +177,14 @@ for (const target of coreTouchTargets) {
   if (target.width < 44 || target.height < 44) failures.push(`${target.label}: touch target smaller than 44px`);
 }
 
-await page.locator('[data-analytics-label="Try it on this page"]').click();
+await page.locator('[data-analytics-event="landing_cta_click"]').click();
 await page.waitForTimeout(250);
 const activatedGtmRequests = initialRequests.filter((url) => /www\.googletagmanager\.com\/gtag\/js/.test(url));
 if (activatedGtmRequests.length !== 1) failures.push(`tracked intent requested GTM ${activatedGtmRequests.length} times`);
 
-const widgetButton = page.locator("[data-homepage-widget-activate]");
+const widgetButton = page.getByRole("button", {
+  name: /^(Open BugDrop feedback|Open Feedback demo)$/,
+});
 await widgetButton.scrollIntoViewIfNeeded();
 await widgetButton.focus();
 const widgetFocusScreenshot = path.join(outputDir, "home-widget-keyboard-focus.png");
@@ -226,8 +228,8 @@ const loadedScreenshot = path.join(outputDir, "home-video-loaded.png");
 await page.screenshot({ path: loadedScreenshot, fullPage: false });
 
 const conversions = await page.evaluate(() => ({
-  trySection: Boolean(document.querySelector("#try-bugdrop")),
-  primaryTryLink: Boolean(document.querySelector('[data-analytics-label="Try it on this page"][href="#try-bugdrop"]')),
+  demoSection: Boolean(document.querySelector("#demo")),
+  primaryDemoLink: Boolean(document.querySelector('[data-analytics-event="landing_cta_click"][href="#demo"]')),
   demoLink: Boolean(document.querySelector('a[href="/demo"]')),
   productHuntAttribution: Boolean(document.querySelector('a[href*="producthunt.com"]')) && document.body.textContent?.includes("#6 Product of the Day"),
   videoDirectLink: Boolean(document.querySelector('a[href*="youtube.com/watch"]')),

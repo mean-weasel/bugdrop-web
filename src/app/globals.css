@@ -36,6 +36,86 @@ body {
   overflow-x: hidden;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+.landing-chapter {
+  min-height: calc(100svh - 4.5rem);
+  scroll-margin-top: 0;
+  display: flex;
+  align-items: center;
+  padding-block: clamp(2rem, 5vh, 4rem);
+  padding-inline: clamp(1rem, 3vw, 2.5rem);
+  border: 1px solid color-mix(in srgb, var(--chapter-accent) 28%, transparent);
+  border-radius: 2rem;
+  background: var(--chapter-background);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+#overview {
+  --chapter-accent: #7dcfff;
+  --chapter-background:
+    radial-gradient(circle at 18% 22%, rgba(125, 207, 255, 0.2), transparent 38%),
+    linear-gradient(145deg, rgba(34, 49, 82, 0.92), rgba(37, 31, 71, 0.92));
+}
+
+#demo {
+  --chapter-accent: #f7768e;
+  --chapter-background:
+    radial-gradient(circle at 80% 22%, rgba(247, 118, 142, 0.18), transparent 36%),
+    linear-gradient(145deg, rgba(69, 40, 52, 0.94), rgba(39, 43, 73, 0.94));
+  padding-block: 2rem;
+}
+
+#flows {
+  --chapter-accent: #9ece6a;
+  --chapter-background:
+    radial-gradient(circle at 20% 80%, rgba(158, 206, 106, 0.18), transparent 38%),
+    linear-gradient(145deg, rgba(25, 66, 66, 0.94), rgba(34, 45, 78, 0.94));
+}
+
+#get-started {
+  --chapter-accent: #ff9e64;
+  --chapter-background:
+    radial-gradient(circle at 82% 76%, rgba(255, 158, 100, 0.19), transparent 38%),
+    linear-gradient(145deg, rgba(72, 53, 37, 0.94), rgba(51, 37, 72, 0.94));
+}
+
+.landing-chapter-content {
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  html {
+    scroll-padding-top: 4rem;
+  }
+
+  .landing-chapter {
+    min-height: calc(100svh - 4rem);
+    scroll-margin-top: 0;
+    padding-block: clamp(1.75rem, 4vh, 3rem);
+    padding-inline: 1rem;
+    border-radius: 1.5rem;
+  }
+
+  #demo {
+    padding-block: 1.75rem;
+  }
+
+  #get-started {
+    padding-block: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+}
+
 .bg-atmosphere {
   position: fixed;
   inset: 0;

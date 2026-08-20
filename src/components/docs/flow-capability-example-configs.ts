@@ -210,7 +210,7 @@ const releaseReadiness: FlowExampleRecipe = {
   eyebrow: "Two-column form · context branch",
   title: "Release readiness",
   description: "A dense operational check that adapts when the host application marks a release as risky.",
-  path: "Checklist → context-aware note",
+  path: "Checklist → conditional risk details → review",
   openOptions: { context: { risk: "high", surface: "release-dashboard" } },
   config: {
     configVersion: 1,
@@ -231,18 +231,30 @@ const releaseReadiness: FlowExampleRecipe = {
           },
           { id: "tests", type: "checkbox", label: "Critical tests passed", required: true },
           { id: "rollback", type: "checkbox", label: "Rollback plan checked", required: true },
+        ],
+      },
+      {
+        id: "risk",
+        title: "Describe the release risk",
+        fields: [
           {
             id: "note",
             type: "longText",
             label: "Risk note",
             helpText: "Shown because the host passed risk=high.",
-            layout: { span: 2 },
+            required: true,
           },
         ],
       },
     ],
     screens: [
       { id: "release-screen", type: "form", form: "release" },
+      {
+        id: "risk-screen",
+        type: "form",
+        form: "risk",
+        when: { context: "risk", equals: "high" },
+      },
       {
         id: "risk-note",
         type: "message",
@@ -255,7 +267,7 @@ const releaseReadiness: FlowExampleRecipe = {
       classification: "feature",
       title: "Release readiness: {{release.name}}",
       sections: [
-        { heading: "Risk note", answer: "release.note", format: "code", omitWhenEmpty: true },
+        { heading: "Risk note", answer: "risk.note", format: "code", omitWhenEmpty: true },
         { heading: "Surface", context: "surface", format: "code" },
       ],
     },

@@ -104,4 +104,22 @@ describe("curated Flow capability example configs", () => {
       expect(key).toMatch(/^[a-z][a-z0-9_-]{0,63}$/);
     }
   });
+
+  it("places release risk input on a context-conditional form screen", () => {
+    const recipe = FLOW_EXAMPLE_RECIPES.find(({ id }) => id === "release-readiness")!;
+    const forms = recipe.config.forms as readonly Record<string, unknown>[];
+    const screens = recipe.config.screens as readonly Record<string, unknown>[];
+    const releaseForm = forms.find(({ id }) => id === "release")!;
+    const riskForm = forms.find(({ id }) => id === "risk")!;
+    const riskScreen = screens.find(({ id }) => id === "risk-screen")!;
+
+    expect(JSON.stringify(releaseForm)).not.toContain('"id":"note"');
+    expect(JSON.stringify(riskForm)).toContain('"id":"note"');
+    expect(riskScreen).toMatchObject({
+      type: "form",
+      form: "risk",
+      when: { context: "risk", equals: "high" },
+    });
+    expect(JSON.stringify(recipe.config.issue)).toContain('"answer":"risk.note"');
+  });
 });

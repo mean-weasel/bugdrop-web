@@ -30,6 +30,23 @@ describe("site navigation and footer", () => {
     expect(features).toContain("Explore all feedback workflows");
   });
 
+  it("keeps flow-design calls to action truthful when the showcase is off", async () => {
+    const hero = await readFile("src/components/landing/hero.tsx", "utf8");
+    const nav = await readFile("src/components/nav.tsx", "utf8");
+
+    for (const source of [hero, nav]) {
+      expect(source).toContain(
+        'process.env.NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED === "true"',
+      );
+      expect(source).toContain('"Design your flow"');
+    }
+    expect(hero).toContain('"Try it on this page"');
+    expect(nav).toContain('"Try Widget"');
+    expect(nav).toContain('"nav_design_flow_click"');
+    expect(nav).toContain('"nav_try_widget_click"');
+    expect(nav).toContain("data-analytics-event={demoCtaEvent}");
+  });
+
   it("links to resources without rendering a resource directory", async () => {
     const page = await readFile("src/app/page.tsx", "utf8");
     const quickStart = await readFile(

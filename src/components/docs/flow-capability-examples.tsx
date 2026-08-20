@@ -45,6 +45,7 @@ const LOCAL_REPO = "mean-weasel/bugdrop-widget-test";
 const DOCS_SCRIPT_ID = "bugdrop-flow-capability-docs-runtime";
 const HOMEPAGE_SCRIPT_ID = "bugdrop-homepage-demo";
 const HOMEPAGE_API_BINDING = Symbol.for("bugdrop.homepage-demo.exact-api");
+const LOCAL_PREVIEW_ENABLED = process.env.NODE_ENV === "development";
 
 function docsWindow(): DocsFlowWindow {
   return window as unknown as DocsFlowWindow;
@@ -137,13 +138,20 @@ export function FlowCapabilityExamples() {
   const [recipeId, setRecipeId] = useState<FlowExampleId>("incident-triage");
   const [transitionKind, setTransitionKind] = useState<TransitionKind>("slide-horizontal");
   const [presetId, setPresetId] = useState<FlowStylePresetId>("product-dark");
-  const [runtimeState, setRuntimeState] = useState<"loading" | "ready" | "failed">("loading");
+  const [runtimeState, setRuntimeState] = useState<"loading" | "ready" | "failed" | "local-only">(
+    LOCAL_PREVIEW_ENABLED ? "loading" : "local-only",
+  );
   const [active, setActive] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [announcement, setAnnouncement] = useState("Loading pinned BugDrop v1.56.3.");
+  const [announcement, setAnnouncement] = useState(
+    LOCAL_PREVIEW_ENABLED
+      ? "Loading pinned BugDrop v1.56.3."
+      : "Interactive previews are available in local development.",
+  );
   const [storedSubmission, setStoredSubmission] = useState<number | null>(null);
   const launcher = useRef<HTMLButtonElement>(null);
   const opened = useRef<OpenedFlow | null>(null);
+  const flowHostObserver = useRef<MutationObserver | null>(null);
   const mounted = useRef(true);
   const restoreLauncherFocus = useRef(false);
 
@@ -173,6 +181,8 @@ export function FlowCapabilityExamples() {
     return () => {
       mounted.current = false;
       query.removeEventListener("change", syncPreference);
+      flowHostObserver.current?.disconnect();
+      flowHostObserver.current = null;
       opened.current?.close();
       opened.current = null;
     };
@@ -186,6 +196,8 @@ export function FlowCapabilityExamples() {
   }, [active]);
 
   useEffect(() => {
+    if (!LOCAL_PREVIEW_ENABLED) return;
+
     let cancelled = false;
     let releaseRuntimeOwnership: (() => void) | null = null;
     const scheduleRuntimeReady = () => {
@@ -248,7 +260,10 @@ export function FlowCapabilityExamples() {
         script.remove();
         forgetHandlesForApi(lateRuntime?.api);
 
-        const homepageRuntime = homepageRuntimeAfterCancellation ?? boundHomepageRuntime();
+        const homepageRuntime =
+          homepageRuntimeAfterCancellation ??
+          boundHomepageRuntime() ??
+          suspendedHomepageRuntime;
         if (homepageRuntime) {
           restoreHomepageRuntime(homepageRuntime);
         } else if (!lateRuntime || docsWindow().BugDrop === lateRuntime.api) {
@@ -312,7 +327,7 @@ export function FlowCapabilityExamples() {
 
   async function launch() {
     const runtime = docsWindow().BugDrop;
-    if (!runtime || active) return;
+    if (!LOCAL_PREVIEW_ENABLED || !runtime || active) return;
 
     const handles = handlesForApi(runtime);
     const key = String(config.id);
@@ -328,14 +343,40 @@ export function FlowCapabilityExamples() {
     opened.current = instance;
     const outcome = await instance.result;
     if (!mounted.current) return;
-    opened.current = null;
-    restoreLauncherFocus.current = outcome.status === "closed";
-    setActive(false);
 
     if (outcome.status === "submitted") {
       setStoredSubmission(outcome.result.issueNumber);
       setAnnouncement(`Example payload ${outcome.result.issueNumber} was stored only by the local route.`);
-    } else if (outcome.status === "busy") {
+      const hasActiveHost = () =>
+        Array.from(document.querySelectorAll<HTMLElement>("[data-bugdrop-instance]")).some(
+          (host) => host.dataset.bugdropInstance === instance.instanceId,
+        );
+      const settleSubmittedInstance = () => {
+        flowHostObserver.current?.disconnect();
+        flowHostObserver.current = null;
+        if (!mounted.current || opened.current !== instance) return;
+        instance.close();
+        opened.current = null;
+        setActive(false);
+      };
+
+      if (!hasActiveHost()) {
+        settleSubmittedInstance();
+      } else {
+        const observer = new MutationObserver(() => {
+          if (!hasActiveHost()) settleSubmittedInstance();
+        });
+        flowHostObserver.current = observer;
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
+      return;
+    }
+
+    opened.current = null;
+    restoreLauncherFocus.current = outcome.status === "closed";
+    setActive(false);
+
+    if (outcome.status === "busy") {
       setAnnouncement("Another BugDrop dialog is already open.");
     } else {
       setAnnouncement("Example closed without submitting.");
@@ -351,17 +392,21 @@ export function FlowCapabilityExamples() {
     >
       <header className={styles.header}>
         <div>
-          <span className={styles.kicker}>Curated live gallery</span>
+          <span className={styles.kicker}>Curated flow gallery</span>
           <h2 id="flow-examples-heading">Compose a released flow</h2>
           <p>
             Pick a useful journey, every released transition choice, and an app-matching preset.
-            The launch uses the public <code>registerFlow(config)</code> and <code>open(options)</code>
+            In local development, the launcher uses the public <code>registerFlow(config)</code> and <code>open(options)</code>
             path from the pinned v1.56.3 runtime.
           </p>
         </div>
         <div className={styles.safety}>
           <ShieldCheck aria-hidden="true" />
-          <span>Local route only · no GitHub Issue</span>
+          <span>
+            {LOCAL_PREVIEW_ENABLED
+              ? "Local route only · no GitHub Issue"
+              : "Interactive preview available locally"}
+          </span>
         </div>
       </header>
 
@@ -453,11 +498,17 @@ export function FlowCapabilityExamples() {
           ref={launcher}
           type="button"
           className={styles.launch}
-          disabled={runtimeState !== "ready" || active}
+          disabled={!LOCAL_PREVIEW_ENABLED || runtimeState !== "ready" || active}
           onClick={() => void launch()}
         >
           {runtimeState === "loading" || active ? <LoaderCircle aria-hidden="true" /> : <Play aria-hidden="true" />}
-          {active ? "Example open" : runtimeState === "failed" ? "Runtime unavailable" : "Launch live example"}
+          {active
+            ? "Example open"
+            : runtimeState === "failed"
+              ? "Runtime unavailable"
+              : runtimeState === "local-only"
+                ? "Local preview only"
+                : "Launch live example"}
         </button>
       </div>
 
@@ -468,7 +519,7 @@ export function FlowCapabilityExamples() {
       ) : null}
       <p className={styles.status} role="status" aria-live="polite">{announcement}</p>
       <p className={styles.provenance}>
-        Runtime <code>{FLOW_CAPABILITIES.release}</code> · commit <code>{FLOW_CAPABILITIES.targetCommit.slice(0, 12)}</code> · local feedback route
+        Runtime <code>{FLOW_CAPABILITIES.release}</code> · commit <code>{FLOW_CAPABILITIES.targetCommit.slice(0, 12)}</code> · {LOCAL_PREVIEW_ENABLED ? "local feedback route" : "configuration preview"}
       </p>
     </section>
   );

@@ -169,7 +169,7 @@ describe("manifest-driven Flow documentation contract", () => {
     expect(FLOW_TRANSITION_KINDS).toBe(FLOW_CAPABILITIES.transitions.kinds);
   });
 
-  it("binds the live gallery to exact release provenance and a local-only runtime", () => {
+  it("binds local previews to exact release provenance and disables them in production", () => {
     const runtimePath = `/vendor/bugdrop/${FLOW_CAPABILITIES.targetCommit}/widget.js`;
     const examplesSource = read(
       "src/components/docs/flow-capability-examples.tsx",
@@ -180,7 +180,12 @@ describe("manifest-driven Flow documentation contract", () => {
       "const RUNTIME_SRC = `/vendor/bugdrop/${FLOW_CAPABILITIES.targetCommit}/widget.js`",
     );
     expect(examplesSource).toContain("script.src = RUNTIME_SRC");
-    expect(examplesHtml).toContain("Local route only · no GitHub Issue");
+    expect(examplesSource).toContain(
+      'const LOCAL_PREVIEW_ENABLED = process.env.NODE_ENV === "development"',
+    );
+    expect(examplesSource).toContain("if (!LOCAL_PREVIEW_ENABLED) return;");
+    expect(examplesHtml).toContain("Interactive preview available locally");
+    expect(examplesHtml).toContain("Local preview only");
     expect(examplesHtml).not.toContain('data-runtime-src="http');
     expect(referenceHtml).toContain(`Commit ${FLOW_CAPABILITIES.targetCommit}`);
     expect(referenceHtml).toContain(

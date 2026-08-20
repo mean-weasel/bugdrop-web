@@ -598,6 +598,13 @@ test("keeps the Classic-only launcher when the feature flag is unset", async ({ 
   await page.goto("/");
 
   await expect(page.getByRole("button", { name: "Open BugDrop feedback" })).toHaveCount(0);
+  await expect(
+    page.getByRole("navigation").getByRole("link", { name: "Try Widget" }),
+  ).toHaveAttribute("href", "/#try-bugdrop");
+  await expect(
+    page.locator("header").getByRole("link", { name: "Try it on this page" }),
+  ).toHaveAttribute("href", "#try-bugdrop");
+  await expect(page.getByRole("link", { name: "Design your flow" })).toHaveCount(0);
   await page.getByRole("button", { name: "Open Feedback demo" }).click();
   await expect(page.locator("body")).toHaveAttribute("data-classic-demo-opened", "true");
 });

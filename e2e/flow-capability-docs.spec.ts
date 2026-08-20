@@ -265,19 +265,24 @@ test("reclaims a delayed detached docs runtime without deleting the Classic-only
     });
   });
 
-  await page.goto("/docs/flow-examples");
-  await docsRequest;
-  await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
-  await expect(page).toHaveURL(`${origin}/`);
+  await page.goto("/");
   const launcher = page.getByRole("button", { name: "Open Feedback demo" });
   await launcher.click();
-  await expect(page.getByRole("button", { name: "Loading Feedback…" })).toBeDisabled();
-
-  releaseDocsResponse();
-  await docsCompletion;
   await expect(page.locator("body")).toHaveAttribute("data-delayed-classic-opened", "1");
   expect(await rememberRuntimeIdentity(page, "delayed-classic", "bugdrop-homepage-demo"))
     .toEqual({ script: true, api: true, host: true });
+
+  await page.getByRole("link", { name: "Docs", exact: true }).click();
+  await page.getByRole("link", { name: "Flow Examples", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/docs/flow-examples`);
+  await docsRequest;
+  await page.getByRole("link", { name: "BugDrop", exact: true }).first().click();
+  await expect(page).toHaveURL(`${origin}/`);
+  await launcher.click();
+  await expect(page.locator("body")).toHaveAttribute("data-delayed-classic-opened", "2");
+
+  releaseDocsResponse();
+  await docsCompletion;
 
   await expect(page.locator("#bugdrop-flow-capability-docs-runtime")).toHaveCount(0);
   await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(1);
@@ -290,7 +295,7 @@ test("reclaims a delayed detached docs runtime without deleting the Classic-only
   )).toEqual({ script: true, api: true, host: true });
 
   await launcher.click();
-  await expect(page.locator("body")).toHaveAttribute("data-delayed-classic-opened", "2");
+  await expect(page.locator("body")).toHaveAttribute("data-delayed-classic-opened", "3");
 });
 
 test("owns the runtime across Classic-only home to docs to home client navigation", async ({
@@ -411,6 +416,33 @@ test("the manifest-driven gallery runs the public pinned flow path accessibly", 
   expect(await compareRuntimeIdentity(page, "direct-docs", "bugdrop-flow-capability-docs-runtime"))
     .toEqual({ script: true, api: true, host: true });
   await expectResponsivePage(page);
+});
+
+test("a submitted gallery flow is disposed when navigation precedes Done", async ({ page }) => {
+  await page.goto("/docs");
+  await page.locator('a[href="/docs/flow-examples"]').first().click();
+  await expect(page.getByRole("button", { name: "Launch live example" })).toBeEnabled();
+
+  await page.getByRole("button", { name: /Release readiness/ }).click();
+  await page.getByRole("button", { name: "Launch live example" }).click();
+  const flow = page.locator(
+    '[data-bugdrop-flow^="docs-release-readiness-slide-horizontal-product-dark"]',
+  );
+
+  await flow.getByLabel("Release name").fill("v1.56.3 docs");
+  await flow.getByLabel("Critical tests passed").check();
+  await flow.getByLabel("Rollback plan checked").check();
+  await flow.getByRole("button", { name: "Continue" }).click();
+  await flow.getByLabel("Risk note").fill("Navigation teardown regression proof.");
+  await flow.getByRole("button", { name: "Continue" }).click();
+  await flow.getByRole("button", { name: "Submit" }).click();
+  await expect(flow.getByRole("button", { name: "Done" })).toBeVisible();
+  await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
+
+  await page.goBack();
+  await expect(page).toHaveURL(`${origin}/docs`);
+  await expect(page.locator("[data-bugdrop-flow]")).toHaveCount(0);
+  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
 });
 
 test.describe("reduced motion", () => {

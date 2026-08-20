@@ -12,12 +12,19 @@ import { FLOW_CAPABILITIES } from "../src/lib/flow-capabilities";
 describe("Flow capability live gallery", () => {
   const html = renderToStaticMarkup(<FlowCapabilityExamples />);
 
-  it("loads only the pinned runtime and describes the public local-only path", () => {
+  it("keeps the deployed gallery descriptive and its interactive launcher local-only", () => {
     expect(html).toContain(`/vendor/bugdrop/${FLOW_CAPABILITIES.targetCommit}/widget.js`);
     expect(html).toContain("registerFlow(config)");
     expect(html).toContain("open(options)");
-    expect(html).toContain("Local route only · no GitHub Issue");
+    expect(html).toContain("Interactive preview available locally");
+    expect(html).toContain("Local preview only");
     expect(html).not.toContain("https://bugdrop.neonwatty.workers.dev");
+
+    const source = readFileSync("src/components/docs/flow-capability-examples.tsx", "utf8");
+    const productionGuard = source.indexOf("if (!LOCAL_PREVIEW_ENABLED) return;");
+    expect(productionGuard).toBeGreaterThan(-1);
+    expect(source.indexOf("document.body.append(script)")).toBeGreaterThan(productionGuard);
+    expect(source).toContain("if (!LOCAL_PREVIEW_ENABLED || !runtime || active) return");
   });
 
   it("owns a docs runtime explicitly and cleans it up without deleting a borrowed homepage runtime", () => {
@@ -42,12 +49,10 @@ describe("Flow capability live gallery", () => {
     expect(source).toContain("return currentRuntime(script)");
     expect(source).toContain("suspendableHomepageRuntime(exactHomepageRuntime)");
     expect(source).toContain("restoreHomepageRuntime(suspendedHomepageRuntime)");
+    expect(source).toContain("boundHomepageRuntime() ??\n          suspendedHomepageRuntime");
     expect(source).toContain('window.addEventListener("bugdrop:ready", handleRuntimeReady)');
     expect(source).toContain("executingScript === script");
     expect(source).toContain("reclaimDetachedRuntime()");
-    expect(source).toContain(
-      "homepageRuntimeAfterCancellation ?? boundHomepageRuntime()",
-    );
     expect(source).toContain("removeDocsFlowHosts()");
     expect(source).toContain(
       "__bugDropDocsFlowHandles?: WeakMap<BugDropApi, Map<string, FlowHandle>>",
@@ -57,6 +62,11 @@ describe("Flow capability live gallery", () => {
     expect(source).toContain("forgetHandlesForApi(lateRuntime?.api)");
     expect(source).toContain("forgetHandlesForApi(ownedApi)");
     expect(source).not.toContain("delete docsWindow().__bugDropDocsFlowHandles");
+    expect(source).toContain("const flowHostObserver = useRef<MutationObserver | null>(null)");
+    expect(source).toContain("if (!hasActiveHost()) settleSubmittedInstance()");
+    expect(source).toContain("instance.close();\n        opened.current = null");
+    expect(source.indexOf("opened.current = null", source.indexOf('outcome.status === "submitted"')))
+      .toBeGreaterThan(source.indexOf("settleSubmittedInstance"));
   });
 
   it("renders every canonical transition choice without a duplicate selector inventory", () => {

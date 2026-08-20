@@ -39,7 +39,7 @@ export const docsNav: DocLink[] = [
   {
     slug: "flow-examples",
     title: "Flow Examples",
-    description: "Try released flow building blocks, transitions, and styling presets with a pinned local runtime.",
+    description: "Explore released flow building blocks, transitions, and styling presets, with interactive previews in local development.",
     parent: "custom-flows",
   },
   {

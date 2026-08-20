@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import Link from "next/link";
 import { MARKETPLACE_URL, WIDGET_URL, widgetScriptTag } from "@/lib/links";
 
 export function QuickStart() {

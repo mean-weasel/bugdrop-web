@@ -8,10 +8,10 @@ import process from "node:process";
 const RECIPE_SOURCE_SHA = "a100e69976ce0a5912df8f07af1b2e53029663b2";
 const RECIPE_SOURCE_BYTE_LENGTH = 8537;
 const RECIPE_SOURCE_DIGEST = "ca205013c47e14cb37cc6f763439922a448d5d06c569940a8b08fc4364b0372d";
-const RUNTIME_TARGET_SHA = "47a392d1e7b1a8d8adeff1692f6bbbd84696280d";
-const RUNTIME_RELEASE = "v1.56.3";
-const RUNTIME_BYTE_LENGTH = 238591;
-const RUNTIME_DIGEST = "338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e";
+const RUNTIME_TARGET_SHA = "2f2918d0dea6d56e28d527540750258f673893f7";
+const RUNTIME_RELEASE = "v1.56.4";
+const RUNTIME_BYTE_LENGTH = 239931;
+const RUNTIME_DIGEST = "c26934dee9c853e4b51b5ce1c36e43e8037418eb7869fedf12d84f4d889d6a02";
 const RUNTIME_LOCAL_PATH = `public/vendor/bugdrop/${RUNTIME_TARGET_SHA}/widget.js`;
 const OUTPUT = "src/components/landing/homepage-flow-recipes.generated.ts";
 

@@ -84,10 +84,10 @@ describe("homepage demo runtime", () => {
       `HTTP://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
       `Http://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
       `http://bugdrop.localhost:03000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
-      `http://bugdrop.localhost:3000/vendor/bugdrop/./47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js`,
-      `http://bugdrop.localhost:3000/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/../47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js`,
+      `http://bugdrop.localhost:3000/vendor/bugdrop/./2f2918d0dea6d56e28d527540750258f673893f7/widget.js`,
+      `http://bugdrop.localhost:3000/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/../2f2918d0dea6d56e28d527540750258f673893f7/widget.js`,
       `http:\\bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
-      `http://bugdrop.localhost:3000\\vendor\\bugdrop\\47a392d1e7b1a8d8adeff1692f6bbbd84696280d\\widget.js`,
+      `http://bugdrop.localhost:3000\\vendor\\bugdrop\\2f2918d0dea6d56e28d527540750258f673893f7\\widget.js`,
       `http://bugdrop%2elocalhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
       `http://%62ugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
       `https://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
@@ -135,14 +135,14 @@ describe("homepage demo runtime", () => {
       CLASSIC_WIDGET_URL,
       `${WIDGET_ORIGIN}/widget.v1.56.2.js`,
       `${HOMEPAGE_SHOWCASE_WIDGET_URL}?cache=mutable`,
-      `http://bugdrop.localhost:3000/vendor/bugdrop/./47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js`,
+      `http://bugdrop.localhost:3000/vendor/bugdrop/./2f2918d0dea6d56e28d527540750258f673893f7/widget.js`,
       `https://bugdrop.localhost:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`,
       "javascript:alert(1)",
     ];
 
     for (const candidate of unsupported) {
       expect(() => resolveWidgetUrl("true", candidate), candidate).toThrow(
-        "Enabled homepage showcase requires the exact v1.56.3 public runtime or an approved local fixture",
+        "Enabled homepage showcase requires the exact v1.56.4 public runtime or an approved local fixture",
       );
     }
   });

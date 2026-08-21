@@ -1,0 +1,9 @@
+{
+  "kind": "released-bugdrop-runtime",
+  "sourceRepository": "mean-weasel/bugdrop",
+  "release": "v1.56.4",
+  "targetCommit": "2f2918d0dea6d56e28d527540750258f673893f7",
+  "downloadUrl": "https://github.com/mean-weasel/bugdrop/releases/download/v1.56.4/widget.v1.56.4.js",
+  "byteLength": 239931,
+  "sha256": "c26934dee9c853e4b51b5ce1c36e43e8037418eb7869fedf12d84f4d889d6a02"
+}

@@ -26,18 +26,18 @@ it("pins the exact released BugDrop runtime used for local homepage testing", as
   const runtime = await readFile(HOMEPAGE_BUGDROP_RUNTIME.localPath);
   const provenance = JSON.parse(
     await readFile(
-      "public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/PROVENANCE.json",
+      "public/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/PROVENANCE.json",
       "utf8",
     ),
   );
 
-  expect(HOMEPAGE_BUGDROP_RUNTIME.release).toBe("v1.56.3");
+  expect(HOMEPAGE_BUGDROP_RUNTIME.release).toBe("v1.56.4");
   expect(HOMEPAGE_BUGDROP_RUNTIME.targetSha).toBe(
-    "47a392d1e7b1a8d8adeff1692f6bbbd84696280d",
+    "2f2918d0dea6d56e28d527540750258f673893f7",
   );
-  expect(HOMEPAGE_BUGDROP_RUNTIME.byteLength).toBe(238591);
+  expect(HOMEPAGE_BUGDROP_RUNTIME.byteLength).toBe(239931);
   expect(HOMEPAGE_BUGDROP_RUNTIME.sha256).toBe(
-    "338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e",
+    "c26934dee9c853e4b51b5ce1c36e43e8037418eb7869fedf12d84f4d889d6a02",
   );
   expect(runtime.byteLength).toBe(HOMEPAGE_BUGDROP_RUNTIME.byteLength);
   expect(createHash("sha256").update(runtime).digest("hex")).toBe(
@@ -49,7 +49,7 @@ it("pins the exact released BugDrop runtime used for local homepage testing", as
     release: HOMEPAGE_BUGDROP_RUNTIME.release,
     targetCommit: HOMEPAGE_BUGDROP_RUNTIME.targetSha,
     downloadUrl:
-      "https://github.com/mean-weasel/bugdrop/releases/download/v1.56.3/widget.v1.56.3.js",
+      "https://github.com/mean-weasel/bugdrop/releases/download/v1.56.4/widget.v1.56.4.js",
     byteLength: HOMEPAGE_BUGDROP_RUNTIME.byteLength,
     sha256: HOMEPAGE_BUGDROP_RUNTIME.sha256,
   });

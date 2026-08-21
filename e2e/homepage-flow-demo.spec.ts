@@ -7,6 +7,8 @@ import {
 
 const origin = process.env.HOMEPAGE_E2E_ORIGIN ?? "http://bugdrop.localhost:3000";
 const runtimePath =
+  "/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7";
+const docsRuntimePath =
   "/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d";
 const repo = "mean-weasel/bugdrop-widget-test";
 
@@ -32,13 +34,18 @@ function installLocalBugDropHarness(
   page.route("**/*", async (route) => {
     const request = route.request();
     const url = new URL(request.url());
+    const exactRuntimePath = [runtimePath, docsRuntimePath].find(
+      (candidate) =>
+        url.pathname === `${candidate}/api/check/${repo}` ||
+        url.pathname === `${candidate}/api/feedback`,
+    );
     const exactCheck =
       url.origin === origin &&
-      url.pathname === `${runtimePath}/api/check/${repo}` &&
+      url.pathname === `${exactRuntimePath}/api/check/${repo}` &&
       request.method() === "GET";
     const exactFeedback =
       url.origin === origin &&
-      url.pathname === `${runtimePath}/api/feedback` &&
+      url.pathname === `${exactRuntimePath}/api/feedback` &&
       request.method() === "POST";
 
     if (exactCheck) {
@@ -285,7 +292,7 @@ test("keeps the pinned homepage API across homepage to lab to homepage navigatio
   ]);
 });
 
-test("borrows the pinned runtime across enabled home to docs to home navigation", async ({
+test("suspends the newer homepage runtime across enabled home to docs to home navigation", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
@@ -325,8 +332,8 @@ test("borrows the pinned runtime across enabled home to docs to home navigation"
   await page.waitForURL("**/docs");
   await page.locator('a[href="/docs/flow-examples"]').first().click();
   await expect(page.getByRole("button", { name: "Launch live example" })).toBeEnabled();
-  await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(1);
-  await expect(page.locator("#bugdrop-flow-capability-docs-runtime")).toHaveCount(0);
+  await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(0);
+  await expect(page.locator("#bugdrop-flow-capability-docs-runtime")).toHaveCount(1);
   await expect(page.locator("#bugdrop-host")).toHaveCount(1);
   expect(
     await page.evaluate(() => {
@@ -345,7 +352,7 @@ test("borrows the pinned runtime across enabled home to docs to home navigation"
         host: identity?.host === document.getElementById("bugdrop-host"),
       };
     }),
-  ).toEqual({ script: true, api: true, host: true });
+  ).toEqual({ script: false, api: false, host: false });
 
   await page.getByRole("button", { name: "Launch live example" }).click();
   await expect(page.locator('[data-bugdrop-flow^="docs-incident-triage"]')).toHaveCount(1);
@@ -495,7 +502,7 @@ test("reclaims a delayed detached docs runtime without deleting the enabled home
   const docsCompletion = new Promise<void>((resolve) => {
     noteDocsCompletion = resolve;
   });
-  await page.route(`**${runtimePath}/widget.js`, async (route) => {
+  await page.route(`**${docsRuntimePath}/widget.js`, async (route) => {
     requestCount += 1;
     if (requestCount === 1) {
       noteDocsRequest();
@@ -835,14 +842,14 @@ test("classifies the uppercase-host exact runtime as private", async ({ page }, 
   );
 });
 
-test("discloses the exact public v1.56.3 runtime as public", async ({ page }, testInfo) => {
+test("discloses the exact public v1.56.4 runtime as public", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   enabledOnly(testInfo);
   const configuredRuntime = process.env.NEXT_PUBLIC_BUGDROP_WIDGET_URL;
-  const publicRuntime = "https://bugdrop.neonwatty.workers.dev/widget.v1.56.3.js";
+  const publicRuntime = "https://bugdrop.neonwatty.workers.dev/widget.v1.56.4.js";
   test.skip(
     configuredRuntime !== publicRuntime,
-    "requires the focused exact public v1.56.3 runtime",
+    "requires the focused exact public v1.56.4 runtime",
   );
 
   await page.goto("/");

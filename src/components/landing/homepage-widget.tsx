@@ -280,7 +280,7 @@ function FlowHomepageWidget() {
         aria-labelledby="flows-heading"
       >
         <div className="max-w-3xl">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent-cyan">Use BugDrop your way</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent-cyan">Design your flows</p>
           <h2 id="flows-heading" className="text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-tight text-text-primary">
             One widget for every feedback moment.
           </h2>

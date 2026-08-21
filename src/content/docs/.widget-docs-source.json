@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceRepository": "mean-weasel/bugdrop",
-  "sourceRevision": "b5dba8d7db6a522555559d39139e09b1b95935ea",
+  "sourceRevision": "2f2918d0dea6d56e28d527540750258f673893f7",
   "files": [
     {
       "source": "docs/website/ci-testing.mdx",
@@ -11,7 +11,7 @@
     {
       "source": "docs/website/configuration.mdx",
       "target": "src/content/docs/configuration.mdx",
-      "sha256": "88d970a2d5b88453898da13132ce2c7fa7b5a5053e4b549bfdfff65ac800154d"
+      "sha256": "bc15116be62419948ae6f9b1357aaa13aaa4ecceff27eec5ca24342f49f56521"
     },
     {
       "source": "docs/website/custom-flows.mdx",

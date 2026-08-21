@@ -24,7 +24,7 @@
 - User-approved local desktop/mobile visual QA is required before PR readiness.
 - Cleanup in `bugdrop-widget-test` must be live-verified before production enablement.
 - `NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED` remains off by default and must not be enabled publicly until cleanup, deployed-preview, review, and separately authorized canary evidence is complete.
-- An enabled showcase requires an explicit runtime selected by one shared source/CSP policy: exact public `https://bugdrop.neonwatty.workers.dev/widget.v1.56.3.js`, the exact root-relative authenticated fixture, or its exact `http://bugdrop.localhost:3000` absolute form with hostname case equivalence only. Missing, mutable, wrong-version, unsafe, and normalized-alias values fail closed. Feature-off/unset Classic retains its mutable `widget.js` default.
+- An enabled showcase requires an explicit runtime selected by one shared source/CSP policy: exact public `https://bugdrop.neonwatty.workers.dev/widget.v1.56.4.js`, the exact root-relative authenticated fixture, or its exact `http://bugdrop.localhost:3000` absolute form with hostname case equivalence only. Missing, mutable, wrong-version, unsafe, and normalized-alias values fail closed. Feature-off/unset Classic retains its mutable `widget.js` default.
 - Read the installed Next.js Script, scripts guide, and Server/Client Component docs before implementation.
 
 ---
@@ -39,7 +39,7 @@
 | `src/components/landing/flow-recipes-source/a100e69976ce0a5912df8f07af1b2e53029663b2/*` | Byte-exact source and provenance. |
 | `src/components/landing/homepage-flow-recipes.generated.ts` | Generated recipes used by the homepage. |
 | `src/components/landing/homepage-flow-demo-recipes.ts` | Bounded presentation/copy overlay that preserves canonical recipe invariants. |
-| `public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/*` | Exact v1.56.3 runtime: 238591 bytes, SHA-256 `338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e`. |
+| `public/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/*` | Exact v1.56.4 runtime: 239931 bytes, SHA-256 `c26934dee9c853e4b51b5ce1c36e43e8037418eb7869fedf12d84f4d889d6a02`. |
 | `src/components/landing/homepage-demo-model.ts` | IDs, copy, and pure state transitions. |
 | `src/components/landing/homepage-demo-runtime.ts` | Lazy loading, registration, and launch routing. |
 | `src/components/landing/homepage-demo-launcher.tsx` | Direct floating feedback launcher. |
@@ -59,11 +59,11 @@
 - Create: `src/components/landing/homepage-flow-demo-recipes.ts`
 - Create: `test/homepage-flow-recipes.test.ts`
 - Create: `test/homepage-flow-demo-recipes.test.ts`
-- Create: `public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js`
-- Create: `public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/PROVENANCE.json`
+- Create: `public/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js`
+- Create: `public/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/PROVENANCE.json`
 
 **Interfaces:**
-- Consumes: recipe source commit `a100e69976ce0a5912df8f07af1b2e53029663b2` and released runtime v1.56.3 target `47a392d1e7b1a8d8adeff1692f6bbbd84696280d`.
+- Consumes: recipe source commit `a100e69976ce0a5912df8f07af1b2e53029663b2` and released runtime v1.56.4 target `2f2918d0dea6d56e28d527540750258f673893f7`.
 - Produces: authenticated generated recipe inputs, the four-entry `homepageFlowDemoRecipes`/`homepageFlowDemoRecipeList` overlay, and an exact local runtime path.
 
 - [ ] **Step 1: Authenticate source bytes**
@@ -72,13 +72,13 @@
 sdk_root=/absolute/path/to/bugdrop
 git -C "$sdk_root" fetch origin main
 sdk_sha=$(git -C "$sdk_root" rev-parse origin/main)
-git -C "$sdk_root" merge-base --is-ancestor 47a392d1e7b1a8d8adeff1692f6bbbd84696280d "$sdk_sha"
+git -C "$sdk_root" merge-base --is-ancestor 2f2918d0dea6d56e28d527540750258f673893f7 "$sdk_sha"
 git -C "$sdk_root" show "$sdk_sha:test/fixtures/flow-recipes.ts" > /tmp/flow-recipes.ts
 shasum -a 256 /tmp/flow-recipes.ts
 wc -c /tmp/flow-recipes.ts
 ```
 
-The recipe source must be 8,537 bytes with SHA-256 `ca205013c47e14cb37cc6f763439922a448d5d06c569940a8b08fc4364b0372d`. Download `https://github.com/mean-weasel/bugdrop/releases/download/v1.56.3/widget.v1.56.3.js`; it must be 238591 bytes with SHA-256 `338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e`. Record both identities in provenance and stop on drift.
+The recipe source must be 8,537 bytes with SHA-256 `ca205013c47e14cb37cc6f763439922a448d5d06c569940a8b08fc4364b0372d`. Download `https://github.com/mean-weasel/bugdrop/releases/download/v1.56.4/widget.v1.56.4.js`; it must be 239931 bytes with SHA-256 `c26934dee9c853e4b51b5ce1c36e43e8037418eb7869fedf12d84f4d889d6a02`. Record both identities in provenance and stop on drift.
 
 - [ ] **Step 2: Write the failing provenance test**
 
@@ -140,7 +140,7 @@ Expected: PASS.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add scripts/vendor-homepage-flow-recipes.mjs src/components/landing/flow-recipes-source src/components/landing/homepage-flow-recipes.generated.ts src/components/landing/homepage-flow-demo-recipes.ts public/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d test/homepage-flow-recipes.test.ts test/homepage-flow-demo-recipes.test.ts
+git add scripts/vendor-homepage-flow-recipes.mjs src/components/landing/flow-recipes-source src/components/landing/homepage-flow-recipes.generated.ts src/components/landing/homepage-flow-demo-recipes.ts public/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7 test/homepage-flow-recipes.test.ts test/homepage-flow-demo-recipes.test.ts
 git commit -m "test: pin homepage flow recipes"
 ```
 
@@ -299,7 +299,7 @@ await expect(page.getByRole("link", { name: "Explore the building blocks" }))
 - [ ] **Step 2: Confirm failure**
 
 ```bash
-NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep "exposes"
+NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --grep "exposes"
 ```
 
 - [ ] **Step 3: Build the direct floating launcher**
@@ -322,7 +322,7 @@ export const BUILDING_BLOCKS_PATH = "/labs/variants";
 
 ```bash
 npx vitest run test/homepage-demo-model.test.ts test/homepage-demo-runtime.test.ts test/integration-resource.test.ts
-NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium
+NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium
 npm run build
 git add src/components/landing/homepage-demo-launcher.tsx src/components/landing/homepage-widget.tsx src/lib/links.ts e2e/homepage-flow-demo.spec.ts
 git commit -m "feat: add homepage feedback experience picker"
@@ -357,7 +357,7 @@ Cover keyboard traversal/Escape, focus restoration from both launchers, rapid-cl
 - [ ] **Step 5: Run and commit**
 
 ```bash
-NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0
+NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0
 git add e2e/homepage-flow-demo.spec.ts
 git commit -m "test: cover homepage feedback experiences"
 ```
@@ -388,7 +388,7 @@ Run `npx vitest run test/integration-resource.test.ts`.
 - name: Test homepage feedback experiences
   env:
     NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "true"
-    NEXT_PUBLIC_BUGDROP_WIDGET_URL: /vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js
+    NEXT_PUBLIC_BUGDROP_WIDGET_URL: /vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js
   run: >-
     npx playwright test e2e/homepage-flow-demo.spec.ts
     --project=desktop-chromium --project=mobile-chromium --retries=0
@@ -411,7 +411,7 @@ node scripts/vendor-homepage-flow-recipes.mjs --source src/components/landing/fl
 npm test
 npx eslint .
 npm run build
-NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0
+NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js npx playwright test e2e/homepage-flow-demo.spec.ts --project=desktop-chromium --project=mobile-chromium --retries=0
 git diff --check
 ```
 

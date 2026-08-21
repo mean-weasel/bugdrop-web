@@ -48,7 +48,7 @@ jobs:
       - name: Test homepage feedback experiences
         env:
           NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED: "true"
-          NEXT_PUBLIC_BUGDROP_WIDGET_URL: /vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js
+          NEXT_PUBLIC_BUGDROP_WIDGET_URL: /vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js
         run: >-
           npx playwright test e2e/homepage-flow-demo.spec.ts
           --project=desktop-chromium --project=mobile-chromium --retries=0

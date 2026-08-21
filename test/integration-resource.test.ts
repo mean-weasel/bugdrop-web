@@ -14,7 +14,7 @@ import { mdxHeadingId } from "@/mdx-components";
 import { widgetCspSource } from "../next.config";
 
 const homepageCiRuntime =
-  "/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js";
+  "/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js";
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -148,7 +148,7 @@ describe("T012 integration and resource contracts", () => {
     const localAbsolute =
       `http://BUGDROP.LOCALHOST:3000${HOMEPAGE_DOGFOOD_RUNTIME_PATH}`;
     const dotSegmentRuntime =
-      "http://bugdrop.localhost:3000/vendor/bugdrop/./47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js";
+      "http://bugdrop.localhost:3000/vendor/bugdrop/./2f2918d0dea6d56e28d527540750258f673893f7/widget.js";
 
     expect(widgetCspSource(resolveWidgetUrl("true", HOMEPAGE_SHOWCASE_WIDGET_URL)))
       .toBe("https://bugdrop.neonwatty.workers.dev");
@@ -163,10 +163,10 @@ describe("T012 integration and resource contracts", () => {
 
     expect(() => resolveWidgetUrl("true", undefined)).toThrow();
     expect(() => resolveWidgetUrl("true", CLASSIC_WIDGET_URL)).toThrow();
-    expect(() => resolveWidgetUrl("true", "https://example.com/widget.v1.56.3.js"))
+    expect(() => resolveWidgetUrl("true", "https://example.com/widget.v1.56.4.js"))
       .toThrow();
     expect(() => widgetCspSource(resolveWidgetUrl("true", dotSegmentRuntime))).toThrow(
-      "Enabled homepage showcase requires the exact v1.56.3 public runtime or an approved local fixture",
+      "Enabled homepage showcase requires the exact v1.56.4 public runtime or an approved local fixture",
     );
   });
 
@@ -179,7 +179,7 @@ describe("T012 integration and resource contracts", () => {
   it("allows a root-relative widget runtime as a same-origin CSP source", () => {
     expect(
       widgetCspSource(
-        "/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js",
+        "/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js",
       ),
     ).toBe("'self'");
   });

@@ -43,6 +43,9 @@ describe("Flow capability live gallery", () => {
     }
     expect(source).toContain("releaseRuntimeOwnership?.()");
     expect(source).toContain("canBorrowHomepageRuntime");
+    expect(source).toContain(
+      "absoluteRuntimeUrl(exactHomepageRuntime.script.src) === absoluteRuntimeUrl(RUNTIME_SRC)",
+    );
     expect(source).toContain("existingApi === exactHomepageRuntime.api");
     expect(source).toContain("if (exactHomepageRuntime) return exactHomepageRuntime");
     expect(source).toContain("const script = runtimeScript(HOMEPAGE_SCRIPT_ID)");

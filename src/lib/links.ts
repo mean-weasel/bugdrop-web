@@ -31,10 +31,10 @@ export const WIDGET_ORIGIN = "https://bugdrop.neonwatty.workers.dev";
 export const CLASSIC_WIDGET_URL = `${WIDGET_ORIGIN}/widget.js`;
 
 export const HOMEPAGE_SHOWCASE_WIDGET_URL =
-  `${WIDGET_ORIGIN}/widget.v1.56.3.js`;
+  `${WIDGET_ORIGIN}/widget.v1.56.4.js`;
 
 export const HOMEPAGE_DOGFOOD_RUNTIME_PATH =
-  "/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js";
+  "/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js";
 
 const LOCAL_HOMEPAGE_SCHEME = "http://";
 const LOCAL_HOMEPAGE_HOST = "bugdrop.localhost:3000";
@@ -70,7 +70,7 @@ export function resolveWidgetUrl(
   }
 
   throw new TypeError(
-    "Enabled homepage showcase requires the exact v1.56.3 public runtime or an approved local fixture",
+    "Enabled homepage showcase requires the exact v1.56.4 public runtime or an approved local fixture",
   );
 }
 

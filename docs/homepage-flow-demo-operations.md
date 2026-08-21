@@ -7,7 +7,7 @@
 established lazy-loading behavior and mutable
 `https://bugdrop.neonwatty.workers.dev/widget.js` default. When the flag is
 `true`, `NEXT_PUBLIC_BUGDROP_WIDGET_URL` is mandatory and must be exactly the
-public v1.56.3 URL or one of the strict local fixtures documented below. Missing,
+public v1.56.4 URL or one of the strict local fixtures documented below. Missing,
 mutable, wrong-version, normalized aliases, and unsafe values fail the build.
 Enable the flag only through the website environment configuration after the
 release prerequisites below are complete.
@@ -17,20 +17,21 @@ The demo is built from pinned, reviewable inputs:
 - Flow recipe source commit: `a100e69976ce0a5912df8f07af1b2e53029663b2`
   (`8,537` bytes; SHA-256
   `ca205013c47e14cb37cc6f763439922a448d5d06c569940a8b08fc4364b0372d`).
-- Widget runtime: BugDrop `v1.56.3`, target
-  `47a392d1e7b1a8d8adeff1692f6bbbd84696280d`
-  (`238,591` bytes; SHA-256
-  `338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e`).
+- Widget runtime: BugDrop `v1.56.4`, target
+  `2f2918d0dea6d56e28d527540750258f673893f7`
+  (`239,931` bytes; SHA-256
+  `c26934dee9c853e4b51b5ce1c36e43e8037418eb7869fedf12d84f4d889d6a02`).
 - Runtime URL used by the browser gate:
-  `/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js`.
+  `/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js`.
 - Exact public runtime URL:
-  `https://bugdrop.neonwatty.workers.dev/widget.v1.56.3.js`.
+  `https://bugdrop.neonwatty.workers.dev/widget.v1.56.4.js`.
 
-The nightly homepage-demo Issue cleanup is currently **not production-ready or
-live**. Production enablement is blocked until that cleanup is corrected,
-independently reviewed, merged, dry-run and live proven, and its scheduled
-observation has passed. Do not enable the feature flag or run a real canary
-before that prerequisite is explicitly satisfied.
+The nightly homepage-demo Issue cleanup is enabled and live at workflow commit
+`deff0f5d6de993133f6cd91afe7cad305649c77e`. Its first scheduled production run
+completed successfully with zero eligible, authorized, closed, labeled, or
+failed Issues. Keep the cleanup enabled while the public demo is enabled, and
+treat workflow drift, failure, partial mutation, overlap, or a safety-cap result
+as an immediate stop condition for further canaries.
 
 ## Pre-enable verification
 
@@ -62,11 +63,11 @@ Before requesting production enablement, complete and record the following:
 
 Run local QA only from the website worktree at the named origin
 `http://bugdrop.localhost:3000`. Keep the dogfood hidden and bind it to the
-approved v1.56.3 runtime for the enabled walkthrough:
+approved v1.56.4 runtime for the enabled walkthrough:
 
 ```sh
 NEXT_PUBLIC_HOMEPAGE_FLOW_DEMO_ENABLED=true \
-NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/47a392d1e7b1a8d8adeff1692f6bbbd84696280d/widget.js \
+NEXT_PUBLIC_BUGDROP_WIDGET_URL=/vendor/bugdrop/2f2918d0dea6d56e28d527540750258f673893f7/widget.js \
 npx playwright test e2e/homepage-flow-demo.spec.ts \
   --project=desktop-chromium --project=mobile-chromium --retries=0
 ```
@@ -79,21 +80,21 @@ build, verify the selected runtime bytes. For the public runtime:
 ```sh
 runtime_file=$(mktemp)
 curl --fail --silent --show-error \
-  https://bugdrop.neonwatty.workers.dev/widget.v1.56.3.js \
+  https://bugdrop.neonwatty.workers.dev/widget.v1.56.4.js \
   --output "$runtime_file"
 wc -c "$runtime_file"
 shasum -a 256 "$runtime_file"
 rm "$runtime_file"
 ```
 
-The result must be exactly `238591` bytes and SHA-256
-`338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e`.
+The result must be exactly `239931` bytes and SHA-256
+`c26934dee9c853e4b51b5ce1c36e43e8037418eb7869fedf12d84f4d889d6a02`.
 Then set `NEXT_PUBLIC_BUGDROP_WIDGET_URL` to the exact URL whose bytes were
 checked. Do not use mutable `widget.js` with the enabled showcase.
 
 Before accepting the browser evidence, hash the bytes served at that exact
-root-relative widget URL. They must be `238,591` bytes with SHA-256
-`338cdb5b19c69dc3429fdcb8f800e3b98a3bdd442fee78563523cd731e2bdf0e`.
+root-relative widget URL. They must be `239,931` bytes with SHA-256
+`c26934dee9c853e4b51b5ce1c36e43e8037418eb7869fedf12d84f4d889d6a02`.
 Record desktop and mobile observations for the direct launcher, customization section, Classic, Bug Report,
 Quick Rating, and Feature Request. The walkthrough must
 also cover keyboard selection, focus containment and restoration, 500ms

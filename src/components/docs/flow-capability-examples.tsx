@@ -115,7 +115,7 @@ function currentRuntime(script: HTMLScriptElement): SuspendedRuntime | null {
 
 function boundHomepageRuntime(): SuspendedRuntime | null {
   const script = runtimeScript(HOMEPAGE_SCRIPT_ID);
-  if (!script || absoluteRuntimeUrl(script.src) !== absoluteRuntimeUrl(RUNTIME_SRC)) return null;
+  if (!script) return null;
   const api = (script as HTMLScriptElement & { [HOMEPAGE_API_BINDING]?: BugDropApi })[
     HOMEPAGE_API_BINDING
   ];
@@ -213,6 +213,7 @@ export function FlowCapabilityExamples() {
       const existingApi = docsWindow().BugDrop;
       const canBorrowHomepageRuntime =
         exactHomepageRuntime !== null &&
+        absoluteRuntimeUrl(exactHomepageRuntime.script.src) === absoluteRuntimeUrl(RUNTIME_SRC) &&
         existingApi === exactHomepageRuntime.api;
 
       if (canBorrowHomepageRuntime) {

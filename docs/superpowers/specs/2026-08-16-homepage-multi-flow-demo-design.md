@@ -71,7 +71,7 @@ The “Explore the building blocks” link points toward the deeper composabilit
 
 A website-owned client controller coordinates:
 
-- Lazy loading one current, pinned BugDrop runtime. Enabled builds require an explicit runtime through the shared source/CSP allowlist: exact public v1.56.3 or the approved strict local fixture forms. Missing, mutable, wrong-version, unsafe, and normalized-alias values fail closed; feature-off/unset Classic retains its established mutable Worker default.
+- Lazy loading one current, pinned BugDrop runtime. Enabled builds require an explicit runtime through the shared source/CSP allowlist: exact public v1.56.4 or the approved strict local fixture forms. Missing, mutable, wrong-version, unsafe, and normalized-alias values fail closed; feature-off/unset Classic retains its established mutable Worker default.
 - The selected experience.
 - Direct floating Classic invocation.
 - Classic invocation.
@@ -95,7 +95,7 @@ The controller must ensure that repeated clicks, flow switching, navigation, and
 
 ### Loading
 
-The runtime remains lazy-loaded. Initial landing-page rendering must not download or initialize the widget before a visitor interacts with the launcher or demo section. Concurrent load requests share one in-flight operation and reach one registered runtime. Source selection and CSP derive from the same enabled-showcase policy: `NEXT_PUBLIC_BUGDROP_WIDGET_URL` is mandatory when the flag is true and accepts only `https://bugdrop.neonwatty.workers.dev/widget.v1.56.3.js`, the exact authenticated root-relative fixture, or its exact named-localhost absolute form with hostname case equivalence only.
+The runtime remains lazy-loaded. Initial landing-page rendering must not download or initialize the widget before a visitor interacts with the launcher or demo section. Concurrent load requests share one in-flight operation and reach one registered runtime. Source selection and CSP derive from the same enabled-showcase policy: `NEXT_PUBLIC_BUGDROP_WIDGET_URL` is mandatory when the flag is true and accepts only `https://bugdrop.neonwatty.workers.dev/widget.v1.56.4.js`, the exact authenticated root-relative fixture, or its exact named-localhost absolute form with hostname case equivalence only.
 
 ## Submission and GitHub Issue Behavior
 

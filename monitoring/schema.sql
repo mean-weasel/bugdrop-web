@@ -54,12 +54,16 @@ CREATE TABLE IF NOT EXISTS monitoring_check_results (
   error_code TEXT
 );
 CREATE INDEX IF NOT EXISTS monitoring_check_results_component_time_idx ON monitoring_check_results (component_id, checked_at DESC);
+CREATE INDEX IF NOT EXISTS monitoring_check_results_checked_at_idx ON monitoring_check_results (checked_at);
 
 CREATE TABLE IF NOT EXISTS monitoring_meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+CREATE INDEX IF NOT EXISTS monitoring_meta_evaluation_window_updated_at_idx
+  ON monitoring_meta (updated_at)
+  WHERE key LIKE 'evaluation_window:%';
 
 CREATE TABLE IF NOT EXISTS monitoring_daily_component_rollups (
   component_id TEXT NOT NULL REFERENCES monitoring_components(id),

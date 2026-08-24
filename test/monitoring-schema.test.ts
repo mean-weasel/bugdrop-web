@@ -3,6 +3,62 @@ import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 
 describe("monitoring schema migration", () => {
+  it("indexes both high-frequency retention deletes by their cutoff columns", () => {
+    const schema = readFileSync(new URL("../monitoring/schema.sql", import.meta.url), "utf8");
+    const database = new DatabaseSync(":memory:");
+    try {
+      database.exec(schema);
+      database.exec(`
+        INSERT INTO monitoring_components (
+          id, name, description, impact_on_failure, failure_threshold, recovery_threshold, updated_at
+        ) VALUES ('feedback_api', 'Feedback API', 'test', 'outage', 2, 2, '2026-08-24T00:00:00Z');
+        WITH RECURSIVE sequence(value) AS (
+          VALUES (0)
+          UNION ALL
+          SELECT value + 1 FROM sequence WHERE value < 999
+        )
+        INSERT INTO monitoring_check_results (component_id, checked_at, ok)
+        SELECT 'feedback_api', printf('2026-08-%02dT00:00:00Z', (value % 28) + 1), 1
+        FROM sequence;
+        WITH RECURSIVE sequence(value) AS (
+          VALUES (0)
+          UNION ALL
+          SELECT value + 1 FROM sequence WHERE value < 499
+        )
+        INSERT INTO monitoring_meta (key, value, updated_at)
+        SELECT printf('evaluation_window:%04d', value), '{}',
+          printf('2026-08-%02dT00:00:00Z', (value % 28) + 1)
+        FROM sequence;
+        ANALYZE;
+      `);
+
+      const checkPlan = database
+        .prepare(
+          "EXPLAIN QUERY PLAN DELETE FROM monitoring_check_results WHERE checked_at < ?",
+        )
+        .all("2026-01-01T00:00:00Z") as Array<{ detail: string }>;
+      const evaluationWindowPlan = database
+        .prepare(
+          `EXPLAIN QUERY PLAN DELETE FROM monitoring_meta
+            WHERE key LIKE 'evaluation_window:%' AND updated_at < ?`,
+        )
+        .all("2026-01-01T00:00:00Z") as Array<{ detail: string }>;
+
+      const checkDetails = checkPlan.map((row) => row.detail).join(" ");
+      const evaluationWindowDetails = evaluationWindowPlan.map((row) => row.detail).join(" ");
+      expect(checkDetails).toMatch(
+        /SEARCH monitoring_check_results USING (?:COVERING )?INDEX monitoring_check_results_checked_at_idx \(checked_at<\?\)/,
+      );
+      expect(evaluationWindowDetails).toMatch(
+        /SEARCH monitoring_meta USING INDEX monitoring_meta_evaluation_window_updated_at_idx \(updated_at<\?\)/,
+      );
+      expect(checkDetails).not.toContain("SCAN");
+      expect(evaluationWindowDetails).not.toContain("SCAN");
+    } finally {
+      database.close();
+    }
+  });
+
   it("adds normalized outcome persistence idempotently without raw payload columns", () => {
     const schema = readFileSync(new URL("../monitoring/schema.sql", import.meta.url), "utf8");
     const database = new DatabaseSync(":memory:");

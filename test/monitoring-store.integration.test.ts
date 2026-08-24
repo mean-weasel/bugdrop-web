@@ -734,6 +734,50 @@ describe("monitoring D1/SQLite integration", () => {
     });
   });
 
+  it("keeps the exact 90-day boundary and unrelated old metadata while pruning history", async () => {
+    const now = new Date("2026-08-05T00:00:00Z");
+    const cutoff = "2026-05-07T00:00:00.000Z";
+    await seedMonitoringComponents(now);
+    await monitoringDatabase().batch([
+      {
+        sql: `INSERT INTO monitoring_check_results (component_id, checked_at, ok)
+          VALUES ('feedback_api', ?, 1), ('feedback_api', ?, 1), ('feedback_api', ?, 1)`,
+        params: ["2026-05-06T23:59:59.999Z", cutoff, "2026-05-07T00:00:00.001Z"],
+      },
+      {
+        sql: `INSERT INTO monitoring_meta (key, value, updated_at) VALUES
+          ('evaluation_window:old', '{}', ?),
+          ('evaluation_window:boundary', '{}', ?),
+          ('evaluation_window:new', '{}', ?),
+          ('unrelated_old_metadata', '{}', ?)`,
+        params: ["2026-05-06T23:59:59.999Z", cutoff, "2026-05-07T00:00:00.001Z", "2025-01-01T00:00:00.000Z"],
+      },
+    ]);
+
+    await pruneMonitoringHistory(now);
+
+    expect(
+      (
+        await monitoringDatabase().query({
+          sql: "SELECT checked_at FROM monitoring_check_results ORDER BY checked_at",
+        })
+      ).results,
+    ).toEqual([{ checked_at: cutoff }, { checked_at: "2026-05-07T00:00:00.001Z" }]);
+    expect(
+      (
+        await monitoringDatabase().query({
+          sql: `SELECT key FROM monitoring_meta
+            WHERE key LIKE 'evaluation_window:%' OR key = 'unrelated_old_metadata'
+            ORDER BY key`,
+        })
+      ).results,
+    ).toEqual([
+      { key: "evaluation_window:boundary" },
+      { key: "evaluation_window:new" },
+      { key: "unrelated_old_metadata" },
+    ]);
+  });
+
   it("prunes resolved incident audit data after 365 days", async () => {
     const definition = COMPONENTS.find((component) => component.id === "feedback_api")!;
     await seedMonitoringComponents(new Date("2025-01-01T00:00:00Z"));

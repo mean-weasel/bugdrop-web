@@ -89,7 +89,7 @@ export function Hero() {
             #6
           </strong>
           <span className="text-sm text-text-muted max-sm:text-[0.68rem] max-sm:leading-tight">
-            Product of the Day
+            Product of the Day on Product Hunt
           </span>
         </a>
       </div>

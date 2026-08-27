@@ -22,7 +22,7 @@ export function Hero() {
         Capture screenshots, annotations, and browser context, then turn user
         feedback into GitHub Issues, all from one script tag.
       </p>
-      <div className="mx-auto mb-8 flex max-w-[720px] flex-wrap justify-center gap-2 text-xs font-medium text-text-muted">
+      <div className="mx-auto mb-8 flex max-w-[720px] flex-wrap justify-center gap-2 text-xs font-medium text-text-muted max-sm:hidden">
         <span className="rounded border border-border bg-bg-surface px-3 py-1.5">
           MIT licensed
         </span>
@@ -52,23 +52,27 @@ export function Hero() {
           Install from GitHub Marketplace
         </a>
       </div>
-      <div className="mx-auto mt-8 grid max-w-[720px] grid-cols-3 divide-x divide-border overflow-hidden rounded-xl border border-border bg-bg-surface/70 max-sm:grid-cols-1 max-sm:divide-x-0 max-sm:divide-y">
+      <div className="mx-auto mt-8 grid max-w-[720px] grid-cols-3 divide-x divide-border overflow-hidden rounded-xl border border-border bg-bg-surface/70 max-sm:mt-5">
         <a
           href={MARKETPLACE_URL}
           target="_blank"
           rel="noopener noreferrer"
           data-analytics-event="outbound_marketplace_click"
           data-analytics-label="130+ app installs"
-          className="flex flex-col items-center gap-1 px-5 py-4 transition-colors hover:bg-bg-elevated"
+          className="flex flex-col items-center gap-1 px-5 py-4 transition-colors hover:bg-bg-elevated max-sm:px-2 max-sm:py-3"
         >
-          <strong className="text-2xl font-bold text-text-primary">130+</strong>
-          <span className="text-sm text-text-muted">App installs</span>
+          <strong className="text-2xl font-bold text-text-primary max-sm:text-xl">
+            130+
+          </strong>
+          <span className="text-sm text-text-muted max-sm:text-[0.68rem] max-sm:leading-tight">
+            App installs
+          </span>
         </a>
-        <div className="flex flex-col items-center gap-1 px-5 py-4">
-          <strong className="text-2xl font-bold text-text-primary">
+        <div className="flex flex-col items-center gap-1 px-5 py-4 max-sm:px-2 max-sm:py-3">
+          <strong className="text-2xl font-bold text-text-primary max-sm:text-xl">
             3,000+
           </strong>
-          <span className="text-sm text-text-muted">
+          <span className="text-sm text-text-muted max-sm:text-[0.68rem] max-sm:leading-tight">
             Feedback issues created
           </span>
         </div>
@@ -79,10 +83,14 @@ export function Hero() {
           aria-label="BugDrop was the number 6 Product of the Day on Product Hunt"
           data-analytics-event="outbound_product_hunt_click"
           data-analytics-label="#6 Product of the Day"
-          className="flex flex-col items-center gap-1 px-5 py-4 transition-colors hover:bg-bg-elevated"
+          className="flex flex-col items-center gap-1 px-5 py-4 transition-colors hover:bg-bg-elevated max-sm:px-2 max-sm:py-3"
         >
-          <strong className="text-2xl font-bold text-text-primary">#6</strong>
-          <span className="text-sm text-text-muted">Product of the Day</span>
+          <strong className="text-2xl font-bold text-text-primary max-sm:text-xl">
+            #6
+          </strong>
+          <span className="text-sm text-text-muted max-sm:text-[0.68rem] max-sm:leading-tight">
+            Product of the Day
+          </span>
         </a>
       </div>
       <p className="mt-6 text-sm text-text-muted">

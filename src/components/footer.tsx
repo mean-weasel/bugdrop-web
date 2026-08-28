@@ -35,6 +35,7 @@ const footerGroups: Array<{ title: string; links: FooterLink[] }> = [
   {
     title: "Trust",
     links: [
+      { label: "Privacy", href: "/privacy" },
       { label: "Security", href: "/docs/security" },
       { label: "Self-hosting", href: "/docs/self-hosting" },
       { label: "Service status", href: "/status" },

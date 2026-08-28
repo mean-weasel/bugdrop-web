@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/sandbox` },
     { url: `${base}/showcase` },
     { url: `${base}/status` },
+    { url: `${base}/privacy` },
     { url: `${base}/docs` },
     ...docsNav
       .filter((doc) => doc.slug !== "")

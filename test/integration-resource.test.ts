@@ -388,6 +388,11 @@ describe("T012 integration and resource contracts", () => {
 
     expect(analytics).toContain("window.bugdropGaConfigured");
     expect(analytics).toContain('window.gtag("config", gaMeasurementId, { send_page_view: false })');
+    expect(analytics).toContain("page_location: analyticsPageLocation()");
+    expect(analytics).toContain("page_referrer: analyticsReferrerLocation()");
+    expect(analytics).toContain('sendGoogleAnalytics("set", {');
+    expect(analytics).not.toContain("$current_url: window.location.href");
+    expect(analytics).not.toContain("page_location: window.location.href");
     expect(analytics).toContain("sendGooglePageView(currentPagePath, attribution)");
     expect(analytics).toMatch(/sendGoogleAnalytics\("event", eventName, properties\);\s+activateGoogleAnalytics\(\);/);
     expect(analytics).toContain("gaMeasurementId && gaActivated");

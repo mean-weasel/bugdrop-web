@@ -63,6 +63,22 @@ function pagePath(pathname: string) {
   return pathname.startsWith("/") ? pathname.split(/[?#]/, 1)[0] : "/";
 }
 
+function analyticsPageLocation(pathname = window.location.pathname) {
+  return `${window.location.origin}${pagePath(pathname)}`;
+}
+
+function analyticsReferrerLocation() {
+  if (!document.referrer) return undefined;
+
+  try {
+    const referrer = new URL(document.referrer);
+    if (!new Set(["http:", "https:"]).has(referrer.protocol)) return undefined;
+    return `${referrer.origin}${pagePath(referrer.pathname)}`;
+  } catch {
+    return undefined;
+  }
+}
+
 function safeLocalStorageGet(key: string) {
   try {
     return window.localStorage.getItem(key);
@@ -210,6 +226,10 @@ function ensureGoogleAnalyticsQueue() {
 
   if (!window.bugdropGaConfigured) {
     window.gtag("js", new Date());
+    window.gtag("set", {
+      page_location: analyticsPageLocation(),
+      page_referrer: analyticsReferrerLocation(),
+    });
     window.gtag("config", gaMeasurementId, { send_page_view: false });
     window.bugdropGaConfigured = true;
   }
@@ -264,7 +284,7 @@ function capturePostHogEvent(
     event: eventName,
     distinct_id: posthogDistinctId(),
     properties: {
-      $current_url: `${window.location.origin}${pagePath(window.location.pathname)}`,
+      $current_url: analyticsPageLocation(),
       $host: window.location.host,
       $pathname: window.location.pathname,
       ...properties,
@@ -294,8 +314,12 @@ function sendGooglePageView(
   currentPagePath: string,
   properties: Record<string, unknown>,
 ) {
+  sendGoogleAnalytics("set", {
+    page_location: analyticsPageLocation(),
+    page_referrer: analyticsReferrerLocation(),
+  });
   sendGoogleAnalytics("event", "page_view", {
-    page_location: `${window.location.origin}${pagePath(window.location.pathname)}`,
+    page_location: analyticsPageLocation(),
     page_path: currentPagePath,
     ...properties,
   });

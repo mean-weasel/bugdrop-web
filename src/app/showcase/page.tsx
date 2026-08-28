@@ -174,8 +174,9 @@ export default function ShowcasePage() {
             Opt-in, reviewed, and honest
           </h2>
           <p className="mb-4 text-sm leading-relaxed text-text-subtle">
-            BugDrop does not publish install data automatically. Private repositories, internal
-            apps, and user data stay private unless you choose to share an anonymized use case.
+            BugDrop publishes only aggregate install and feedback totals. App names, repository
+            details, internal apps, and user data stay private unless you explicitly approve a
+            showcase entry.
           </p>
           <p className="text-sm leading-relaxed text-text-subtle">
             The first entries here are first-party examples. Outside products will appear only after

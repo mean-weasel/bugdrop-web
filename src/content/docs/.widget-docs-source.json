@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceRepository": "mean-weasel/bugdrop",
-  "sourceRevision": "2f2918d0dea6d56e28d527540750258f673893f7",
+  "sourceRevision": "9750faacc9fdfe87028d85b38a8d83361f43bb68",
   "files": [
     {
       "source": "docs/website/ci-testing.mdx",
@@ -11,7 +11,7 @@
     {
       "source": "docs/website/configuration.mdx",
       "target": "src/content/docs/configuration.mdx",
-      "sha256": "bc15116be62419948ae6f9b1357aaa13aaa4ecceff27eec5ca24342f49f56521"
+      "sha256": "e212c7867012c4f35bc2618a16a01f51da8cb63ff2c73ca4d826043a178c7e27"
     },
     {
       "source": "docs/website/custom-flows.mdx",
@@ -21,7 +21,7 @@
     {
       "source": "docs/website/faq.mdx",
       "target": "src/content/docs/faq.mdx",
-      "sha256": "581aaee97b6128c0f3a94b7df016778765158645ac5e7dd7910390b0c35a5957"
+      "sha256": "e8b2122dea5ba7f554f952ad18aeb1af02015dacd2942055601c7da542d7cb57"
     },
     {
       "source": "docs/website/flow-branching-and-output.mdx",
@@ -76,7 +76,7 @@
     {
       "source": "docs/website/getting-started.mdx",
       "target": "src/content/docs/getting-started.mdx",
-      "sha256": "e82e6ccc0cc16217cfd56e630739d75a0d3114dbe973f554a9ae6e006b16f8b3"
+      "sha256": "02de40855f0396cd7a23767a957abfda6ed5fdaec9cc83c8031601ce2a48d09a"
     },
     {
       "source": "docs/website/installation.mdx",
@@ -91,7 +91,7 @@
     {
       "source": "docs/website/security.mdx",
       "target": "src/content/docs/security.mdx",
-      "sha256": "775f67a7ea6de9ed507e86f7172306b16bf2bdf8c8b8c91af67fcb8f95cbf21b"
+      "sha256": "21af8d4ec9a54a9c24255feb32ff083042cd83170d7b0517ed8d90b1b4971fad"
     },
     {
       "source": "docs/website/self-hosting.mdx",

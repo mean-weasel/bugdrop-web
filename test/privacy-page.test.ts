@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 
 const approvedPolicyHash =
-  "ce853aad7d54d8401af6c14bf1785aa0837f4264bb41dffda2893976e730b389";
+  "200a804728e3b16c76eeeb88a1fc4cd33a4b07bb3b1b267647444244a07f4b90";
 
 describe("privacy page", () => {
   it("publishes the approved policy as a first-party route", async () => {
@@ -13,7 +13,10 @@ describe("privacy page", () => {
     expect(page).toContain('path: "/privacy"');
     expect(page).toContain("<PrivacyPolicy />");
     expect(policy).toContain("# Privacy Policy");
-    expect(policy).toContain("## Installation and Usage Information");
+    expect(policy).toContain("## Installation Information");
+    expect(policy).toMatch(
+      /BugDrop does not\s+currently retain per-installation feedback counts or last-active dates\./,
+    );
     expect(policy).toContain("## App Names, Logos, Links, and Testimonials");
     expect(policy).toContain("privacy@bugdrop.dev");
     expect(createHash("sha256").update(policy).digest("hex")).toBe(

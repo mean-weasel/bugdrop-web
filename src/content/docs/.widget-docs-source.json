@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceRepository": "mean-weasel/bugdrop",
-  "sourceRevision": "9750faacc9fdfe87028d85b38a8d83361f43bb68",
+  "sourceRevision": "0b7ada459af8802f5942672ed1b7b07999cebb80",
   "files": [
     {
       "source": "docs/website/ci-testing.mdx",
@@ -21,7 +21,7 @@
     {
       "source": "docs/website/faq.mdx",
       "target": "src/content/docs/faq.mdx",
-      "sha256": "e8b2122dea5ba7f554f952ad18aeb1af02015dacd2942055601c7da542d7cb57"
+      "sha256": "88cef3ef5935c5abe69cc98c99426b60a5ac33134b4695188e44595de2c32698"
     },
     {
       "source": "docs/website/flow-branching-and-output.mdx",
@@ -91,7 +91,7 @@
     {
       "source": "docs/website/security.mdx",
       "target": "src/content/docs/security.mdx",
-      "sha256": "21af8d4ec9a54a9c24255feb32ff083042cd83170d7b0517ed8d90b1b4971fad"
+      "sha256": "e6e084ca46a4a4d814320820466c113869fad10824b3f3f42252c43fb4ad4113"
     },
     {
       "source": "docs/website/self-hosting.mdx",

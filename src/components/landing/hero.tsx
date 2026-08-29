@@ -58,14 +58,14 @@ export function Hero() {
           target="_blank"
           rel="noopener noreferrer"
           data-analytics-event="outbound_marketplace_click"
-          data-analytics-label="130+ app installs"
+          data-analytics-label="133+ GitHub App installs"
           className="flex flex-col items-center gap-1 px-5 py-4 transition-colors hover:bg-bg-elevated max-sm:px-2 max-sm:py-3"
         >
           <strong className="text-2xl font-bold text-text-primary max-sm:text-xl">
-            130+
+            133+
           </strong>
           <span className="text-sm text-text-muted max-sm:text-[0.68rem] max-sm:leading-tight">
-            App installs
+            GitHub App installs
           </span>
         </a>
         <div className="flex flex-col items-center gap-1 px-5 py-4 max-sm:px-2 max-sm:py-3">

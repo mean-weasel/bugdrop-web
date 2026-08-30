@@ -5,8 +5,11 @@ import {
   MARKETPLACE_URL,
   PRODUCT_HUNT_URL,
 } from "@/lib/links";
+import { getFeedbackIssuesDisplay } from "@/lib/feedback-count";
 
-export function Hero() {
+export async function Hero() {
+  const feedbackIssuesDisplay = await getFeedbackIssuesDisplay();
+
   return (
     <header className="mx-auto max-w-[960px] text-center">
       <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-accent-cyan">
@@ -70,7 +73,7 @@ export function Hero() {
         </a>
         <div className="flex flex-col items-center gap-1 px-5 py-4 max-sm:px-2 max-sm:py-3">
           <strong className="text-2xl font-bold text-text-primary max-sm:text-xl">
-            3,000+
+            {feedbackIssuesDisplay}
           </strong>
           <span className="text-sm text-text-muted max-sm:text-[0.68rem] max-sm:leading-tight">
             Feedback issues created
@@ -95,11 +98,21 @@ export function Hero() {
       </div>
       <p className="mt-6 text-sm text-text-muted">
         Open source by{" "}
-        <a href={GITHUB_ORG_URL} target="_blank" rel="noopener noreferrer" className="text-accent-cyan underline-offset-4 hover:underline">
+        <a
+          href={GITHUB_ORG_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent-cyan underline-offset-4 hover:underline"
+        >
           mean-weasel
         </a>{" "}
         ·{" "}
-        <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" className="text-accent-cyan underline-offset-4 hover:underline">
+        <a
+          href={GITHUB_REPO_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent-cyan underline-offset-4 hover:underline"
+        >
           View the code on GitHub
         </a>
       </p>

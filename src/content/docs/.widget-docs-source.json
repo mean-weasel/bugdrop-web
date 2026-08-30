@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceRepository": "mean-weasel/bugdrop",
-  "sourceRevision": "0b7ada459af8802f5942672ed1b7b07999cebb80",
+  "sourceRevision": "3e5abb40873551bb4c2c05b2cc8b1623fb41d275",
   "files": [
     {
       "source": "docs/website/ci-testing.mdx",
@@ -91,7 +91,7 @@
     {
       "source": "docs/website/security.mdx",
       "target": "src/content/docs/security.mdx",
-      "sha256": "e6e084ca46a4a4d814320820466c113869fad10824b3f3f42252c43fb4ad4113"
+      "sha256": "9ec0c1600d3142ee39a4da39787a4ab63a05e9adb2ded7d329e498b6863445bf"
     },
     {
       "source": "docs/website/self-hosting.mdx",

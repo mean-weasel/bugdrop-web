@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceRepository": "mean-weasel/bugdrop",
-  "sourceRevision": "0b7ada459af8802f5942672ed1b7b07999cebb80",
+  "sourceRevision": "61d938379b03cd7baacfe37e5a7726598833b6a1",
   "files": [
     {
       "source": "docs/website/ci-testing.mdx",
@@ -21,7 +21,7 @@
     {
       "source": "docs/website/faq.mdx",
       "target": "src/content/docs/faq.mdx",
-      "sha256": "88cef3ef5935c5abe69cc98c99426b60a5ac33134b4695188e44595de2c32698"
+      "sha256": "ada9af294e819e96f2c93573db5e388b464ba84a8f3cd94f0f2c6e68c13576a9"
     },
     {
       "source": "docs/website/flow-branching-and-output.mdx",
@@ -81,7 +81,7 @@
     {
       "source": "docs/website/installation.mdx",
       "target": "src/content/docs/installation.mdx",
-      "sha256": "31d0af0411233e21e15ddd2a2bab40b875da3689f451e35a78dc9e59a449939c"
+      "sha256": "a5a25f3af96708796c4971c168d1199caafe7cb16865d38be62308095b1c5b7b"
     },
     {
       "source": "docs/website/javascript-api.mdx",
@@ -91,7 +91,7 @@
     {
       "source": "docs/website/security.mdx",
       "target": "src/content/docs/security.mdx",
-      "sha256": "e6e084ca46a4a4d814320820466c113869fad10824b3f3f42252c43fb4ad4113"
+      "sha256": "826208cb1c934cb65222eded843edd7ab9fc3c166712515660587a475feb3091"
     },
     {
       "source": "docs/website/self-hosting.mdx",
@@ -106,7 +106,7 @@
     {
       "source": "docs/website/version-pinning.mdx",
       "target": "src/content/docs/version-pinning.mdx",
-      "sha256": "ee8ad3ef5f49b5c66d4a8ebd8284082cd42033deae89c1ded2f3ac4e64a0b260"
+      "sha256": "af62c22a785714191f13c6bd46b3b16e32b4a6a8e876bd13e6db649f1a25a8d5"
     },
     {
       "source": "docs/website/flow-capabilities.ts",

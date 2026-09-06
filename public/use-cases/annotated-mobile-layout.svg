@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360" role="img" aria-labelledby="title desc">
+  <title id="title">Illustrative mobile checkout bug with annotation</title>
+  <desc id="desc">A sample order summary shows the Pay button overlapping the total. A red outline and arrow identify the overlap.</desc>
+  <rect width="480" height="360" rx="16" fill="#111827"/>
+  <text x="24" y="34" fill="#a5f3fc" font-family="system-ui,sans-serif" font-size="16">ILLUSTRATIVE REPORT · MOBILE</text>
+  <rect x="48" y="55" width="384" height="226" rx="12" fill="#f8fafc"/>
+  <path d="M48 97H432" stroke="#cbd5e1"/>
+  <text x="68" y="82" fill="#475569" font-family="system-ui,sans-serif" font-size="16">example.test/checkout</text>
+  <text x="68" y="130" fill="#0f172a" font-family="system-ui,sans-serif" font-size="22" font-weight="700">Order summary</text>
+  <text x="68" y="164" fill="#475569" font-family="system-ui,sans-serif" font-size="18">Starter plan</text>
+  <path d="M68 185H410" stroke="#cbd5e1"/>
+  <text x="68" y="221" fill="#0f172a" font-family="system-ui,sans-serif" font-size="20" font-weight="700">Total</text>
+  <text x="314" y="221" fill="#0f172a" font-family="system-ui,sans-serif" font-size="22" font-weight="700">$29.00</text>
+  <rect x="334" y="199" width="80" height="47" rx="6" fill="#155e75"/>
+  <text x="358" y="228" fill="#ffffff" font-family="system-ui,sans-serif" font-size="18" font-weight="700">Pay</text>
+  <rect x="302" y="192" width="120" height="65" rx="10" fill="none" stroke="#dc2626" stroke-width="4"/>
+  <path d="M281 309L327 265M327 265L313 270M327 265L322 279" fill="none" stroke="#fca5a5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="24" y="324" fill="#fecaca" font-family="system-ui,sans-serif" font-size="18">Pay button covers the total</text>
+</svg>

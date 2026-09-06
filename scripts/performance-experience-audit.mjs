@@ -178,7 +178,9 @@ for (const target of coreTouchTargets) {
 }
 
 await page.locator('[data-analytics-event="landing_cta_click"]').click();
-await page.waitForTimeout(250);
+await page.locator(".bd-modal").waitFor({ state: "visible", timeout: 15_000 });
+await page.locator(".bd-close").click();
+await page.locator(".bd-modal").waitFor({ state: "hidden" });
 const activatedGtmRequests = initialRequests.filter((url) => /www\.googletagmanager\.com\/gtag\/js/.test(url));
 if (activatedGtmRequests.length !== 1) failures.push(`tracked intent requested GTM ${activatedGtmRequests.length} times`);
 
@@ -229,9 +231,9 @@ await page.screenshot({ path: loadedScreenshot, fullPage: false });
 
 const conversions = await page.evaluate(() => ({
   demoSection: Boolean(document.querySelector("#demo")),
-  primaryDemoLink: Boolean(document.querySelector('[data-analytics-event="landing_cta_click"][href="#demo"]')),
+  primaryDemoLink: Boolean(document.querySelector('[data-analytics-event="landing_cta_click"][href="#flows"][data-homepage-hero-activate]')),
   demoLink: Boolean(document.querySelector('a[href="/demo"]')),
-  productHuntAttribution: Boolean(document.querySelector('a[href*="producthunt.com"]')) && document.body.textContent?.includes("#6 Product of the Day"),
+  productHuntAttribution: Boolean(document.querySelector('a[href*="producthunt.com"]')) && Boolean(document.querySelector('a[aria-label="BugDrop was the number 6 Product of the Day on Product Hunt"]')),
   videoDirectLink: Boolean(document.querySelector('a[href*="youtube.com/watch"]')),
 }));
 for (const [name, pass] of Object.entries(conversions)) {

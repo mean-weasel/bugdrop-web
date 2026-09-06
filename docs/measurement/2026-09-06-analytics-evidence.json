@@ -1,0 +1,64 @@
+{
+  "baseline": "289d1ed",
+  "date": "2026-09-06",
+  "runtime": "local Next.js development server, dummy analytics keys",
+  "unitTests": {
+    "file": "test/analytics-capture.test.ts",
+    "passed": 18
+  },
+  "typecheck": "passed",
+  "changedTypeScriptLint": "passed",
+  "networkPolicy": {
+    "externalAnalyticsTransmitted": false,
+    "explanation": "All PostHog, Google Tag Manager, and Google Analytics requests were intercepted and fulfilled locally by Playwright."
+  },
+  "privacyContract": {
+    "rawQueryValues": false,
+    "fullReferrers": false,
+    "sandboxFreeText": false,
+    "secrets": false,
+    "unnecessaryPii": false,
+    "controlledLabelsOnly": true
+  },
+  "journeys": [
+    {
+      "name": "organic-comparison",
+      "pageviews": 1,
+      "device": "Desktop",
+      "browser": "Chrome",
+      "sessionPresent": true
+    },
+    {
+      "name": "use-case",
+      "pageviews": 1,
+      "device": "Mobile",
+      "browser": "Safari",
+      "sessionPresent": true
+    },
+    {
+      "name": "sandbox-install-proxy",
+      "pageviews": 1,
+      "device": "Desktop",
+      "browser": "Chrome",
+      "sessionPresent": true
+    },
+    {
+      "name": "resource",
+      "pageviews": 1,
+      "device": "Desktop",
+      "browser": "Chrome",
+      "sessionPresent": true
+    }
+  ],
+  "navigationDelivery": {
+    "passed": true,
+    "delayMs": 222
+  },
+  "spaNavigation": {
+    "sourcePath": "/compare/userback",
+    "destinationPath": "/demo",
+    "preservedDocument": true
+  },
+  "failures": [],
+  "passed": true
+}

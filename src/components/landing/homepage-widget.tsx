@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useReducer, useRef, useState } from "react";
 import Link from "next/link";
 import { HomepageDemoLauncher, homepageExperienceLabel } from "./homepage-demo-launcher";
 import {
@@ -37,6 +37,23 @@ const WELCOME =
   "This is the BugDrop landing page demo. Send a test report to see what your users would experience.";
 
 type LoadState = "idle" | "loading" | "ready" | "error";
+
+function useHeroDemoLaunch(onLaunch: (trigger: HTMLAnchorElement) => void) {
+  const handleLaunch = useEffectEvent(onLaunch);
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const trigger = event.target instanceof Element
+        ? event.target.closest<HTMLAnchorElement>("[data-homepage-hero-activate]")
+        : null;
+      if (!trigger) return;
+      event.preventDefault();
+      handleLaunch(trigger);
+    };
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
+}
 
 function configureScript(script: HTMLScriptElement) {
   script.id = SCRIPT_ID;
@@ -92,11 +109,14 @@ export function ClassicHomepageWidget() {
         document.removeEventListener("bugdrop:ready", openWhenReady);
         script.remove();
         setLoadState("error");
+        document.getElementById("flows")?.scrollIntoView({ behavior: "instant", block: "start" });
       },
       { once: true },
     );
     document.body.append(script);
   };
+
+  useHeroDemoLaunch(() => openDemo());
 
   return (
     <section
@@ -126,7 +146,7 @@ export function ClassicHomepageWidget() {
             <span aria-hidden="true">🐛</span>
             {loadState === "loading" ? "Loading Feedback…" : "Open Feedback demo"}
           </button>
-          <span id="homepage-widget-status" className="sr-only" aria-live="polite">
+          <span id="homepage-widget-status" className={loadState === "error" ? "text-sm text-accent-rose" : "sr-only"} aria-live="polite">
             {loadState === "loading" && "Loading the BugDrop feedback demo."}
             {loadState === "ready" && "The BugDrop feedback demo is ready."}
             {loadState === "error" && "The feedback demo could not load. Try again."}
@@ -207,6 +227,7 @@ function FlowHomepageWidget() {
     const generation = ++launchGeneration.current;
     const isCurrent = () => mounted.current && generation === launchGeneration.current;
     launchInFlight.current = true;
+    initiator?.setAttribute("aria-busy", "true");
     activeLaunchRef.current = initiator;
     if (id !== "classic") dispatch({ type: "select", id });
     dispatch({ type: "launch", id });
@@ -244,8 +265,13 @@ function FlowHomepageWidget() {
       activeExperience.current = null;
       launchInFlight.current = false;
       dispatch({ type: "runtime-error" });
+      document.getElementById("flows")?.scrollIntoView({ block: "start", behavior: "instant" });
+    } finally {
+      initiator?.removeAttribute("aria-busy");
     }
   };
+
+  useHeroDemoLaunch((trigger) => void launch("classic", trigger));
 
   useEffect(() => {
     mounted.current = true;
@@ -280,18 +306,15 @@ function FlowHomepageWidget() {
         aria-labelledby="flows-heading"
       >
         <div className="max-w-3xl">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent-cyan">Design your flows</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent-cyan">More than bug reports</p>
           <h2 id="flows-heading" className="text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-tight text-text-primary">
-            One widget for every feedback moment.
+            Bugs, ideas, and ratings. One widget.
           </h2>
           <p className="mt-2 text-text-subtle">
-            Place and customize BugDrop wherever and whenever you need feedback throughout your app.
-          </p>
-          <p className="mt-3 text-sm text-text-subtle">
-            The floating <span className="font-medium text-text-primary">Give feedback</span> button opens the Classic experience. Choose a custom flow below to explore other possibilities.
+            Choose the feedback you need. Send every response to GitHub.
           </p>
         </div>
-        <fieldset className="mt-7 grid w-full min-w-0 max-w-full grid-flow-col auto-cols-[minmax(240px,82%)] gap-3 overflow-x-auto pb-2 max-sm:mt-4 md:grid-flow-row md:auto-cols-auto md:grid-cols-3 md:overflow-visible md:pb-0" aria-label="Feedback experience">
+        <fieldset className="mt-7 grid w-full min-w-0 grid-cols-1 gap-3 max-sm:mt-4 md:grid-cols-3" aria-label="Feedback experience">
           <legend className="sr-only">Feedback experience</legend>
           {homepageFlowExperiences.map((experience) => (
             <label

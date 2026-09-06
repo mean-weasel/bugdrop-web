@@ -45,7 +45,8 @@ describe("site navigation and footer", () => {
       expect(nav).toContain(`id="${id}"`);
     }
     expect(page.match(/<LandingChapter/g)).toHaveLength(4);
-    expect(hero).toContain('href="#demo"');
+    expect(hero).toContain('data-homepage-hero-activate');
+    expect(hero).toContain('href="#flows"');
     expect(styles).toContain("scroll-behavior: smooth");
     expect(styles).toContain("min-height: calc(100svh - 4.5rem)");
     expect(styles).toContain("prefers-reduced-motion: reduce");
@@ -65,7 +66,7 @@ describe("site navigation and footer", () => {
     );
 
     expect(audit).toContain('[data-analytics-event="landing_cta_click"]');
-    expect(audit).toContain('href="#demo"');
+    expect(audit).toContain('href="#flows"');
     expect(audit).toContain("Open BugDrop feedback|Open Feedback demo");
     expect(audit).not.toContain('data-analytics-label="Try it on this page"');
   });

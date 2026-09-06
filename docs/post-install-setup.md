@@ -1,7 +1,9 @@
 # Post-install setup
 
-The first version of `/setup` links to widget installation instructions and offers
-an optional email draft sent to the existing privacy inbox. Sending the email is
+The `/setup` page includes the widget script, repository configuration instructions,
+and a test-report step. Framework and troubleshooting links lead to the relevant
+installation guide sections. An expandable optional invitation below setup offers
+an email draft addressed to the existing privacy inbox. Sending the email is
 permission to contact the sender about research or a testimonial; it is not
 permission to publish anything. A click alone must never be recorded as consent.
 Keep the original email as private permission evidence. Honor withdrawals and

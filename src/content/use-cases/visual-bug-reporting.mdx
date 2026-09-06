@@ -1,10 +1,47 @@
 # Visual Bug Reporting
 
-Visual bug reporting is a QA practice, not merely a screenshot feature. A useful report combines the broken state with expected behavior, reproduction context, environment details, and a clear owner for triage. BugDrop can collect the visual artifact and structured browser context; the team still owns investigation and verification.
+A visual bug is an interface problem you can see: overlapping buttons, clipped text, a missing image, or a layout that breaks on a small screen. Visual bug reporting shows the problem with a screenshot or annotation and explains what should happen instead. BugDrop helps send that evidence from your website to GitHub Issues, together with page and browser context.
 
-**Use this guide when:** you are designing the reporting and triage process. For widget capture controls, read [Screenshot Feedback Widget](/use-cases/screenshot-feedback-widget).
+**Use this guide when:** you want to write visual reports that a developer can reproduce and act on. For capture settings, see [Screenshot Feedback Widget](/use-cases/screenshot-feedback-widget).
 
-[Practice the reporter flow](/demo) and [review the CI verification guide](/docs/ci-testing).
+[Try the reporting flow](/demo) or use the [visual bug report template](/resources/visual-bug-report-template).
+
+## Example: a button overlaps the checkout total
+
+Imagine a checkout that looks correct on desktop, but its Pay button covers the order total on mobile. “Checkout looks wrong” leaves the developer guessing. Here is how to make the report useful.
+
+### 1. Show the broken layout
+
+Capture the order summary with enough surrounding context to show where the overlap happens. Draw a box around the affected region and point to the button. A focused area capture is easier to inspect than a screenshot of the entire long page.
+
+<figure className="my-6">
+  <img src="/use-cases/annotated-mobile-layout.svg" alt="Illustrative mobile checkout: a red outline and arrow identify the Pay button overlapping the order total." width="480" height="360" className="h-auto w-full max-w-[480px] rounded-xl" />
+  <figcaption className="mt-2 text-sm text-text-muted">Illustrative layout and annotation, created for this guide. This is not a real customer screenshot or BugDrop interface capture.</figcaption>
+</figure>
+
+### 2. Add the expectation and steps
+
+A useful description for this example is: “At a 390px-wide viewport, the Pay button covers part of the total. The full price should remain visible and the button should sit below it. Add the Starter plan to the cart, open checkout, and view the order summary.”
+
+The annotation locates the problem; the description explains why it is wrong and how to reach it. Review the capture for private information before sending it.
+
+### 3. Hand the report to the developer in GitHub
+
+After a successful BugDrop submission, the configured repository receives an issue with the report and its available context. A developer can use the URL and viewport to reproduce it, then compare the corrected layout against the expected behavior.
+
+<div className="my-6 rounded-xl border border-border bg-bg-surface p-5">
+  <p className="mb-2 text-sm font-semibold text-accent-cyan">Illustrative issue summary</p>
+  <p className="mb-3 text-lg font-semibold text-text-primary">Pay button covers the checkout total on mobile</p>
+  <ul className="space-y-2 text-text-subtle">
+    <li><strong>Observed:</strong> the total is partially hidden behind Pay.</li>
+    <li><strong>Expected:</strong> the full total is visible above the button.</li>
+    <li><strong>Steps:</strong> add Starter plan, open checkout, view order summary.</li>
+    <li><strong>Page:</strong> https://example.test/checkout</li>
+    <li><strong>Viewport:</strong> 390 × 844</li>
+    <li><strong>Evidence:</strong> annotated order-summary capture.</li>
+  </ul>
+  <p className="mt-3 text-sm text-text-muted">An example of the information to include, not an exact issue template or a real submission. BugDrop also includes browser, OS, and language information.</p>
+</div>
 
 ## A five-part visual bug report
 
@@ -54,4 +91,4 @@ The `bugdrop-screenshots` branch contains user-generated artifacts. Keep it outs
 
 Start with one surface and three representative defects: a responsive overlap, a content mismatch, and an interaction state. Have a non-developer report them, then ask a developer to triage without verbal context. Record which fields or screenshots were useful and which questions remained.
 
-If the gaps are mostly form or screenshot configuration, adjust BugDrop. If the gaps require replay, automatic logs, or a managed review workspace, choose a better-fitting tool through the [comparison hub](/compare). When the workflow is sound, [install BugDrop](/docs/installation) and add a [CI smoke check](/docs/ci-testing).
+If the gaps are mostly form or screenshot configuration, adjust BugDrop. If the gaps require replay, automatic logs, or a managed review workspace, choose a better-fitting tool through the [comparison hub](/compare). When the workflow is sound, [install BugDrop](/docs/installation) and agree who will own incoming reports. Teams automating their integration checks can use the [CI testing guide](/docs/ci-testing).

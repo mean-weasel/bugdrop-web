@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from "node:fs";
-import { chromium } from "playwright";
+import { chromium, devices } from "playwright";
 
 const args = process.argv.slice(2);
 const baseUrl = args.find((arg) => arg.startsWith("--base-url="))?.slice(11);
@@ -24,6 +24,18 @@ const allowedPropertyKeys = new Set([
   "$current_url",
   "$host",
   "$pathname",
+  "$session_id",
+  "$window_id",
+  "$browser",
+  "$os",
+  "$device_type",
+  "$viewport_width",
+  "$viewport_height",
+  "analytics_collector",
+  "analytics_context_version",
+  "is_internal",
+  "is_synthetic",
+  "traffic_type",
   "page_location",
   "page_path",
   "landing_page",
@@ -70,6 +82,7 @@ const journeys = [
   },
   {
     name: "use-case",
+    mobile: true,
     path: "/use-cases/nextjs-feedback-widget?email=private.person%40example.com",
     clicks: ["use_case_demo_click", "use_case_installation_click", "use_case_marketplace_click"],
   },
@@ -89,7 +102,7 @@ const evidence = [];
 
 for (const journey of journeys) {
   const context = await browser.newContext({
-    viewport: { width: 1280, height: 900 },
+    ...(journey.mobile ? devices["iPhone 13"] : { viewport: { width: 1280, height: 900 } }),
     permissions: ["clipboard-read", "clipboard-write"],
   });
   const capturedPostHog = [];
@@ -254,6 +267,18 @@ for (const journey of journeys) {
     if (pageView?.acquisition_channel !== "organic_search") failures.push("organic landing was not classified as organic_search");
     if (pageView?.search_engine !== "google") failures.push("organic landing did not identify the enumerated Google source");
     if (pageView?.landing_page !== "/compare/userback") failures.push("organic landing path was not query-free");
+  }
+
+  const sessionIds = new Set(relevantPostHog.map((event) => event.properties.$session_id));
+  const windowIds = new Set(relevantPostHog.map((event) => event.properties.$window_id));
+  if (sessionIds.size !== 1 || windowIds.size !== 1) failures.push(`${journey.name}: session/window changed within a journey`);
+  for (const event of relevantPostHog) {
+    const context = event.properties;
+    if (!/^[0-9a-f-]{14}7[0-9a-f-]{21}$/.test(context.$session_id ?? "")) failures.push(`${journey.name}: missing UUIDv7 session`);
+    if (context.$device_type !== (journey.mobile ? "Mobile" : "Desktop")) failures.push(`${journey.name}: incorrect device context`);
+    if (!context.$browser || context.$browser === "Unknown") failures.push(`${journey.name}: missing browser context`);
+    if (!(context.$viewport_width > 0 && context.$viewport_height > 0)) failures.push(`${journey.name}: missing viewport context`);
+    if (context.is_synthetic !== true) failures.push(`${journey.name}: automated visit was not marked synthetic`);
   }
 
   const payloads = [...relevantPostHog, ...relevantGoogle];

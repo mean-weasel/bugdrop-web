@@ -680,8 +680,8 @@ test("keeps the Classic-only launcher when the feature flag is unset", async ({ 
   await expect(
     page.getByRole("navigation").getByRole("link", { name: "Flows", exact: true }),
   ).toHaveAttribute("href", "/#flows");
-  await expect(page.locator("header").getByRole("link", { name: "See BugDrop in action" }))
-    .toHaveAttribute("href", "#demo");
+  await expect(page.locator("header").getByRole("link", { name: "Try the widget" }))
+    .toHaveAttribute("href", "#flows");
   await page.getByRole("button", { name: "Open Feedback demo" }).click();
   await expect(page.locator("body")).toHaveAttribute("data-classic-demo-opened", "true");
 });

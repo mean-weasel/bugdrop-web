@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { MARKETPLACE_URL, WIDGET_URL, widgetScriptTag } from "@/lib/links";
+import { MARKETPLACE_URL, HOMEPAGE_SHOWCASE_WIDGET_URL } from "@/lib/links";
 
 export function QuickStart() {
   const [copied, setCopied] = useState(false);
-  const codeSnippet = widgetScriptTag();
+  const codeSnippet = `<script src="${HOMEPAGE_SHOWCASE_WIDGET_URL}" data-repo="owner/repo"></script>`;
 
   function handleCopy() {
     navigator.clipboard.writeText(codeSnippet);
@@ -16,7 +16,7 @@ export function QuickStart() {
 
   return (
     <div className="min-w-0 rounded-3xl border border-border bg-bg-surface p-8 max-md:p-6">
-      <h3 className="text-2xl font-semibold text-text-primary">Install in under a minute.</h3>
+      <h3 className="text-2xl font-semibold text-text-primary">Add BugDrop to your site.</h3>
       <p className="mt-2 text-text-subtle">Connect your repository, then add one script tag.</p>
       <a
         href={MARKETPLACE_URL}
@@ -36,7 +36,7 @@ export function QuickStart() {
                 <span className="text-accent-rose">&lt;script</span>
                 {"\n  "}
                 <span className="text-accent-purple">src</span>=
-                <span className="text-accent-green">&quot;{WIDGET_URL}&quot;</span>
+                <span className="text-accent-green">&quot;{HOMEPAGE_SHOWCASE_WIDGET_URL}&quot;</span>
                 {"\n  "}
                 <span className="text-accent-purple">data-repo</span>=
                 <span className="text-accent-green">&quot;owner/repo&quot;</span>

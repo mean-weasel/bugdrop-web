@@ -45,7 +45,8 @@ describe("site navigation and footer", () => {
       expect(nav).toContain(`id="${id}"`);
     }
     expect(page.match(/<LandingChapter/g)).toHaveLength(4);
-    expect(hero).toContain('href="#demo"');
+    expect(hero).toContain('data-homepage-hero-activate');
+    expect(hero).toContain('href="#flows"');
     expect(styles).toContain("scroll-behavior: smooth");
     expect(styles).toContain("min-height: calc(100svh - 4.5rem)");
     expect(styles).toContain("prefers-reduced-motion: reduce");

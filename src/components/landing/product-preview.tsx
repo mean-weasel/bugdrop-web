@@ -1,10 +1,11 @@
+import styles from "./hero.module.css";
 import Image from "next/image";
 import { ArrowDownRight, CircleDot, Paperclip } from "lucide-react";
 
 export function ProductPreview() {
   return (
-    <figure className="product-preview" aria-label="Example report from the BugDrop widget to a GitHub Issue">
-      <div className="preview-caption"><span>01 / On your website</span><span>Actual BugDrop widget</span></div>
+    <figure className={styles["product-preview"]} aria-label="Example report from the BugDrop widget to a GitHub Issue">
+      <div className={styles["preview-caption"]}><span>01 / On your website</span><span>Actual BugDrop widget</span></div>
       <Image
         src="/images/bugdrop-report-example.png"
         alt="BugDrop feedback form with a report about a checkout button cut off on mobile, a description, and optional screenshot capture."
@@ -12,10 +13,10 @@ export function ProductPreview() {
         height={576}
         sizes="(max-width: 767px) 220px, 360px"
         loading="eager"
-        className="preview-widget"
+        className={styles["preview-widget"]}
       />
-      <ArrowDownRight className="preview-arrow" aria-hidden="true" />
-      <div className="preview-issue">
+      <ArrowDownRight className={styles["preview-arrow"]} aria-hidden="true" />
+      <div className={styles["preview-issue"]}>
         <div className="mb-3 flex items-center justify-between gap-2 text-[11px] text-text-subtle">
           <span className="font-mono">02 / In GitHub Issues</span>
           <span className="rounded-full border border-border px-2 py-0.5">Example</span>
@@ -31,7 +32,7 @@ export function ProductPreview() {
           <span>/checkout</span><span>390 × 844</span>
         </div>
       </div>
-      <figcaption className="preview-footnote">One report. The context your team needs.</figcaption>
+      <figcaption className={styles["preview-footnote"]}>One report. The context your team needs.</figcaption>
     </figure>
   );
 }

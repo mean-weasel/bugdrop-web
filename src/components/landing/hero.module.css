@@ -1,0 +1,48 @@
+/* A real widget capture and a labeled example keep the product visible before a demo loads. */
+.hero-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); align-items: center; gap: 2rem; }
+.hero-title { max-width: 510px; margin-bottom: 1.5rem; font-size: clamp(2.35rem,4.1vw,3.45rem); font-weight: 400; line-height: 1.12; letter-spacing: -.045em; }
+.hero-title strong { font-weight: 650; color: var(--color-accent-warm); }
+.hero-description { max-width: 430px; margin-bottom: 1.75rem; font-size: 1.1rem; line-height: 1.7; color: var(--color-text-subtle); }
+.hero-actions { display:flex; flex-wrap:wrap; gap:.65rem; }
+.hero-primary, .hero-install { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; min-height:48px; padding:.7rem 1rem; border-radius:10px; font-size:.875rem; font-weight:600; transition:background .2s; }
+.hero-primary { background:var(--color-accent-cyan); color:var(--color-bg-deep); }
+.hero-primary:hover { background:#a8dfff; }
+.hero-install { border:1px solid var(--color-accent-warm); color:var(--color-accent-warm); }
+.hero-install:hover { background:rgba(255,158,100,.1); }
+.hero-primary:focus-visible, .hero-install:focus-visible { outline:2px solid var(--color-accent-cyan); outline-offset:4px; }
+.product-preview { position:relative; min-width:0; width:100%; max-width:455px; height:470px; margin-inline:auto; }
+.preview-caption { display:flex; justify-content:space-between; gap:.5rem; font-size:10px; color:var(--color-text-subtle); margin-bottom:12px; }
+.preview-caption span:first-child { color:var(--color-accent-cyan); font-family:var(--font-mono); }
+.preview-widget { width:360px; max-width:88%; height:auto; border-radius:12px; box-shadow:0 16px 50px #0c102a55; }
+.preview-arrow { position:absolute; right:8px; top:140px; width:38px; height:38px; color:var(--color-accent-cyan); }
+.preview-issue { position:absolute; bottom:26px; right:0; width:300px; max-width:90%; border:1px solid #61709a; background:#1c2134; padding:18px; border-radius:14px; box-shadow:0 18px 48px #0c102a80; }
+.preview-footnote { position:absolute; bottom:0; right:0; font-size:11px; color:var(--color-text-subtle); }
+.hero-proof { grid-column:1/-1; display:grid; grid-template-columns:1fr 1fr 1fr auto; align-items:center; gap:1rem; border-top:1px solid var(--color-border); padding-top:1.4rem; }
+.hero-proof > :not(.hero-source) { display:flex; flex-direction:column; gap:3px; }
+.hero-proof strong { color:var(--color-text-primary); font-size:1.25rem; line-height:1.3; }
+.hero-proof span { color:var(--color-text-subtle); font-size:.72rem; }
+.hero-source { display:flex; align-items:center; gap:4px; color:var(--color-accent-cyan); font-size:.75rem; }
+@media (max-width:767px) {
+  .hero-layout { grid-template-columns:minmax(0,1fr); gap:1.5rem; }
+  .hero-title { font-size:2.15rem; margin-bottom:.9rem; max-width:480px; }
+  .hero-description { font-size:.96rem; line-height:1.6; margin-bottom:1rem; }
+  .hero-actions { flex-wrap:nowrap; }
+  .hero-primary,.hero-install { padding:.65rem .75rem; flex:1; font-size:.8rem; white-space:nowrap; }
+  .product-preview { max-width:365px; height:335px; }
+  .preview-caption { font-size:9px; }
+  .preview-widget { width:220px; }
+  .preview-arrow { top:60px; right:10px; width:30px; height:30px; }
+  .preview-issue { width:245px; padding:13px; bottom:23px; }
+  .preview-issue > p:nth-of-type(2) { display:none; }
+  .preview-footnote { font-size:10px; }
+  .hero-proof { grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; }
+  .hero-proof span { font-size:.64rem; line-height:1.4; }
+  .hero-proof strong { font-size:1.1rem; }
+  .hero-source { grid-column:1/-1; }
+}
+
+@media (max-width:359px) {
+  .hero-actions { flex-wrap:wrap; }
+  .hero-primary,.hero-install { flex-basis:100%; }
+  .hero-title { font-size:1.95rem; }
+}

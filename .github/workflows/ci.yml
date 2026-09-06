@@ -29,6 +29,12 @@ jobs:
       - name: Build (includes type check)
         run: npm run build
 
+      - name: Set up production layout browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify production homepage layout
+        run: npx playwright test --config=playwright.production.config.ts
+
   homepage-feedback-experiences:
     needs: check
     runs-on: ubuntu-latest

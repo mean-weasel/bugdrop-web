@@ -10,8 +10,8 @@ export async function Hero() {
     <header className="hero-layout">
       <div className="hero-copy">
         <p className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-accent-cyan max-sm:mb-3">Open-source website feedback</p>
-        <h1 className="hero-title">From “it’s broken” to <strong>an actionable GitHub Issue.</strong></h1>
-        <p className="hero-description">Collect screenshots, annotations, and browser context right from your website. Give your team the details to fix it.</p>
+        <h1 className="hero-title">Website feedback to GitHub Issues—<strong>with screenshots.</strong></h1>
+        <p className="hero-description">Let users show you what’s wrong. Get annotated screenshots and browser details directly in GitHub.</p>
         <div className="hero-actions">
           <a href="#flows" aria-describedby="hero-demo-note" data-homepage-hero-activate data-analytics-event="landing_cta_click" data-analytics-label="Try the widget" className="hero-primary">
             <MessageSquare size={17} aria-hidden="true" /> Try the widget

@@ -306,15 +306,12 @@ function FlowHomepageWidget() {
         aria-labelledby="flows-heading"
       >
         <div className="max-w-3xl">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent-cyan">Design your flows</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent-cyan">More than bug reports</p>
           <h2 id="flows-heading" className="text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-tight text-text-primary">
-            One widget for every feedback moment.
+            Bugs, ideas, and ratings. One widget.
           </h2>
           <p className="mt-2 text-text-subtle">
-            Place and customize BugDrop wherever and whenever you need feedback throughout your app.
-          </p>
-          <p className="mt-3 text-sm text-text-subtle">
-            Try a bug report, a quick rating, or a feature request. Each flow sends the right details to GitHub.
+            Choose the feedback you need. Send every response to GitHub.
           </p>
         </div>
         <fieldset className="mt-7 grid w-full min-w-0 grid-cols-1 gap-3 max-sm:mt-4 md:grid-cols-3" aria-label="Feedback experience">

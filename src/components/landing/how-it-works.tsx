@@ -1,7 +1,7 @@
 const steps = [
-  { number: 1, title: "Add One Script Tag", description: "Install the GitHub App and add one script tag." },
-  { number: 2, title: "Users Share Feedback", description: "They capture and annotate feedback inside your app." },
-  { number: 3, title: "Issues Arrive Ready", description: "Structured reports land in the repository you chose." },
+  { number: 1, title: "Connect your site", description: "Install the GitHub App and add one script tag." },
+  { number: 2, title: "Users report a problem", description: "They describe the issue and mark up a screenshot." },
+  { number: 3, title: "Get a GitHub Issue", description: "See the report, screenshot, and browser details together." },
 ];
 
 export function HowItWorks() {

@@ -46,3 +46,9 @@ Independent correctness, tests, silent-failure, contracts/types, and documentati
 The regression failed before the fix and passes afterward. The fix keeps memory authoritative for a key after a failed write, retries writes on subsequent updates, and resumes persisted reads after recovery. The test also proves other-tab session changes are visible once writes recover. An independent follow-up found no concrete defect; all 19 analytics tests, all 247 unit tests, TypeScript, and changed-file lint pass.
 
 Native `codex review --base origin/main` was attempted for both repositories but failed because the installed CLI does not support its configured model. This native-review gap remains open before merge. No merges or deployments were performed.
+
+## Messaging polish after owner review
+
+Restored the owner's preferred concrete positioning: “Website feedback to GitHub Issues—with screenshots.” Shortened the supporting copy, replaced abstract demo/flow headings with specific outcomes, and made the setup steps literal. Retained the screenshots, direct actions, and “Three steps. No new dashboard.” promise.
+
+Verified the revised copy in Chrome at desktop and 390px, plus a 320px document-overflow check (content width equals viewport width). Refreshed the homepage and mobile-flow screenshots. The 13 existing site-chrome/model checks and changed-file lint pass. Copy and an existing heading expectation changed; behavior did not.

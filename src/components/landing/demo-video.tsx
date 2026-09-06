@@ -11,13 +11,13 @@ export function DemoVideo() {
     <div className="grid items-center gap-6 md:grid-cols-[minmax(0,0.72fr)_minmax(340px,1.28fr)] md:gap-10 lg:gap-12">
       <div className="max-w-[620px]">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent-cyan">
-          From report to resolution
+          See it in action
         </p>
         <h2 id="demo-heading" className="text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-tight text-text-primary">
-          See the whole journey.
+          From screenshot to GitHub Issue.
         </h2>
         <p className="mt-4 text-lg leading-8 text-text-subtle max-sm:text-base max-sm:leading-6">
-          Open the widget, describe a bug, annotate a screenshot, and see the report arrive in GitHub.
+          Watch a user report a bug, mark up a screenshot, and send it to GitHub.
         </p>
       </div>
       <div className="flex flex-col items-center justify-center rounded-3xl border border-border bg-bg-surface/80 p-4 max-sm:p-3">
@@ -48,8 +48,8 @@ export function DemoVideo() {
               <span className="relative mt-24 flex size-16 items-center justify-center rounded-full border border-accent-cyan/50 bg-accent-cyan text-bg-deep shadow-[0_12px_35px_rgba(125,207,255,0.25)] transition-transform group-hover:scale-105 max-sm:size-12" aria-hidden="true">
                 <Play className="ml-1 size-7 fill-current" />
               </span>
-              <span className="relative mt-4 text-sm font-semibold">Play example walkthrough</span>
-              <span className="relative mt-1 text-xs text-text-subtle">Loads YouTube after activation</span>
+              <span className="relative mt-4 text-sm font-semibold">Watch the demo</span>
+              <span className="relative mt-1 text-xs text-text-subtle">Loads YouTube when you press play</span>
             </button>
           )}
         </div>

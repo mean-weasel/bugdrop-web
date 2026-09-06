@@ -224,7 +224,7 @@ test("separates the simple floating feedback action from the flow showcase", asy
   expect(await floating.evaluate((button) => button.parentElement === document.body)).toBe(true);
   await expect(page.getByRole("menu", { name: "Feedback experience" })).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "One widget for every feedback moment." }),
+    page.getByRole("heading", { name: "Bugs, ideas, and ratings. One widget." }),
   ).toBeVisible();
   await expect(
     page.getByRole("navigation").getByRole("link", { name: "Flows" }),

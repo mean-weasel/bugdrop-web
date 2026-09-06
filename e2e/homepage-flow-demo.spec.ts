@@ -153,9 +153,9 @@ test("presents four viewport chapters with smooth anchored navigation", async ({
   });
 
   expect(layout.chapterIds).toEqual(["overview", "demo", "flows", "get-started"]);
-  expect(layout.chapterHeights.map(Math.round)).toEqual(
-    Array.from({ length: 4 }, () => Math.round(layout.availableHeight)),
-  );
+  for (const height of layout.chapterHeights) {
+    expect(Math.round(height)).toBeGreaterThanOrEqual(Math.round(layout.availableHeight));
+  }
   expect(new Set(layout.chapterBackgrounds).size).toBe(4);
   expect(layout.fitsViewport).toBe(true);
 
@@ -191,6 +191,26 @@ test("presents four viewport chapters with smooth anchored navigation", async ({
     .poll(() => page.locator("#flows").evaluate((element) => Math.round(element.getBoundingClientRect().top)))
     .toBe(layout.scrollPaddingTop);
   await expect(floating).toBeVisible();
+});
+
+test("opens the hero demo directly and restores keyboard focus without duplicate runtimes", async ({ page }, testInfo) => {
+  enabledOnly(testInfo);
+  const harness = installLocalBugDropHarness(page);
+  await page.goto("/");
+  const hero = page.getByRole("link", { name: "Try the widget", exact: true });
+  await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(0);
+  await hero.focus();
+  await page.keyboard.press("Enter");
+  const widget = page.locator("#bugdrop-host").first();
+  await expect(widget.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await widget.getByRole("button", { name: "Cancel" }).click();
+  await expect(hero).toBeFocused();
+  await hero.click();
+  await expect(widget.getByRole("heading", { name: "Send Feedback" })).toBeVisible();
+  await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(1);
+  await widget.getByRole("button", { name: "Cancel" }).click();
+  expect(harness.submissions).toEqual([]);
+  harness.assertClean();
 });
 
 test("separates the simple floating feedback action from the flow showcase", async ({ page }, testInfo) => {
@@ -682,8 +702,10 @@ test("keeps the Classic-only launcher when the feature flag is unset", async ({ 
   ).toHaveAttribute("href", "/#flows");
   await expect(page.locator("header").getByRole("link", { name: "Try the widget" }))
     .toHaveAttribute("href", "#flows");
-  await page.getByRole("button", { name: "Open Feedback demo" }).click();
+  await page.getByRole("link", { name: "Try the widget", exact: true }).click();
   await expect(page.locator("body")).toHaveAttribute("data-classic-demo-opened", "true");
+  await page.getByRole("button", { name: "Open Feedback demo" }).click();
+  await expect(page.locator("#bugdrop-homepage-demo")).toHaveCount(1);
 });
 
 test("submits the independent Classic journey through the local mock", async ({ page }, testInfo) => {

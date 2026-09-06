@@ -43,7 +43,7 @@ export function DemoVideo() {
               className="group relative flex size-full min-h-44 cursor-pointer flex-col items-center justify-center overflow-hidden border-0 bg-[radial-gradient(circle_at_35%_20%,rgba(125,207,255,0.24),transparent_36%),linear-gradient(145deg,#24283b,#1a1b26)] px-5 text-text-primary focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-accent-cyan"
               aria-label="Load the BugDrop demo video from YouTube"
             >
-              <Image src="/images/bugdrop-report-preview.png" alt="" fill sizes="(max-width: 640px) 240px, 390px" className="object-contain object-top opacity-75" />
+              <Image src="/images/bugdrop-report-example.png" alt="" fill sizes="(max-width: 640px) 240px, 390px" className="object-contain object-top opacity-75" />
               <span className="absolute inset-0 bg-gradient-to-b from-transparent via-bg-deep/35 to-bg-deep" aria-hidden="true" />
               <span className="relative mt-24 flex size-16 items-center justify-center rounded-full border border-accent-cyan/50 bg-accent-cyan text-bg-deep shadow-[0_12px_35px_rgba(125,207,255,0.25)] transition-transform group-hover:scale-105 max-sm:size-12" aria-hidden="true">
                 <Play className="ml-1 size-7 fill-current" />

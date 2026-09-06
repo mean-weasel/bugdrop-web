@@ -66,7 +66,7 @@ describe("site navigation and footer", () => {
     );
 
     expect(audit).toContain('[data-analytics-event="landing_cta_click"]');
-    expect(audit).toContain('href="#demo"');
+    expect(audit).toContain('href="#flows"');
     expect(audit).toContain("Open BugDrop feedback|Open Feedback demo");
     expect(audit).not.toContain('data-analytics-label="Try it on this page"');
   });

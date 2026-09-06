@@ -6,7 +6,7 @@ export function ProductPreview() {
     <figure className="product-preview" aria-label="Example report from the BugDrop widget to a GitHub Issue">
       <div className="preview-caption"><span>01 / On your website</span><span>Actual BugDrop widget</span></div>
       <Image
-        src="/images/bugdrop-report-preview.png"
+        src="/images/bugdrop-report-example.png"
         alt="BugDrop feedback form with a report about a checkout button cut off on mobile, a description, and optional screenshot capture."
         width={600}
         height={576}

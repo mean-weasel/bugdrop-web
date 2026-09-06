@@ -109,6 +109,7 @@ export function ClassicHomepageWidget() {
         document.removeEventListener("bugdrop:ready", openWhenReady);
         script.remove();
         setLoadState("error");
+        document.getElementById("flows")?.scrollIntoView({ behavior: "instant", block: "start" });
       },
       { once: true },
     );
@@ -145,7 +146,7 @@ export function ClassicHomepageWidget() {
             <span aria-hidden="true">🐛</span>
             {loadState === "loading" ? "Loading Feedback…" : "Open Feedback demo"}
           </button>
-          <span id="homepage-widget-status" className="sr-only" aria-live="polite">
+          <span id="homepage-widget-status" className={loadState === "error" ? "text-sm text-accent-rose" : "sr-only"} aria-live="polite">
             {loadState === "loading" && "Loading the BugDrop feedback demo."}
             {loadState === "ready" && "The BugDrop feedback demo is ready."}
             {loadState === "error" && "The feedback demo could not load. Try again."}

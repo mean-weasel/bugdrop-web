@@ -51,6 +51,26 @@ describe("privacy-preserving browser capture", () => {
     expect(second.event).toBe("outbound_marketplace_click");
   });
 
+  it("keeps the renewed session when storage remains readable but writes fail", async () => {
+    const { analyticsIdentity } = await import("../src/lib/analytics-context");
+    const time = 1_800_000_000_000;
+    const initial = analyticsIdentity(time);
+    const write = vi.spyOn(window.localStorage, "setItem").mockImplementation(() => {
+      throw new DOMException("Storage quota exceeded", "QuotaExceededError");
+    });
+    const renewed = analyticsIdentity(time + 31 * 60_000);
+    expect(renewed.$session_id).not.toBe(initial.$session_id);
+    expect(analyticsIdentity(time + 31 * 60_000 + 1_000).$session_id).toBe(renewed.$session_id);
+    expect(renewed.distinctId).toBe(initial.distinctId);
+
+    write.mockRestore();
+    expect(analyticsIdentity(time + 31 * 60_000 + 2_000).$session_id).toBe(renewed.$session_id);
+    const key = "bugdrop_analytics_session_v1";
+    const otherTab = { id: initial.$session_id, started: time, last: time + 31 * 60_000 + 2_000 };
+    storage.set(key, JSON.stringify(otherTab));
+    expect(analyticsIdentity(time + 31 * 60_000 + 3_000).$session_id).toBe(otherTab.id);
+  });
+
   it("preserves first touch in restricted storage across navigation", async () => {
     Object.defineProperty(window, "localStorage", { get() { throw new Error("blocked"); } });
     const { attributionProperties } = await import("../src/lib/analytics-attribution");

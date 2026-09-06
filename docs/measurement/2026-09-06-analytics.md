@@ -31,7 +31,7 @@ Marketplace button events still mean a click, not completed installation. Verifi
 
 ## Validation
 
-`test/analytics-capture.test.ts` exercises actual serialized beacon payloads with dummy keys. It verifies restricted storage, session continuity and expiry, passive vitals, document changes, malformed storage, browser/mobile/tablet detection, campaign precedence, synthetic/internal flags, and failed transport. These are local collection assertions, not proof of production ingestion.
+`test/analytics-capture.test.ts` exercises actual serialized beacon payloads with dummy keys. It verifies restricted storage, session continuity and expiry, passive vitals, document changes, malformed storage, browser/mobile/tablet detection, campaign precedence, synthetic/internal flags, and failed transport. It also verifies session continuity when reads succeed but writes fail, write recovery, and subsequent cross-tab reads. These are local collection assertions, not proof of production ingestion.
 
 The existing `scripts/analytics-journey-audit.mjs` now also asserts session/browser/device/viewport context and includes an iPhone-emulated use-case journey. All PostHog, Google Tag Manager and Google Analytics traffic is intercepted. It checks one pageview per navigation, no GA loading before intent, counted click/copy events, privacy with sensitive fixture values, bounded external navigation, and preserved client navigation. Mobile emulation runs in Chromium; it is not a test on physical iOS Safari.
 

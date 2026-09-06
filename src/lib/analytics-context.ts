@@ -1,6 +1,9 @@
 // Values fall back to this document's memory when storage is restricted.
 const memory = new Map<string, string>();
+const failedWrites = new Set<string>();
 export function safeLocalStorageGet(key: string) {
+  // A readable persisted value may be stale after a quota/write failure.
+  if (failedWrites.has(key)) return memory.get(key) ?? null;
   try {
     return window.localStorage.getItem(key) ?? memory.get(key) ?? null;
   } catch {
@@ -11,7 +14,9 @@ export function safeLocalStorageSet(key: string, value: string) {
   memory.set(key, value);
   try {
     window.localStorage.setItem(key, value);
+    failedWrites.delete(key);
   } catch {
+    failedWrites.add(key);
     // Never break a user journey because analytics storage is unavailable.
   }
 }

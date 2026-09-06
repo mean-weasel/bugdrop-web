@@ -14,7 +14,7 @@ Integrated branch: `codex/bugdrop-homepage-september`, based on production commi
 
 ## Attempts to disprove the result
 
-- 246 unit tests pass across 28 files, including outgoing analytics payloads and a regression that compiles the real Userback MDX through Next's Rust compiler.
+- 247 unit tests pass across 28 files, including outgoing analytics payloads and a regression that compiles the real Userback MDX through Next's Rust compiler.
 - Enabled homepage browser suite: 28 passed, 26 conditionally skipped. Desktop/mobile checks cover keyboard launch and focus restoration, duplicate-runtime prevention, local submissions, error/retry behavior, delayed loads, and navigation cleanup. A separate feature-disabled check passed, confirming the hero still opens Classic and reuses its runtime.
 - Production build passes. Repository lint exits successfully with 0 errors and 1,305 warnings from existing vendored widget bundles. Final changed-file lint passes without warnings.
 - Chrome visual inspection: homepage at 1668px, 390px, and 320px; no document horizontal overflow. Both edited use-case routes inspected at desktop and 390px. The illustrative mobile image loads and fits its content area.
@@ -26,7 +26,7 @@ Integrated branch: `codex/bugdrop-homepage-september`, based on production commi
 
 This is a local review build, not a deployment. Local analytics keys are unset; demo submissions use the vendored local runtime and local endpoints.
 
-The docs mirror references canonical widget commit `61d938379b03cd7baacfe37e5a7726598833b6a1`, prepared in the sibling `widget-docs` checkout. That source commit is still local: publish/review/land it before releasing the website documentation sync, then refresh the receipt if the upstream SHA changes.
+The docs mirror references canonical widget commit `61d938379b03cd7baacfe37e5a7726598833b6a1`, prepared in the sibling `widget-docs` checkout. That source commit is published in draft [widget PR #362](https://github.com/mean-weasel/bugdrop/pull/362): land it before releasing the website documentation sync, then refresh the receipt if the upstream SHA changes.
 
 After an eventual release, inspect actual PostHog ingestion and compare only the new measurement version. Historical “Automation” classification remains unresolved. Marketplace clicks do not prove installations; completed installation and first real issue measurement require backend outcome events.
 
@@ -38,3 +38,11 @@ The widget's internal screenshot zoom/redaction controls were not changed in thi
 - [Mobile homepage](homepage-mobile.png)
 - [Mobile feedback chooser](flows-mobile.png)
 - [Mobile visual-reporting example](visual-reporting-mobile.png)
+
+## Pre-PR review follow-up
+
+Independent correctness, tests, silent-failure, contracts/types, and documentation reviewers checked both prepared changes where applicable. The upstream source also received its required simplification pass. One finding was independently validated: readable browser storage with failing writes reused an expired persisted session instead of its in-memory replacement, giving consecutive events different session IDs.
+
+The regression failed before the fix and passes afterward. The fix keeps memory authoritative for a key after a failed write, retries writes on subsequent updates, and resumes persisted reads after recovery. The test also proves other-tab session changes are visible once writes recover. An independent follow-up found no concrete defect; all 19 analytics tests, all 247 unit tests, TypeScript, and changed-file lint pass.
+
+Native `codex review --base origin/main` was attempted for both repositories but failed because the installed CLI does not support its configured model. This native-review gap remains open before merge. No merges or deployments were performed.

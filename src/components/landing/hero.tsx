@@ -26,7 +26,7 @@ export async function Hero() {
       </div>
       <ProductPreview />
       <div className="hero-proof">
-        <a href={MARKETPLACE_URL} target="_blank" rel="noopener noreferrer" data-analytics-event="outbound_marketplace_click" data-analytics-label="133+ GitHub App installs"><strong>133+</strong><span>GitHub App installs</span></a>
+        <a href={MARKETPLACE_URL} target="_blank" rel="noopener noreferrer" data-analytics-event="outbound_marketplace_click" data-analytics-label="140+ GitHub App installs"><strong>140+</strong><span>GitHub App installs</span></a>
         <div><strong>{feedbackIssuesDisplay}</strong><span>Feedback issues created</span></div>
         <a href={`${PRODUCT_HUNT_URL}?utm_source=homepage-proof&utm_medium=website&utm_campaign=bugdrop-2`} data-analytics-event="outbound_product_hunt_click" data-analytics-label="#6 Product of the Day" target="_blank" rel="noopener noreferrer" aria-label="BugDrop was the number 6 Product of the Day on Product Hunt"><strong>#6</strong><span>Product of the Day</span></a>
         <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" className="hero-source">Explore the source <ArrowUpRight size={14} aria-hidden="true" /></a>

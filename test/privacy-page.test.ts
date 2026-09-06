@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 
 const approvedPolicyHash =
-  "200a804728e3b16c76eeeb88a1fc4cd33a4b07bb3b1b267647444244a07f4b90";
+  "e37f4372b1202a3c02b528aef48422893566cb477e0c0dcb83e3c396fb17a360";
 
 describe("privacy page", () => {
   it("publishes the approved policy as a first-party route", async () => {
@@ -14,8 +14,22 @@ describe("privacy page", () => {
     expect(page).toContain("<PrivacyPolicy />");
     expect(policy).toContain("# Privacy Policy");
     expect(policy).toContain("## Installation Information");
+    expect(policy).toContain(
+      "best-effort, unrounded per-installation count of successful GitHub",
+    );
     expect(policy).toMatch(
-      /BugDrop does not\s+currently retain per-installation feedback counts or last-active dates\./,
+      /The count begins when this collection is\s+enabled/,
+    );
+    expect(policy).toMatch(
+      /anonymous aggregate counter and each\s+installation counter retain up to 1,024 recent random identifiers/,
+    );
+    expect(policy).toMatch(
+      /deletion guard derived from the GitHub App installation\s+ID/,
+    );
+    expect(policy).toContain("The guard contains only an expiry time");
+    expect(policy).toContain("deleted when the app is uninstalled");
+    expect(policy).not.toContain(
+      "does not currently retain per-installation feedback counts",
     );
     expect(policy).toContain("## App Names, Logos, Links, and Testimonials");
     expect(policy).toContain("privacy@bugdrop.dev");

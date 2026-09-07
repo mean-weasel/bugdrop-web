@@ -29,3 +29,27 @@ promise query values are absent from provider operational logs.
    page, the guide is accessible, and opening an email draft does not send it.
 
 Reference: https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/about-the-setup-url
+
+## Opt-in follow-up email
+
+Gmail template name: `BugDrop - opt-in follow-up`
+
+Use only after someone explicitly opts in. Send from the inbox receiving the
+privacy alias. Keep individual replies and consent evidence private, not in Git.
+Before featuring anyone, show them the exact name, app link, logo, and quote to
+be published and obtain separate approval. This template is not that approval.
+
+Subject: How's BugDrop working for you?
+
+Hi,
+
+Thanks for offering to share your experience!
+
+What app or site are you using BugDrop on, and how has it helped? A link and a
+sentence or two would be great. Anything we could improve?
+
+We won't publish your name, app, or words without showing you exactly what we'd
+feature and getting your approval first.
+
+Thanks,
+Jeremy

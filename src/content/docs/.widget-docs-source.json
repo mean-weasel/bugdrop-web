@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceRepository": "mean-weasel/bugdrop",
-  "sourceRevision": "61d938379b03cd7baacfe37e5a7726598833b6a1",
+  "sourceRevision": "d4099ccf449f73e92b3e63d4a09774284bfd6a8a",
   "files": [
     {
       "source": "docs/website/ci-testing.mdx",
@@ -11,7 +11,7 @@
     {
       "source": "docs/website/configuration.mdx",
       "target": "src/content/docs/configuration.mdx",
-      "sha256": "e212c7867012c4f35bc2618a16a01f51da8cb63ff2c73ca4d826043a178c7e27"
+      "sha256": "95d00c08c14c89ad94207f548c6a81d3f14f407d4bea5bd443fc90ab19657621"
     },
     {
       "source": "docs/website/custom-flows.mdx",
@@ -91,7 +91,7 @@
     {
       "source": "docs/website/security.mdx",
       "target": "src/content/docs/security.mdx",
-      "sha256": "826208cb1c934cb65222eded843edd7ab9fc3c166712515660587a475feb3091"
+      "sha256": "c5c4795f03a4eaa6d2bae4f8fcfa478f9056aab3a4a4f0556cabc773b34d9b60"
     },
     {
       "source": "docs/website/self-hosting.mdx",
